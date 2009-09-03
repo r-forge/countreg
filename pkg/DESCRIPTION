@@ -2,9 +2,9 @@ Package: countreg
 Version: 0.0-1
 Date: 2009-08-25
 Title: Count Data Regression
-Author: Dominique Cueni, Christian Kleiber
+Author: Dominique Cueni, Christian Kleiber, Achim Zeileis
 Maintainer: Christian Kleiber <Christian.Kleiber@unibas.ch>
-Description: Generalized count data regression
+Description: Generalized count data regression.
 LazyLoad: yes
 Depends: R (>= 2.8.0), stats, AER, MASS, pscl, gamlss
 Suggests: foreign, lattice
