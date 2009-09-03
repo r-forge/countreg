@@ -1,5 +1,6 @@
 \name{zerotrunc}
 \alias{zerotrunc}
+\alias{print.zerotrunc}
 
 \title{Zero-Truncated Count Data Regression}
 
@@ -117,13 +118,13 @@ URL \url{http://www.jstatsoft.org/v27/i08/}.
 
 \seealso{\code{\link{zerotrunc.control}}, \code{\link[stats]{glm}},
   \code{\link[stats]{glm.fit}}, \code{\link[MASS]{glm.nb}},
-  \code{\link{zeroinfl}, \code\link{hurdle}}}
+  \code{\link[pscl]{zeroinfl}}, \code{\link[pscl]{hurdle}}
 }
 
 \examples{
 ## data
 data("bioChemists", package = "pscl")
-bc <- subst(bioChemists, subset = art > 0)
+bc <- subset(bioChemists, subset = art > 0)
 
 ## poisson
 zt_p <- zerotrunc(art ~ ., data = bc)

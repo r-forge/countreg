@@ -57,6 +57,9 @@ Riphahn, R., Wambach, A. and Million, A. (2003). Incentive Effects in the Demand
 
 \examples{
 data("GSOEP")
+
+if(exists("nbp.u") & exists("nbp.o")) {
+
 # We fit an NB1, an NB2 and an NBP model as in Greene (2007) ...
 model.u <- docvis ~ age + I(age^2) + hsat + handdum + handper + married + educ + 
            hhninc + hhkids + self + civil + bluec + working + public + addon + year
@@ -76,6 +79,8 @@ model.o <- docvis ~ age + I(age^2) + hsat + handdum + handper + married + educ +
 
 # visualization of the fit
 # plot(fm.nbp.o)
+
+}
 }
 
 \keyword{datasets}

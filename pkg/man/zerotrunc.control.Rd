@@ -46,7 +46,7 @@ zerotrunc.control(method = "BFGS", maxit = 10000, start = NULL, \dots)
 
 \examples{
 data("bioChemists", package = "pscl")
-bc <- subst(bioChemists, subset = art > 0)
+bc <- subset(bioChemists, subset = art > 0)
 
 ## default start values
 zt_nb <- zerotrunc(art ~ fem + ment, data = bc, dist = "negbin")

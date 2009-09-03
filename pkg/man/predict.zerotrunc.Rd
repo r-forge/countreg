@@ -67,7 +67,7 @@
 
 \examples{
 data("bioChemists", package = "pscl")
-bc <- subst(bioChemists, subset = art > 0)
+bc <- subset(bioChemists, subset = art > 0)
 fm <- zerotrunc(art ~ ., data = bc, dist = "negbin")
 
 plot(residuals(fm, type = "deviance") ~ fitted(fm))
