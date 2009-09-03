@@ -1,9 +1,3 @@
-## hurdle/zeroinfl todo:
-##   print methods
-##   deviance residuals
-##   weights in residuals
-##   object$weights = 0 for rep(1, n)
-
 zerotrunc <- function(formula, data, subset, na.action, weights, offset,
                       dist = c("poisson", "negbin", "geometric"), theta = Inf,
 	   	      control = zerotrunc.control(...),
