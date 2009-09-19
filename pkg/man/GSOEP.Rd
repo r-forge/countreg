@@ -40,7 +40,7 @@ several personal socioeconomic details. These data were first used by Riphahn, W
 }
 
 \details{
-As noted by Greene (2007) there are 40 observations on \code{hsat} taking on values between 6 and 7 although the variable is supposed to be an integer. For three other variables similar problems occur: By construction, \code{handdum} should be a dummy variable but there are 18 observations taking on values between 0 and 1. Also, for \code{handper} 3,290 observations are not integer-valued. Finally, the precision of 148 values of \code{educ} is very suspicious.
+As noted by Greene (2007), there are 40 observations on \code{hsat} taking on values between 6 and 7 although the variable is supposed to be an integer. For three other variables similar problems occur: By construction, \code{handdum} should be a dummy variable but there are 18 observations taking on values between 0 and 1. Also, for \code{handper} 3,290 observations are not integer-valued. Finally, the precision of 148 values of \code{educ} is very suspicious.
 }
 
 \source{

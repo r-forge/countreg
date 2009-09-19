@@ -1,6 +1,6 @@
 Package: countreg
 Version: 0.0-1
-Date: 2009-08-25
+Date: 2009-09-03
 Title: Count Data Regression
 Author: Dominique Cueni, Christian Kleiber, Achim Zeileis
 Maintainer: Christian Kleiber <Christian.Kleiber@unibas.ch>
