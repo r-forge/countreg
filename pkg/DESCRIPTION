@@ -8,7 +8,7 @@ Description: Regression models for count data, including zero-inflated,
              zero-truncated, and hurdle models as well as generalized count
              data regression.
 LazyLoad: yes
-Depends: R (>= 2.8.0), stats, AER, MASS, pscl, gamlss
-Suggests: foreign, lattice
+Depends: R (>= 2.8.0), stats, MASS
+Suggests: foreign, lattice, AER, pscl, gamlss, lmtest
 Imports: stats
 License: GPL-2
