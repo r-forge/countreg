@@ -1,6 +1,5 @@
 \name{GSOEP}
 \alias{GSOEP}
-\docType{data}
 
 \title{Data from the German Socioeconomic Panel (GSOEP)}
 
@@ -14,28 +13,28 @@ several personal socioeconomic details. These data were first used by Riphahn, W
 \format{
   A data frame with 27,326 observations on the following 22 variables.
   \describe{
-    \item{\code{id}}{identification number indicating 1 to 7 observations for each of the 7,293 cases.}
-    \item{\code{female}}{factor indicating whether a person is female (\code{yes} or \code{no}).}
-    \item{\code{year}}{factor giving the calendar year of the observation.}
-    \item{\code{age}}{age in years.}
-    \item{\code{hsat}}{personal health satisfaction judged on a scale from 0 (low) to 10 (high). See \emph{Details}.}
-    \item{\code{handdum}}{dummy variable indicating whether a person is handicapped (\code{=1}) or not (\code{=0}). See \emph{Details}.}
-    \item{\code{handper}}{degree of handicap expressed in percent from 0 to 100. See \emph{Details}.}
-    \item{\code{hhninc}}{monthly household net income in 1'000 German marks.}
-    \item{\code{hhkids}}{factor indicating whether a household has kids below the age of 16 (\code{yes} or \code{no}).}
-    \item{\code{educ}}{years of schooling. See \emph{Details}.}
-    \item{\code{married}}{factor indicating whether a person is married (\code{yes} or \code{no}).}
-    \item{\code{school}}{factor giving the highest schooling degree. \code{haupt} for Hauptschule, \code{real} for Realschule, \code{fach} for Fachschule and \code{abitur} for Gymnasium.}
-    \item{\code{univ}}{factor indicating whether a person has a university diploma (\code{yes} or \code{no}).}
-    \item{\code{working}}{factor indicating whether a person is employed (\code{yes} or \code{no}).}
-    \item{\code{bluec}}{factor indicating whether a person is a blue collar worker (\code{yes} or \code{no}).}
-    \item{\code{whitec}}{factor indicating whether a person is a white collar worker (\code{yes} or \code{no}).}
-    \item{\code{self}}{factor indicating whether a person is self employed (\code{yes} or \code{no}).}
-    \item{\code{civil}}{factor indicating whether a person is a civil servant (\code{yes} or \code{no}).}
-    \item{\code{docvis}}{number of doctor visits within the last three months.}
-    \item{\code{hospvis}}{number of hospital visits within the last calendar year.}
-    \item{\code{public}}{factor indicating whether a person is insured in public health insurance (\code{yes} or \code{no}).}
-    \item{\code{addon}}{factor indicating whether a person is insured in add-on insurance (\code{yes} or \code{no}).}
+    \item{id}{identification number indicating 1 to 7 observations for each of the 7,293 cases.}
+    \item{female}{factor indicating whether a person is female (\code{yes} or \code{no}).}
+    \item{year}{factor giving the calendar year of the observation.}
+    \item{age}{age in years.}
+    \item{hsat}{personal health satisfaction judged on a scale from 0 (low) to 10 (high). See \emph{Details}.}
+    \item{handdum}{dummy variable indicating whether a person is handicapped (\code{=1}) or not (\code{=0}). See \emph{Details}.}
+    \item{handper}{degree of handicap expressed in percent from 0 to 100. See \emph{Details}.}
+    \item{hhninc}{monthly household net income in 1'000 German marks.}
+    \item{hhkids}{factor indicating whether a household has kids below the age of 16 (\code{yes} or \code{no}).}
+    \item{educ}{years of schooling. See \emph{Details}.}
+    \item{married}{factor indicating whether a person is married (\code{yes} or \code{no}).}
+    \item{school}{factor giving the highest schooling degree. \code{haupt} for Hauptschule, \code{real} for Realschule, \code{fach} for Fachschule and \code{abitur} for Gymnasium.}
+    \item{univ}{factor indicating whether a person has a university diploma (\code{yes} or \code{no}).}
+    \item{working}{factor indicating whether a person is employed (\code{yes} or \code{no}).}
+    \item{bluec}{factor indicating whether a person is a blue collar worker (\code{yes} or \code{no}).}
+    \item{whitec}{factor indicating whether a person is a white collar worker (\code{yes} or \code{no}).}
+    \item{self}{factor indicating whether a person is self employed (\code{yes} or \code{no}).}
+    \item{civil}{factor indicating whether a person is a civil servant (\code{yes} or \code{no}).}
+    \item{docvis}{number of doctor visits within the last three months.}
+    \item{hospvis}{number of hospital visits within the last calendar year.}
+    \item{public}{factor indicating whether a person is insured in public health insurance (\code{yes} or \code{no}).}
+    \item{addon}{factor indicating whether a person is insured in add-on insurance (\code{yes} or \code{no}).}
   }
 }
 
