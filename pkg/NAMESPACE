@@ -1,0 +1,57 @@
+importFrom("MASS", "glm.nb")
+importFrom("stats", "logLik")
+
+export(
+  "hurdle",
+  "hurdle.control",
+  "hurdletest",
+
+  "zeroinfl",
+  "zeroinfl.control",
+  
+  "zerotrunc",
+  "zerotrunc.control"
+)
+
+## methods for class zeroinfl
+S3method("print", "zeroinfl")
+S3method("print", "summary.zeroinfl")
+S3method("summary", "zeroinfl")
+S3method("coef", "zeroinfl")
+S3method("vcov", "zeroinfl")
+S3method("logLik", "zeroinfl")
+S3method("predict", "zeroinfl")
+S3method("residuals", "zeroinfl")
+S3method("fitted", "zeroinfl")
+S3method("terms", "zeroinfl")
+S3method("model.matrix", "zeroinfl")
+S3method("extractAIC", "zeroinfl")
+
+## methods for class hurdle
+S3method("print", "hurdle")
+S3method("print", "summary.hurdle")
+S3method("summary", "hurdle")
+S3method("coef", "hurdle")
+S3method("vcov", "hurdle")
+S3method("logLik", "hurdle")
+S3method("predict", "hurdle")
+S3method("residuals", "hurdle")
+S3method("fitted", "hurdle")
+S3method("terms", "hurdle")
+S3method("model.matrix", "hurdle")
+S3method("extractAIC", "hurdle")
+
+## methods for class zerotrunc
+S3method("print", "zerotrunc")
+S3method("print", "summary.zerotrunc")
+S3method("summary", "zerotrunc")
+S3method("coef", "zerotrunc")
+S3method("vcov", "zerotrunc")
+S3method("logLik", "zerotrunc")
+S3method("predict", "zerotrunc")
+S3method("residuals", "zerotrunc")
+S3method("fitted", "zerotrunc")
+S3method("terms", "zerotrunc")
+S3method("model.frame", "zerotrunc")
+S3method("model.matrix", "zerotrunc")
+S3method("extractAIC", "zerotrunc")

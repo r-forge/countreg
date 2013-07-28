@@ -1,14 +1,15 @@
 Package: countreg
-Version: 0.0-1
-Date: 2009-09-03
+Version: 0.1-0
+Date: 2013-07-28
 Title: Count Data Regression
-Author: Dominique Cueni, Christian Kleiber, Achim Zeileis
-Maintainer: Christian Kleiber <Christian.Kleiber@unibas.ch>
+Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org"),
+             person(given = "Christian", family = "Kleiber", role = "aut", email = "Christian.Kleiber@unibas.ch"),
+             person(given = "Dominique", family = "Cueni", role = "ctb"))
 Description: Regression models for count data, including zero-inflated,
              zero-truncated, and hurdle models as well as generalized count
              data regression.
 LazyLoad: yes
 Depends: R (>= 2.10.0), stats, MASS
-Suggests: foreign, lattice, AER, pscl, gamlss, lmtest
+Suggests: AER, car, gamlss, lmtest, pscl, sandwich
 Imports: stats
 License: GPL-2

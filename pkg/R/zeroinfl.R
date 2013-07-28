@@ -1,5 +1,5 @@
 zeroinfl <- function(formula, data, subset, na.action, weights, offset,
-                     dist = c("poisson", "negbin", "geometric", "binomial"),
+                     dist = c("poisson", "negbin", "geometric"),
                      link = c("logit", "probit", "cloglog", "cauchit", "log"),
 		     control = zeroinfl.control(...),
 		     model = TRUE, y = TRUE, x = FALSE, ...)
@@ -38,22 +38,6 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
   }
   
   ziGeom <- function(parms) ziNegBin(c(parms, 0))
-
-  ## set up likelihood
-  ziBinomial <- function(parms) {
-    ## count mean
-    mu <- as.vector(linkinv(X %*% parms[1:kx]))
-    ## binary mean
-    phi <- as.vector(linkinv(Z %*% parms[(kx+1):(kx+kz)]))
-    
-    ## log-likelihood for y = 0 and y >= 1
-    loglik0 <- log(phi + exp(log(1-phi) + dbinom(x=0, size=size, prob=mu, log=TRUE)))
-    loglik1 <- log(1-phi) + dbinom(x=Y, size=size, prob=mu, log=TRUE)
-    
-    ## collect and return
-    loglik <- sum(weights[Y0] * loglik0[Y0]) + sum(weights[Y1] * loglik1[Y1])
-    loglik
-  }
 
   gradPoisson <- function(parms) {
     ## count mean
@@ -122,42 +106,16 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
 
     colSums(cbind(wres_count * weights * X, wres_zero * weights * Z, wres_theta))
   }
-
-  gradBinomial <- function(parms) {
-    ## count mean
-    eta <- as.vector(X %*% parms[1:kx])
-    mu <- linkinv(eta)
-    ## binary mean
-    etaz <- as.vector(Z %*% parms[(kx+1):(kx+kz)])
-    muz <- linkinv(etaz)
-  
-    ## densities at 0
-    clogdens0 <- dbinom(0, size=size, prob=mu, log=TRUE)
-    dens0 <- muz * (1 - as.numeric(Y1)) + exp(log(1-muz) + clogdens0)
-
-    ## working residuals
-    ## ToDo: wres_count needs to be properly modified!!!
-    wres_count <- ifelse(Y1, Y - mu * (Y+1)/(mu+1), -exp(-log(dens0) + log(1-muz) + clogdens0 - log(mu+1) + log(mu)))
-    wres_zero  <- ifelse(Y1, -1/(1-muz) * linkobj$mu.eta(etaz), 
-                             (linkobj$mu.eta(etaz) - exp(clogdens0) * linkobj$mu.eta(etaz))/dens0)
-     
-    colSums(cbind(wres_count * weights * X, wres_zero * weights * Z))
-  }
-  ## set it to NULL until wres_count is figured out!!!
-  ##   --> optim() will consequently use finite-difference approximation for gradients
-  gradBinomial <- NULL
-
+    
   dist <- match.arg(dist)
   loglikfun <- switch(dist,
                       "poisson" = ziPoisson,
 		      "geometric" = ziGeom,
-		      "negbin" = ziNegBin,
-			  "binomial" = ziBinomial)
+		      "negbin" = ziNegBin)
   gradfun <- switch(dist,
                       "poisson" = gradPoisson,
 		      "geometric" = gradGeom,
-		      "negbin" = gradNegBin,
-			  "binomial" = gradBinomial)
+		      "negbin" = gradNegBin)
 
   ## binary link processing
   linkstr <- match.arg(link)
@@ -165,8 +123,9 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
   linkinv <- linkobj$linkinv
 
   if(control$trace) cat("Zero-inflated Count Model\n",
-    paste("count model:", dist, "with", ifelse(dist == "binomial", linkstr, log), "link\n"),
+    paste("count model:", dist, "with log link\n"),
     paste("zero-inflation model: binomial with", linkstr, "link\n"), sep = "")
+	     
   
   ## call and formula
   cl <- match.call()
@@ -192,7 +151,7 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
     ffz <- ffc <- ff <- formula
     ffz[[2]] <- NULL
   }
-  if(length(grep("in formula and no", try(terms(ffz), silent = TRUE), fixed = TRUE)) > 0) {
+  if(inherits(try(terms(ffz), silent = TRUE), "try-error")) {
     ffz <- eval(parse(text = sprintf( paste("%s -", deparse(ffc[[2]])), deparse(ffz) )))
   }
 
@@ -201,17 +160,14 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
   mf <- eval(mf, parent.frame())
   
   ## extract terms, model matrices, response
-  mt <- terms(formula, data = data)
+  mt <- attr(mf, "terms")
   mtX <- terms(ffc, data = data)
   X <- model.matrix(mtX, mf)
   mtZ <- terms(ffz, data = data)
   mtZ <- terms(update(mtZ, ~ .), data = data)
   Z <- model.matrix(mtZ, mf)
   Y <- model.response(mf, "numeric")
-  if(dist == "binomial") { ## ToDo: how is this done in glm()?
-    size <- rowSums(Y)
-    Y <- Y[, 1]
-  }
+
 
   ## sanity checks
   if(length(Y) < 1) stop("empty model")
@@ -284,11 +240,7 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
   
   if(is.null(start)) {
     if(control$trace) cat("generating starting values...")
-    if(dist %in% c("poisson", "negbin", "geometric")) {
-      model_count <- glm.fit(X, Y, family = poisson(), weights = weights, offset = offsetx)
-    } else { ## binomial
-      model_count <- glm.fit(X, cbind(Y1, size), family = binomial(link=linkstr), weights = weights)
-    }
+    model_count <- glm.fit(X, Y, family = poisson(), weights = weights, offset = offsetx)
     model_zero <- glm.fit(Z, as.integer(Y0), weights = weights, family = binomial(link = linkstr), offset = offsetz)
     start <- list(count = model_count$coefficients, zero = model_zero$coefficients)
     if(dist == "negbin") start$theta <- 1
@@ -377,12 +329,9 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
       }
     }
 
-    if(control$EM & dist == "binomial") {
-      stop("EM estimation of starting values not available")
-    }
-
     if(control$trace) cat("done\n")
   }
+
 
   ## ML estimation
   if(control$trace) cat("calling optim() for ML estimation:\n")
@@ -415,11 +364,7 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
                                     paste("zero",  colnames(Z), sep = "_"))
 
   ## fitted and residuals
-  if(dist != "binomial") {
-    mu <- exp(X %*% coefc + offsetx)[,1]
-  } else {
-    mu <- linkinv(X %*% coefc)[,1]
-  }
+  mu <- exp(X %*% coefc + offsetx)[,1]
   phi <- linkinv(Z %*% coefz + offsetz)[,1]
   Yhat <- (1-phi) * mu
   res <- sqrt(weights) * (Y - Yhat)
@@ -509,8 +454,7 @@ print.zeroinfl <- function(x, digits = max(3, getOption("digits") - 3), ...)
   if(!x$converged) {
     cat("model did not converge\n")
   } else {
-    cat(paste("Count model coefficients (", x$dist, " with ", 
-              ifelse(x$dist != "binomial", "log", x$link), " link):\n", sep = "")) ## ToDo
+    cat(paste("Count model coefficients (", x$dist, " with log link):\n", sep = ""))
     print.default(format(x$coefficients$count, digits = digits), print.gap = 2, quote = FALSE)
     if(x$dist == "negbin") cat(paste("Theta =", round(x$theta, digits), "\n"))
   
@@ -566,8 +510,7 @@ print.summary.zeroinfl <- function(x, digits = max(3, getOption("digits") - 3), 
     print(structure(quantile(x$residuals),
       names = c("Min", "1Q", "Median", "3Q", "Max")), digits = digits, ...)  
 
-    cat(paste("Count model coefficients (", x$dist, " with ", 
-              ifelse(x$dist != "binomial", "log", x$link), " link):\n", sep = "")) ## ToDo
+    cat(paste("\nCount model coefficients (", x$dist, " with log link):\n", sep = ""))
     printCoefmat(x$coefficients$count, digits = digits, signif.legend = FALSE)
   
     cat(paste("\nZero-inflation model coefficients (binomial with ", x$link, " link):\n", sep = ""))
@@ -585,7 +528,7 @@ print.summary.zeroinfl <- function(x, digits = max(3, getOption("digits") - 3), 
 }
 
 predict.zeroinfl <- function(object, newdata, type = c("response", "prob", "count", "zero"),
-  na.action = na.pass, ...)
+  na.action = na.pass, at = NULL, ...)
 {
     type <- match.arg(type)
 
@@ -604,11 +547,7 @@ predict.zeroinfl <- function(object, newdata, type = c("response", "prob", "coun
 	}
 	offsetx <- if(is.null(object$offset$count)) rep.int(0, NROW(X)) else object$offset$count
 	offsetz <- if(is.null(object$offset$zero))  rep.int(0, NROW(Z)) else object$offset$zero
-        if(object$dist != "binomial") {
-          mu <- exp(X %*% object$coefficients$count + offsetx)[,1]
-        } else {
-          mu <- object$linkinv(X %*% object$coefficients$count)[,1]
-        }
+        mu <- exp(X %*% object$coefficients$count + offsetx)[,1]
         phi <- object$linkinv(Z %*% object$coefficients$zero + offsetz)[,1]
       }
     } else {
@@ -621,11 +560,7 @@ predict.zeroinfl <- function(object, newdata, type = c("response", "prob", "coun
       if(is.null(offsetz)) offsetz <- rep.int(0, NROW(Z))
       if(!is.null(object$call$offset)) offsetx <- offsetx + eval(object$call$offset, newdata)
 
-      if(object$dist != "binomial") {
-        mu <- exp(X %*% object$coefficients$count + offsetx)[,1]
-      } else {
-        mu <- object$linkinv(X %*% object$coefficients$count)[,1]
-      }
+      mu <- exp(X %*% object$coefficients$count + offsetx)[,1]
       phi <- object$linkinv(Z %*% object$coefficients$zero + offsetz)[,1]
       rval <- (1-phi) * mu
     }
@@ -640,7 +575,7 @@ predict.zeroinfl <- function(object, newdata, type = c("response", "prob", "coun
         else if(!is.null(object$model)) y <- model.response(object$model)
 	else stop("predicted probabilities cannot be computed for fits with y = FALSE and model = FALSE")
 
-      yUnique <- min(y):max(y)
+      yUnique <- if(is.null(at)) 0:max(y) else at
       nUnique <- length(yUnique)
       rval <- matrix(NA, nrow = length(rval), ncol = nUnique)
       dimnames(rval) <- list(rownames(X), yUnique)
@@ -658,12 +593,8 @@ predict.zeroinfl <- function(object, newdata, type = c("response", "prob", "coun
 	     "geometric" = {
                rval[, 1] <- phi + (1-phi) * dnbinom(0, mu = mu, size = 1)
                for(i in 2:nUnique) rval[,i] <- (1-phi) * dnbinom(yUnique[i], mu = mu, size = 1)
-             },
-             "binomial" = { 
-               rval[, 1] <- phi + (1-phi) * dbinom(0, prob = mu, size = size)
-               for(i in 2:nUnique) rval[,i] <- (1-phi) * dbinom(yUnique[i], prob = mu, size = size)
-	     }) ## ToDo: where can we get size here - should we store it in the model object? How is this
-    }       ##       done in glm()
+	     })
+    }
    
     rval
 }
@@ -689,8 +620,7 @@ residuals.zeroinfl <- function(object, type = c("pearson", "response"), ...) {
     theta1 <- switch(object$dist,
       "poisson" = 0,
       "geometric" = 1,
-      "negbin" = 1/object$theta,
-      "binomial" = 0) ## ToDo: is this line and line bellow OK, what about size?
+      "negbin" = 1/object$theta)
     vv <- object$fitted.values * (1 + (phi + theta1) * mu)
     return(res/sqrt(vv))  
   })

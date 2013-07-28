@@ -1,0 +1,4 @@
+Changes in Version 0.1-0
+
+  o Ported zeroinfl() and hurdle() along with corresponding vignette
+    from "pscl" to "countreg".
