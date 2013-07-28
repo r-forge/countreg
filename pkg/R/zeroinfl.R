@@ -1,7 +1,8 @@
 zeroinfl <- function(formula, data, subset, na.action, weights, offset,
-                     dist = c("poisson", "negbin", "geometric"),
+                     dist = c("poisson", "negbin", "geometric", "binomial"),
                      link = c("logit", "probit", "cloglog", "cauchit", "log"),
 		     control = zeroinfl.control(...),
+		     size = NULL,
 		     model = TRUE, y = TRUE, x = FALSE, ...)
 {
   ## set up likelihood
@@ -39,6 +40,21 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
   
   ziGeom <- function(parms) ziNegBin(c(parms, 0))
 
+  ziBinom <- function(parms) {
+    ## count mean
+    mu <- size * as.vector(linkinv(X %*% parms[1:kx] + offsetx))
+    ## binary mean
+    phi <- as.vector(linkinv(Z %*% parms[(kx+1):(kx+kz)] + offsetz))
+    
+    ## log-likelihood for y = 0 and y >= 1
+    loglik0 <- log( phi + exp( log(1-phi) + dbinom(0, prob = mu/size, size = size, log = TRUE) ) )
+    loglik1 <- log(1-phi) + dbinom(Y, prob = mu/size, size = size, log = TRUE)
+    
+    ## collect and return
+    loglik <- sum(weights[Y0] * loglik0[Y0]) + sum(weights[Y1] * loglik1[Y1])
+    loglik
+  }
+  
   gradPoisson <- function(parms) {
     ## count mean
     eta <- as.vector(X %*% parms[1:kx] + offsetx)
@@ -107,15 +123,38 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
     colSums(cbind(wres_count * weights * X, wres_zero * weights * Z, wres_theta))
   }
     
+  gradBinom <- function(parms) {
+    ## count mean
+    eta <- as.vector(X %*% parms[1:kx] + offsetx)
+    mu <- size * linkinv(eta)
+    ## binary mean
+    etaz <- as.vector(Z %*% parms[(kx+1):(kx+kz)] + offsetz)
+    muz <- linkinv(etaz)
+
+    ## densities at 0
+    clogdens0 <- dbinom(0, prob = mu/size, size = size, log = TRUE)
+    dens0 <- muz * (1 - as.numeric(Y1)) + exp(log(1 - muz) + clogdens0)
+
+    ## working residuals  
+    wres_count <- ifelse(Y1, Y - mu * (Y + 1)/(mu + 1), -exp(-log(dens0) +
+      log(1 - muz) + clogdens0 - log(mu + 1) + log(mu)))
+    wres_zero <- ifelse(Y1, -1/(1-muz) * linkobj$mu.eta(etaz),
+      (linkobj$mu.eta(etaz) - exp(clogdens0) * linkobj$mu.eta(etaz))/dens0)
+      
+    colSums(cbind(wres_count * weights * X, wres_zero * weights * Z))
+  }
+
   dist <- match.arg(dist)
   loglikfun <- switch(dist,
                       "poisson" = ziPoisson,
 		      "geometric" = ziGeom,
-		      "negbin" = ziNegBin)
+		      "negbin" = ziNegBin,
+		      "binomial" = ziBinom)
   gradfun <- switch(dist,
                       "poisson" = gradPoisson,
 		      "geometric" = gradGeom,
-		      "negbin" = gradNegBin)
+		      "negbin" = gradNegBin,
+		      "binomial" = gradBinom)
 
   ## binary link processing
   linkstr <- match.arg(link)
@@ -123,7 +162,7 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
   linkinv <- linkobj$linkinv
 
   if(control$trace) cat("Zero-inflated Count Model\n",
-    paste("count model:", dist, "with log link\n"),
+    paste("count model:", dist, "with",  if(dist == "binomial") linkstr else "log", "link\n"),
     paste("zero-inflation model: binomial with", linkstr, "link\n"), sep = "")
 	     
   
@@ -168,7 +207,6 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
   Z <- model.matrix(mtZ, mf)
   Y <- model.response(mf, "numeric")
 
-
   ## sanity checks
   if(length(Y) < 1) stop("empty model")
   if(all(Y > 0)) stop("invalid dependent variable, minimum count is not zero")  
@@ -177,6 +215,12 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
   Y <- as.integer(round(Y + 0.001))
   if(any(Y < 0)) stop("invalid dependent variable, negative counts")
   
+  ## size of binomial experiments
+  if(dist == "binomial") {
+    if(is.null(size)) size <- max(Y)
+    stopifnot(all(Y <= size))
+  }
+
   if(control$trace) {
     cat("dependent variable:\n")
     tab <- table(factor(Y, levels = 0:max(Y)), exclude = NULL)
@@ -240,7 +284,11 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
   
   if(is.null(start)) {
     if(control$trace) cat("generating starting values...")
-    model_count <- glm.fit(X, Y, family = poisson(), weights = weights, offset = offsetx)
+    model_count <- if(dist == "binomial") {
+      glm.fit(X, cbind(Y, size - Y), family = binomial(link = linkstr), weights = weights, offset = offsetx)
+    } else {
+      glm.fit(X, Y, family = poisson(), weights = weights, offset = offsetx)
+    }
     model_zero <- glm.fit(Z, as.integer(Y0), weights = weights, family = binomial(link = linkstr), offset = offsetz)
     start <- list(count = model_count$coefficients, zero = model_zero$coefficients)
     if(dist == "negbin") start$theta <- 1
@@ -329,6 +377,30 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
       }
     }
 
+    if(control$EM & dist == "binomial") {
+      mui <- model_count$fitted
+      probi <- model_zero$fitted
+      probi <- probi/(probi + (1-probi) * dbinom(0, prob = mui, size = size))
+      probi[Y1] <- 0
+
+      ll_new <- loglikfun(c(start$count, start$zero))
+      ll_old <- 2 * ll_new
+    
+      while(abs((ll_old - ll_new)/ll_old) > control$reltol) {
+        ll_old <- ll_new
+        model_count <- glm.fit(X, cbind(Y, size - Y), weights = weights * (1-probi), offset = offsetx,
+	  family = binomial(link = linkstr), start = start$count)
+        model_zero <- suppressWarnings(glm.fit(Z, probi, weights = weights, offset = offsetz,
+	  family = binomial(link = linkstr), start = start$zero))
+        mui <- model_count$fitted
+        probi <- model_zero$fitted
+        probi <- probi/(probi + (1-probi) * dbinom(0, prob = mui, size = size))
+        probi[Y1] <- 0
+        start <- list(count = model_count$coefficients, zero = model_zero$coefficients)
+        ll_new <- loglikfun(c(start$count, start$zero))
+      }
+    }
+
     if(control$trace) cat("done\n")
   }
 
@@ -364,8 +436,9 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
                                     paste("zero",  colnames(Z), sep = "_"))
 
   ## fitted and residuals
-  mu <- exp(X %*% coefc + offsetx)[,1]
-  phi <- linkinv(Z %*% coefz + offsetz)[,1]
+  mu <- drop(X %*% coefc + offsetx)
+  mu <- if(dist == "binomial") size * linkinv(mu) else exp(mu)
+  phi <- linkinv(drop(Z %*% coefz + offsetz))
   Yhat <- (1-phi) * mu
   res <- sqrt(weights) * (Y - Yhat)
 
@@ -397,7 +470,8 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
     call = cl,
     formula = ff,
     levels = .getXlevels(mt, mf),
-    contrasts = list(count = attr(X, "contrasts"), zero = attr(Z, "contrasts"))
+    contrasts = list(count = attr(X, "contrasts"), zero = attr(Z, "contrasts")),
+    size = if(dist == "binomial") size else NULL
   )
   if(model) rval$model <- mf
   if(y) rval$y <- Y
@@ -454,7 +528,7 @@ print.zeroinfl <- function(x, digits = max(3, getOption("digits") - 3), ...)
   if(!x$converged) {
     cat("model did not converge\n")
   } else {
-    cat(paste("Count model coefficients (", x$dist, " with log link):\n", sep = ""))
+    cat(paste("Count model coefficients (", x$dist, " with ", if(x$dist == "binomial") x$link else "log", " link):\n", sep = ""))
     print.default(format(x$coefficients$count, digits = digits), print.gap = 2, quote = FALSE)
     if(x$dist == "negbin") cat(paste("Theta =", round(x$theta, digits), "\n"))
   
@@ -510,7 +584,7 @@ print.summary.zeroinfl <- function(x, digits = max(3, getOption("digits") - 3), 
     print(structure(quantile(x$residuals),
       names = c("Min", "1Q", "Median", "3Q", "Max")), digits = digits, ...)  
 
-    cat(paste("\nCount model coefficients (", x$dist, " with log link):\n", sep = ""))
+    cat(paste("\nCount model coefficients (", x$dist, " with ", if(x$dist == "binomial") x$link else "log", " link):\n", sep = ""))
     printCoefmat(x$coefficients$count, digits = digits, signif.legend = FALSE)
   
     cat(paste("\nZero-inflation model coefficients (binomial with ", x$link, " link):\n", sep = ""))
@@ -547,8 +621,9 @@ predict.zeroinfl <- function(object, newdata, type = c("response", "prob", "coun
 	}
 	offsetx <- if(is.null(object$offset$count)) rep.int(0, NROW(X)) else object$offset$count
 	offsetz <- if(is.null(object$offset$zero))  rep.int(0, NROW(Z)) else object$offset$zero
-        mu <- exp(X %*% object$coefficients$count + offsetx)[,1]
-        phi <- object$linkinv(Z %*% object$coefficients$zero + offsetz)[,1]
+        mu <- drop(X %*% object$coefficients$count + offsetx)
+	mu <- if(object$dist == "binomial") object$size * object$linkinv(mu) else exp(mu)
+        phi <- object$linkinv(drop(Z %*% object$coefficients$zero + offsetz))
       }
     } else {
       mf <- model.frame(delete.response(object$terms$full), newdata, na.action = na.action, xlev = object$levels)
@@ -560,8 +635,9 @@ predict.zeroinfl <- function(object, newdata, type = c("response", "prob", "coun
       if(is.null(offsetz)) offsetz <- rep.int(0, NROW(Z))
       if(!is.null(object$call$offset)) offsetx <- offsetx + eval(object$call$offset, newdata)
 
-      mu <- exp(X %*% object$coefficients$count + offsetx)[,1]
-      phi <- object$linkinv(Z %*% object$coefficients$zero + offsetz)[,1]
+      mu <- drop(X %*% object$coefficients$count + offsetx)
+      mu <- if(object$dist == "binomial") object$size * object$linkinv(mu) else exp(mu)
+      phi <- object$linkinv(drop(Z %*% object$coefficients$zero + offsetz))
       rval <- (1-phi) * mu
     }
     
@@ -620,7 +696,8 @@ residuals.zeroinfl <- function(object, type = c("pearson", "response"), ...) {
     theta1 <- switch(object$dist,
       "poisson" = 0,
       "geometric" = 1,
-      "negbin" = 1/object$theta)
+      "negbin" = 1/object$theta,
+      "binomial" = 0) ## FIXME
     vv <- object$fitted.values * (1 + (phi + theta1) * mu)
     return(res/sqrt(vv))  
   })

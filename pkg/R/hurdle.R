@@ -1,7 +1,8 @@
 hurdle <- function(formula, data, subset, na.action, weights, offset,
-                   dist = c("poisson", "negbin", "geometric"),
+                   dist = c("poisson", "negbin", "geometric", "binomial"),
                    zero.dist = c("binomial", "poisson", "negbin", "geometric"),
                    link = c("logit", "probit", "cloglog", "cauchit", "log"),
+		   size = NULL,
 		   control = hurdle.control(...),
 		   model = TRUE, y = TRUE, x = FALSE, ...)
 {
@@ -62,6 +63,17 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
     loglik  
   }
 
+  countBinom <- function(parms) {
+    ## mean
+    mu <- size * as.vector(linkinv(X %*% parms + offsetx))[Y1]
+    ## log-likelihood
+    loglik0 <- dbinom(0, prob = mu/size, size = size, log = TRUE)
+    loglik1 <- dbinom(Y[Y1], prob = mu/size, size = size, log = TRUE)
+    ## collect and return
+    loglik <- sum(weights[Y1] * loglik1) - sum(weights[Y1] * log(1 - exp(loglik0)))
+    loglik
+  }
+
   countGradPoisson <- function(parms) {
     eta <- as.vector(X %*% parms + offsetx)[Y1]
     mu <- exp(eta)
@@ -91,6 +103,13 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
       exp(logratio) * (log(theta) - log(mu + theta) + 1 - theta/(mu + theta))) * weights[Y1]) * theta
     c(rval, rval2)
   }  
+  
+  countGradBinom <- function(parms) {
+    eta <- as.vector(X %*% parms + offsetx)[Y1]
+    mu <- linkinv(eta)
+    colSums(((Y[Y1] - size * mu)/(mu * (1 - mu))) *
+      linkobj$mu.eta(eta) * weights[Y1] * X[Y1, , drop = FALSE])
+  }
   
   zeroGradPoisson <- function(parms) {
     eta <- as.vector(Z %*% parms + offsetz)
@@ -122,7 +141,7 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
   zeroGradBinom <- function(parms) {
     eta <- as.vector(Z %*% parms + offsetz)
     mu <- linkinv(eta)
-    colSums(ifelse(Y0, -1/(1-mu), 1/mu)  * linkobj$mu.eta(eta) * weights * Z)  
+    colSums(ifelse(Y0, -1/(1-mu), 1/mu) * linkobj$mu.eta(eta) * weights * Z)  
   }
 
   ## collect likelihood components
@@ -131,7 +150,8 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
   countDist <- switch(dist,
                      "poisson" = countPoisson,
 		     "geometric" = countGeom,
-		     "negbin" = countNegBin)
+		     "negbin" = countNegBin,
+		     "binomial" = countBinom)
   zeroDist <- switch(zero.dist,
                      "poisson" = zeroPoisson,
 		     "geometric" = zeroGeom,
@@ -140,7 +160,8 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
   countGrad <- switch(dist,
                      "poisson" = countGradPoisson,
 		     "geometric" = countGradGeom,
-		     "negbin" = countGradNegBin)
+		     "negbin" = countGradNegBin,
+		     "binomial" = countGradBinom)
   zeroGrad <- switch(zero.dist,
                      "poisson" = zeroGradPoisson,
 		     "geometric" = zeroGradGeom,
@@ -158,7 +179,7 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
   linkinv <- linkobj$linkinv
 
   if(control$trace) cat("Hurdle Count Model\n",
-    paste("count model:", dist, "with log link\n"),
+    paste("count model:", dist, "with", ifelse(dist == "binomial", linkstr, "log"), "link\n"),
     paste("zero hurdle model:", zero.dist, "with", ifelse(zero.dist == "binomial", linkstr, "log"), "link\n"),
     sep = "")
 
@@ -229,6 +250,12 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
   Y0 <- Y <= 0
   Y1 <- Y > 0
 
+  ## size of binomial experiments
+  if(dist == "binomial") {
+    if(is.null(size)) size <- max(Y)
+    stopifnot(all(Y <= size))
+  }
+
   ## weights and offset
   weights <- model.weights(mf)
   if(is.null(weights)) weights <- 1
@@ -281,7 +308,11 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
   
   if(is.null(start)) {
     if(control$trace) cat("generating starting values...")
-    model_count <- glm.fit(X, Y, family = poisson(), weights = weights, offset = offsetx)
+    model_count <- if(dist == "binomial") {
+      glm.fit(X, cbind(Y, size - Y), family = binomial(link = linkstr), weights = weights, offset = offsetx)
+    } else {
+      glm.fit(X, Y, family = poisson(), weights = weights, offset = offsetx)
+    }
     model_zero <- switch(zero.dist,
       "poisson" = glm.fit(Z, Y, family = poisson(), weights = weights, offset = offsetz),
       "negbin" = glm.fit(Z, Y, family = poisson(), weights = weights, offset = offsetz),
@@ -377,13 +408,14 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
         	    "negbin" = pnbinom(0, size = theta["zero"], mu = phi, lower.tail = FALSE, log.p = TRUE),
         	    "geometric" = pnbinom(0, size = 1, mu = phi, lower.tail = FALSE, log.p = TRUE))
 
-  mu <- exp(X %*% coefc + offsetx)[,1]
+  mu <- drop(X %*% coefc + offsetx)
+  mu <- if(dist == "binomial") size * linkinv(mu) else exp(mu)
   p0_count <- switch(dist,
         	    "poisson" = ppois(0, lambda = mu, lower.tail = FALSE, log.p = TRUE),
         	    "negbin" = pnbinom(0, size = theta["count"], mu = mu, lower.tail = FALSE, log.p = TRUE),
-        	    "geometric" = pnbinom(0, size = 1, mu = mu, lower.tail = FALSE, log.p = TRUE))
+        	    "geometric" = pnbinom(0, size = 1, mu = mu, lower.tail = FALSE, log.p = TRUE),
+        	    "binomial" = pbinom(0, prob = mu/size, size = size, lower.tail = FALSE, log.p = TRUE))
   Yhat <- exp((p0_zero - p0_count) + log(mu))
-
   res <- sqrt(weights) * (Y - Yhat)
 
   ## effective observations
@@ -408,14 +440,15 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
     loglik = if(separate) fit_count$value + fit_zero$value else fit$value,
     vcov = vc,
     dist = list(count = dist, zero = zero.dist),
-    link = if(zero.dist == "binomial") linkstr else NULL,
-    linkinv = if(zero.dist == "binomial") linkinv else NULL,
+    link = if("binomial" %in% c(dist, zero.dist)) linkstr else NULL,
+    linkinv = if("binomial" %in% c(dist, zero.dist)) linkinv else NULL,
     separate = separate,
     converged = if(separate) fit_count$convergence < 1 & fit_zero$convergence < 1 else fit$convergence < 1,
     call = cl,
     formula = ff,
     levels = .getXlevels(mt, mf),
-    contrasts = list(count = attr(X, "contrasts"), zero = attr(Z, "contrasts"))
+    contrasts = list(count = attr(X, "contrasts"), zero = attr(Z, "contrasts")),
+    size = if(dist == "binomial") size else NULL
   )
   if(model) rval$model <- mf
   if(y) rval$y <- Y
@@ -472,7 +505,8 @@ print.hurdle <- function(x, digits = max(3, getOption("digits") - 3), ...)
   if(!x$converged) {
     cat("model did not converge\n")
   } else {
-    cat(paste("Count model coefficients (truncated ", x$dist$count, " with log link):\n", sep = ""))
+    cat(paste("Count model coefficients (truncated ", x$dist$count, " with ",
+      if(x$dist$count == "binomial") x$link else "log", " link):\n", sep = ""))
     print.default(format(x$coefficients$count, digits = digits), print.gap = 2, quote = FALSE)
     if(x$dist$count == "negbin") cat(paste("Theta =", round(x$theta["count"], digits), "\n"))
   
@@ -540,7 +574,8 @@ print.summary.hurdle <- function(x, digits = max(3, getOption("digits") - 3), ..
     print(structure(quantile(x$residuals),
       names = c("Min", "1Q", "Median", "3Q", "Max")), digits = digits, ...)  
 
-    cat(paste("\nCount model coefficients (truncated ", x$dist$count, " with log link):\n", sep = ""))
+    cat(paste("\nCount model coefficients (truncated ", x$dist$count, " with ",
+      if(x$dist$count == "binomial") x$link else "log", " link):\n", sep = ""))
     printCoefmat(x$coefficients$count, digits = digits, signif.legend = FALSE)
   
     zero_dist <- if(x$dist$zero != "binomial") paste("censored", x$dist$zero, "with log link")
@@ -612,11 +647,13 @@ predict.hurdle <- function(object, newdata, type = c("response", "prob", "count"
 		      "negbin" = pnbinom(0, size = object$theta["zero"], mu = phi, lower.tail = FALSE, log.p = TRUE),
 		      "geometric" = pnbinom(0, size = 1, mu = phi, lower.tail = FALSE, log.p = TRUE))
 
-    mu <- exp(X %*% object$coefficients$count + offsetx)[,1]
+    mu <- drop(X %*% object$coefficients$count + offsetx)
+    mu <- if(object$dist$count == "binomial") object$size * object$linkinv(mu) else exp(mu)
     p0_count <- switch(object$dist$count,
 		      "poisson" = ppois(0, lambda = mu, lower.tail = FALSE, log.p = TRUE),
 		      "negbin" = pnbinom(0, size = object$theta["count"], mu = mu, lower.tail = FALSE, log.p = TRUE),
-		      "geometric" = pnbinom(0, size = 1, mu = mu, lower.tail = FALSE, log.p = TRUE))
+		      "geometric" = pnbinom(0, size = 1, mu = mu, lower.tail = FALSE, log.p = TRUE),
+		      "binomial" = pnbinom(0, prob = mu/object$size, size = object$size, lower.tail = FALSE, log.p = TRUE))
     logphi <- p0_zero - p0_count
     
     if(type == "response") rval <- exp(logphi + log(mu))
@@ -644,6 +681,9 @@ predict.hurdle <- function(object, newdata, type = c("response", "prob", "count"
 	     },
 	     "geometric" = {
                for(i in 2:nUnique) rval[,i] <- exp(logphi + dnbinom(yUnique[i], mu = mu, size = 1, log = TRUE))
+	     },
+	     "binomial" = {
+               for(i in 2:nUnique) rval[,i] <- exp(logphi + dbinom(yUnique[i], prob = mu/object$size, size = object$size, log = TRUE))
 	     })
     }
    
@@ -671,7 +711,8 @@ residuals.hurdle <- function(object, type = c("pearson", "response"), ...) {
     theta1 <- switch(object$dist$count,
       "poisson" = 0,
       "geometric" = 1,
-      "negbin" = 1/object$theta["count"])
+      "negbin" = 1/object$theta["count"],
+      "binomial" = 0) ## FIXME!
     vv <- object$fitted.values * (1 + ((1-phi) + theta1) * mu)
     return(res/sqrt(vv))
   })
