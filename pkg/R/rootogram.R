@@ -3,7 +3,7 @@ rootogram <- function(object, ...) {
 }
 
 rootogram.default <- function(object, fitted, breaks = NULL,
-  style = c("hanging", "standing", "deviation"),
+  style = c("hanging", "standing", "suspended"),
   scale = c("sqrt", "raw"), width = NULL,
   xlab = NULL, ylab = NULL, main = NULL)
 {
@@ -48,7 +48,7 @@ rootogram.default <- function(object, fitted, breaks = NULL,
 
   ## height/position of rectangles
   y <- if(style == "hanging") expctd - obsrvd else 0
-  height <- if(style == "deviation") expctd - obsrvd else obsrvd
+  height <- if(style == "suspended") expctd - obsrvd else obsrvd
 
   ## return everything as data.frame
   rval <- data.frame(observed = as.vector(object), expected = as.vector(fitted),
