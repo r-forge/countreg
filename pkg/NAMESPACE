@@ -1,4 +1,6 @@
+importFrom("MASS", "fitdistr")
 importFrom("MASS", "glm.nb")
+importFrom("MASS", "negative.binomial")
 importFrom("stats", "logLik")
 
 export(
@@ -10,7 +12,11 @@ export(
   "zeroinfl.control",
   
   "zerotrunc",
-  "zerotrunc.control"
+  "zerotrunc.control",
+  
+  "rootogram",
+  "rootogram.default",
+  "autoplot.rootogram" ## for the moment
 )
 
 ## methods for class zeroinfl
@@ -55,3 +61,16 @@ S3method("terms", "zerotrunc")
 S3method("model.frame", "zerotrunc")
 S3method("model.matrix", "zerotrunc")
 S3method("extractAIC", "zerotrunc")
+
+## methods for rootograms
+S3method("rootogram", "default")
+S3method("rootogram", "numeric")
+S3method("rootogram", "zeroinfl")
+S3method("rootogram", "hurdle")
+S3method("rootogram", "glm")
+
+## methods for class rootogram
+S3method("print", "rootogram")
+S3method("plot", "rootogram")
+S3method("c", "rootogram")
+S3method("rbind", "rootogram")
