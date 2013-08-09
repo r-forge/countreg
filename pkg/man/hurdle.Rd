@@ -10,10 +10,10 @@
 
 \usage{
 hurdle(formula, data, subset, na.action, weights, offset,
-  dist = c("poisson", "negbin", "geometric"),
+  dist = c("poisson", "negbin", "geometric", "binomial"),
   zero.dist = c("binomial", "poisson", "negbin", "geometric"),
   link = c("logit", "probit", "cloglog", "cauchit", "log"),
-  control = hurdle.control(\dots),
+  size = NULL, control = hurdle.control(\dots),
   model = TRUE, y = TRUE, x = FALSE, \dots)
 }
 
@@ -29,6 +29,8 @@ hurdle(formula, data, subset, na.action, weights, offset,
   \item{zero.dist}{character specification of the zero hurdle model family.}
   \item{link}{character specification of link function in the binomial
     zero hurdle (only used if \code{zero.dist = "binomial"}.}
+  \item{size}{size parameter in case the a binomial count model is used
+    (\code{dist = "binomial"}). By default the maximum count is used.}
   \item{control}{a list of control arguments specified via
     \code{\link{hurdle.control}}.}
   \item{model, y, x}{logicals. If \code{TRUE} the corresponding components

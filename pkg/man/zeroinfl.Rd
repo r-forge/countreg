@@ -9,9 +9,9 @@
 
 \usage{
 zeroinfl(formula, data, subset, na.action, weights, offset,
-  dist = c("poisson", "negbin", "geometric"),
+  dist = c("poisson", "negbin", "geometric", "binomial"),
   link = c("logit", "probit", "cloglog", "cauchit", "log"),
-  control = zeroinfl.control(\dots),
+  size = NULL, control = zeroinfl.control(\dots),
   model = TRUE, y = TRUE, x = FALSE, \dots)
 }
 
@@ -27,6 +27,8 @@ zeroinfl(formula, data, subset, na.action, weights, offset,
     always used).}
   \item{link}{character specification of link function in the binary
     zero-inflation model (a binomial family is always used).}
+  \item{size}{size parameter in case the a binomial count model is used
+    (\code{dist = "binomial"}). By default the maximum count is used.}
   \item{control}{a list of control arguments specified via
     \code{\link{zeroinfl.control}}.}
   \item{model, y, x}{logicals. If \code{TRUE} the corresponding components

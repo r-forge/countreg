@@ -1,8 +1,8 @@
 zeroinfl <- function(formula, data, subset, na.action, weights, offset,
                      dist = c("poisson", "negbin", "geometric", "binomial"),
                      link = c("logit", "probit", "cloglog", "cauchit", "log"),
-		     control = zeroinfl.control(...),
 		     size = NULL,
+		     control = zeroinfl.control(...),
 		     model = TRUE, y = TRUE, x = FALSE, ...)
 {
   ## set up likelihood

@@ -5,7 +5,7 @@ rootogram <- function(object, ...) {
 rootogram.default <- function(object, fitted, breaks = NULL,
   style = c("hanging", "standing", "suspended"),
   scale = c("sqrt", "raw"), width = NULL,
-  xlab = NULL, ylab = NULL, main = NULL)
+  xlab = NULL, ylab = NULL, main = NULL, ...)
 {
   ## rectangle style
   scale <- match.arg(scale)
