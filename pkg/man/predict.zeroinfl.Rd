@@ -8,6 +8,7 @@
 \alias{summary.zeroinfl}
 \alias{print.summary.zeroinfl}
 \alias{logLik.zeroinfl}
+\alias{nobs.zeroinfl}
 \alias{fitted.zeroinfl}
 \alias{predprob.zeroinfl}
 \alias{extractAIC.zeroinfl}

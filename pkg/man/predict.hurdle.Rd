@@ -8,6 +8,7 @@
 \alias{summary.hurdle}
 \alias{print.summary.hurdle}
 \alias{logLik.hurdle}
+\alias{nobs.hurdle}
 \alias{fitted.hurdle}
 \alias{predprob.hurdle}
 \alias{extractAIC.hurdle}

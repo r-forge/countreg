@@ -199,6 +199,9 @@ zerotrunc <- function(formula, data, subset, na.action, weights, offset,
   Yhat <- exp(log(mu) - p0)
   res <- sqrt(weights) * (Y - Yhat)
 
+  ## effective observations
+  nobs <- sum(weights > 0) ## = n - sum(weights == 0)
+
   rval <- list(coefficients = cf,
     residuals = res,
     fitted.values = Yhat,
@@ -208,9 +211,9 @@ zerotrunc <- function(formula, data, subset, na.action, weights, offset,
     start = start,
     weights = if(identical(as.vector(weights), rep(1, n))) NULL else weights,
     offset = if(identical(offset, rep(0, n))) NULL else offset,
-    n = n,
-    df.null = n - 1 - (dist == "negbin"),     ## effective: df.null     - sum(weights == 0)
-    df.residual = n - k - (dist == "negbin"), ## effective: df.residual - sum(weights == 0)
+    n = nobs,
+    df.null = nobs - 1 - (dist == "negbin"),
+    df.residual = nobs - k - (dist == "negbin"),
     terms = mt,
     theta = theta,
     SE.logtheta = SE.logtheta,
@@ -251,8 +254,10 @@ vcov.zerotrunc <- function(object, ...) {
 }
 
 logLik.zerotrunc <- function(object, ...) {
-  structure(object$loglik, df = object$n - object$df.residual, class = "logLik")
+  structure(object$loglik, df = object$n - object$df.residual, nobs = object$n, class = "logLik")
 }
+
+nobs.zerotrunc <- function(object, ...) object$n
 
 print.zerotrunc <- function(x, digits = max(3, getOption("digits") - 3), ...)
 {

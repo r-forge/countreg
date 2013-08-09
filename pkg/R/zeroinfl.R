@@ -517,8 +517,10 @@ vcov.zeroinfl <- function(object, model = c("full", "count", "zero"), ...) {
 }
 
 logLik.zeroinfl <- function(object, ...) {
-  structure(object$loglik, df = object$n - object$df.residual, class = "logLik")
+  structure(object$loglik, df = object$n - object$df.residual, nobs = object$n, class = "logLik")
 }
+
+nobs.zeroinfl <- function(object, ...) object$n
 
 print.zeroinfl <- function(x, digits = max(3, getOption("digits") - 3), ...)
 {
