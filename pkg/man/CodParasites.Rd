@@ -1,15 +1,15 @@
-\name{ParasiteCod}
-\alias{ParasiteCod}
+\name{CodParasites}
+\alias{CodParasites}
 
 \encoding{latin1}
 
-\title{Parasites in Cod}
+\title{Parasite Infections in Cod}
 
 \description{
 Date on parasite infection in cod along the coast of Finmark.
 }
 
-\usage{data("ParasiteCod")}
+\usage{data("CodParasites")}
 
 \format{
 A data frame containing 1254 observations on 10 variables. 
@@ -66,39 +66,39 @@ Zuur AF, Ieno EN, Walker NJ, Saveliev AA, Smith GM (2009).
 
 \examples{
 ## load data
-data("ParasiteCod", package = "countreg")
+data("CodParasites", package = "countreg")
 
 ## Table 1 from Hemmingsen et al. (2005)
 ## number of observations
-xtabs(~ area + year, data = ParasiteCod)
+xtabs(~ area + year, data = CodParasites)
 ## prevalence of parasites (NAs counted as "yes")
-tab <- xtabs(~ area + year + factor(is.na(prevalence) | prevalence == "yes"), data = ParasiteCod)
+tab <- xtabs(~ area + year + factor(is.na(prevalence) | prevalence == "yes"), data = CodParasites)
 round(100 * prop.table(tab, 1:2)[,,2], digits = 1)
 
 ## omit NAs in response
-ParasiteCod <- subset(ParasiteCod, !is.na(intensity))
+CodParasites <- subset(CodParasites, !is.na(intensity))
 
 ## exploratory displays for hurdle and counts
 par(mfrow = c(2, 2))
-plot(factor(intensity == 0) ~ interaction(year, area), data = ParasiteCod)
-plot(factor(intensity == 0) ~ length, data = ParasiteCod, breaks = c(15, 3:8 * 10, 105))
-plot(jitter(intensity) ~ interaction(year, area), data = ParasiteCod, subset = intensity > 0, log = "y")
-plot(jitter(intensity) ~ length, data = ParasiteCod, subset = intensity > 0, log = "y")
+plot(factor(intensity == 0) ~ interaction(year, area), data = CodParasites)
+plot(factor(intensity == 0) ~ length, data = CodParasites, breaks = c(15, 3:8 * 10, 105))
+plot(jitter(intensity) ~ interaction(year, area), data = CodParasites, subset = intensity > 0, log = "y")
+plot(jitter(intensity) ~ length, data = CodParasites, subset = intensity > 0, log = "y")
 
 ## count data models
-pc_p   <-    glm(intensity ~ length + area * year, data = ParasiteCod, family = poisson)
-pc_nb  <- glm.nb(intensity ~ length + area * year, data = ParasiteCod)
-pc_hp  <- hurdle(intensity ~ length + area * year, data = ParasiteCod, dist = "poisson")
-pc_hnb <- hurdle(intensity ~ length + area * year, data = ParasiteCod, dist = "negbin")
-AIC(pc_p, pc_nb, pc_hp, pc_hnb)
-BIC(pc_p, pc_nb, pc_hp, pc_hnb)
+cp_p   <-    glm(intensity ~ length + area * year, data = CodParasites, family = poisson)
+cp_nb  <- glm.nb(intensity ~ length + area * year, data = CodParasites)
+cp_hp  <- hurdle(intensity ~ length + area * year, data = CodParasites, dist = "poisson")
+cp_hnb <- hurdle(intensity ~ length + area * year, data = CodParasites, dist = "negbin")
+AIC(cp_p, cp_nb, cp_hp, cp_hnb)
+BIC(cp_p, cp_nb, cp_hp, cp_hnb)
 
 ## rootograms
 par(mfrow = c(2, 2))
-rootogram(pc_p, max = 50, main = "Poisson")
-rootogram(pc_nb, max = 50, main = "Negative Binomial")
-rootogram(pc_hp, max = 50, main = "Hurdle Poisson")
-rootogram(pc_hnb, max = 50, main = "Hurdle Negative Binomial")
+rootogram(cp_p, max = 50, main = "Poisson")
+rootogram(cp_nb, max = 50, main = "Negative Binomial")
+rootogram(cp_hp, max = 50, main = "Hurdle Poisson")
+rootogram(cp_hnb, max = 50, main = "Hurdle Negative Binomial")
 }
 
 \keyword{datasets}
