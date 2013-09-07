@@ -242,14 +242,16 @@ rootogram.zeroinfl <- rootogram.hurdle <- function(object, newdata = NULL,
     model.frame(mt, newdata, na.action = na.omit)
   }
   y <- model.response(mf)
+  w <- model.weights(mf)
+  if(is.null(w)) w <- rep(1, NROW(y))
   
   ## observed and expected frequencies
-  max0 <- if(is.null(max)) max(1.5 * max(y), 20L) else max  
-  obsrvd <- table(factor(y, levels = 0L:max0))
+  max0 <- if(is.null(max)) max(1.5 * max(y[w > 0]), 20L) else max  
+  obsrvd <- as.vector(xtabs(w ~ factor(y, levels = 0L:max0)))
   expctd <- if(is.null(newdata)) {
-    colSums(predict(object, type = "prob", at = 0L:max0))  
+    colSums(predict(object, type = "prob", at = 0L:max0) * w)
   } else {
-    colSums(predict(object, newdata = newdata, type = "prob", at = 0L:max0, na.action = na.omit))
+    colSums(predict(object, newdata = newdata, type = "prob", at = 0L:max0, na.action = na.omit) * w)
   }
 
   ## try to guess a good maximum
@@ -284,23 +286,24 @@ rootogram.glm <- function(object, newdata = NULL, breaks = NULL,
     model.frame(mt, newdata, na.action = na.omit)
   }
   y <- model.response(mf)
+  w <- model.weights(mf)
+  if(is.null(w)) w <- rep(1, NROW(y))
   mu <- predict(object, newdata = newdata, type = "response", na.action = na.omit)
 
   if(family == "gaussian") {
     ## estimated standard deviation (ML)
-    s <- sqrt(mean(residuals(object)^2))
+    s <- sqrt(weighted.mean(residuals(object)^2, w))
 
     ## breaks
     if(is.null(breaks)) breaks <- "Sturges"
-    yhist <- hist(y, plot = FALSE, breaks = breaks)
-    breaks <- yhist$breaks
-    obsrvd <- yhist$count
+    breaks <- hist(y[w > 0], plot = FALSE, breaks = breaks)$breaks
+    obsrvd <- as.vector(xtabs(w ~ cut(y, breaks, include.lowest = TRUE)))
 
     ## expected frequencies
     p <- matrix(NA, nrow = length(y), ncol = length(breaks) - 1L)
-    for(i in 1L:ncol(p)) p[, i] <- pnorm(yhist$breaks[i + 1L], mean = mu, sd = s) -
-      pnorm(yhist$breaks[i], mean = mu, sd = s)
-    expctd <- colSums(p)
+    for(i in 1L:ncol(p)) p[, i] <- pnorm(breaks[i + 1L], mean = mu, sd = s) -
+      pnorm(breaks[i], mean = mu, sd = s)
+    expctd <- colSums(p * w)
   } else if(family == "binomial") {
     ## successes and failures
     if(NCOL(y) < 2L) y <- cbind(y, 1L - y)
@@ -312,14 +315,14 @@ rootogram.glm <- function(object, newdata = NULL, breaks = NULL,
     breaks <- -1L:size + 0.5
     
     ## observed and expected
-    obsrvd <- table(factor(y[, 1L], levels = at))
+    obsrvd <- as.vector(xtabs(w ~ factor(y[, 1L], levels = at)))
     p <- matrix(NA, length(mu), length(at))
     for(i in at) p[, i + 1L] <- dbinom(i, prob = mu, size = size)
-    expctd <- colSums(p)
+    expctd <- colSums(p * w)
   } else {
     ## observed frequencies
-    max0 <- if(is.null(max)) max(1.5 * max(y), 20L) else max  
-    obsrvd <- table(factor(y, levels = 0L:max0))
+    max0 <- if(is.null(max)) max(1.5 * max(y[w > 0]), 20L) else max  
+    obsrvd <- as.vector(xtabs(w ~ factor(y, levels = 0L:max0)))
 
     ## expected frequencies
     at <- 0L:max0
@@ -331,7 +334,7 @@ rootogram.glm <- function(object, newdata = NULL, breaks = NULL,
       if(is.null(theta)) theta <- get(".Theta", environment(family(object)$variance))
       for(i in at) p[, i + 1L] <- dnbinom(i, mu = mu, size = theta)
     }
-    expctd <- colSums(p)
+    expctd <- colSums(p * w)
 
     ## try to guess a good maximum
     if(is.null(max)) {
