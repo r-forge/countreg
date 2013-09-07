@@ -1,8 +1,5 @@
-importFrom("MASS", "fitdistr")
-importFrom("MASS", "glm.nb")
-importFrom("MASS", "negative.binomial")
-importFrom("stats", "logLik")
-importFrom("stats", "nobs")
+import("stats")
+importFrom("MASS", "fitdistr", "glm.nb", "negative.binomial")
 
 export(
   "hurdle",
@@ -17,7 +14,9 @@ export(
   
   "rootogram",
   "rootogram.default",
-  "autoplot.rootogram" ## for the moment
+  "autoplot.rootogram", ## for the moment
+  
+  "FLXMRnegbin"
 )
 
 ## methods for class zeroinfl
