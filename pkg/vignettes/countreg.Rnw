@@ -18,6 +18,13 @@
 \Keywords{GLM, Poisson model, negative binomial model, hurdle model, zero-inflated model}
 
 \Abstract{
+  This introduction to \proglang{R} functions for count data regression, especially
+  the functions \fct{hurdle} and \fct{zeroinfl} from package \pkg{countreg},
+  is a somewhat modified version of \cite{countreg:Zeileis+Kleiber+Jackman:2008},
+  published in the \emph{Journal of Statistical Software}. Originally, it
+  accompanied the package \pkg{pscl} but meanwhile \fct{hurdle}/\fct{zeroinfl}
+  have been moved to the \pkg{countreg} package.
+
   The classical Poisson, geometric and negative binomial regression models 
   for count data belong to the family of generalized linear models and
   are available at the core of the statistics toolbox in the \proglang{R}
@@ -575,8 +582,11 @@ together with \cite{countreg:Zeileis:2006}. The objective is to model
 the demand for medical care---as captured by the number of physician/non-physician
 office and hospital outpatient visits---by the covariates available
 for the patients. Here, we adopt the number of physician office visits \code{ofp}
-as the dependent variable and use the health status variables
-\code{hosp} (number of hospital stays),
+as the dependent variable and use the health status variables\footnote{In
+addition to the variables considered here, \cite{countreg:Zeileis+Kleiber+Jackman:2008}
+also employ \code{hosp}, the number of hospital days. As this is more appropriately
+used as a dependent variable for medical care rather than a regressor, it is
+omitted from the analysis here.}
 \code{health} (self-perceived health status),
 \code{numchron} (number of chronic conditions),
 as well as the socio-economic variables
@@ -586,7 +596,7 @@ as well as the socio-economic variables
 select the variables used from the full data set:
 
 <<dt>>=
-dt <- DebTrivedi[, c(1, 6:8, 13, 15, 18)]
+dt <- DebTrivedi[, c(1, 7, 8, 13, 15, 18)]
 @
 
 <<dt2, echo=FALSE>>=
@@ -691,8 +701,6 @@ plot(clog(ofp) ~ cfac(numchron), data = dt,
   ylab = "Physician office visits (in clogs)", xlab = "Number of chronic conditions", main = "numchron")
 plot(clog(ofp) ~ privins, data = dt, varwidth = TRUE,
   ylab = "Physician office visits (in clogs)", xlab = "Covered by private insurance", main = "privins")
-plot(clog(ofp) ~ cfac(hosp, c(0:2, 8)), data = dt,
-  ylab = "Physician office visits (in clogs)", xlab = "Number of hospital stays", main = "hosp")
 plot(clog(ofp) ~ gender, data = dt, varwidth = TRUE,
   ylab = "Physician office visits (in clogs)", xlab = "Gender", main = "gender")
 plot(cfac(ofp, c(0:2, 4, 6, 10, 100)) ~ school, data = dt, breaks = 9,
@@ -708,7 +716,6 @@ can be produced via
 plot(clog(ofp) ~ health, data = dt, varwidth = TRUE)
 plot(clog(ofp) ~ cfac(numchron), data = dt)
 plot(clog(ofp) ~ privins, data = dt, varwidth = TRUE)
-plot(clog(ofp) ~ cfac(hosp, c(0:2, 8)), data = dt)
 plot(clog(ofp) ~ gender, data = dt, varwidth = TRUE)
 plot(cfac(ofp, c(0:2, 4, 6, 10, 100)) ~ school, data = dt, breaks = 9)
 @
@@ -734,9 +741,9 @@ if(file.exists("countreg-models.rda")) {
   fm_qpois  <-      glm(ofp ~ ., data = dt, family = quasipoisson)
   fm_nbin   <-   glm.nb(ofp ~ ., data = dt)
   fm_zinb0  <- zeroinfl(ofp ~ ., data = dt, dist = "negbin")
-  fm_zinb   <- zeroinfl(ofp ~ . | hosp + numchron + privins + school + gender, data = dt, dist = "negbin")
+  fm_zinb   <- zeroinfl(ofp ~ . | numchron + privins + school + gender, data = dt, dist = "negbin")
   fm_hurdle0<-   hurdle(ofp ~ ., data = dt, dist = "negbin")
-  fm_hurdle <-   hurdle(ofp ~ . | hosp + numchron + privins + school + gender, data = dt, dist = "negbin")
+  fm_hurdle <-   hurdle(ofp ~ . | numchron + privins + school + gender, data = dt, dist = "negbin")
   fm_hurdle2<-   hurdle(ofp ~ ., data = dt2, dist = "negbin")
   if(!refit_models) save(fm_pois, fm_qpois, fm_nbin, fm_zinb0, fm_zinb, fm_hurdle0, fm_hurdle, fm_hurdle2, file = "countreg-models.rda")
 }
@@ -834,7 +841,7 @@ However, it might be possible to omit the \code{health} variable from
 the hurdle model. To test this hypothesis, the reduced model is fitted
 via
 <<hurdle, eval=FALSE>>=
-fm_hurdle <- hurdle(ofp ~ . | hosp + numchron + privins + school + gender,
+fm_hurdle <- hurdle(ofp ~ . | numchron + privins + school + gender,
   data = dt, dist = "negbin")
 @
 and can then be compared to the full model in a Wald test
@@ -847,7 +854,7 @@ lrtest(fm_hurdle0, fm_hurdle)
 @
 which leads to virtually identical results.
 
-\begin{table}[p]
+\begin{table}[t!]
 \begin{center}
 \begin{tabular}{|l|rrrr|rr|} \hline
 Type & \multicolumn{4}{|c|}{GLM} & \multicolumn{2}{|c|}{zero-augmented} \\
@@ -859,37 +866,37 @@ Object & \code{fm_pois} & \code{fm_pois} & \code{fm_qpois} & \code{fm_nbin} & \c
 <<summary-table, echo=FALSE, results=tex>>=
 fm <- list("ML-Pois" = fm_pois, "Adj-Pois" = fm_pois, "Quasi-Pois" = fm_qpois, "NB" = fm_nbin,
   "Hurdle-NB" = fm_hurdle, "ZINB" = fm_zinb)
-fm_summary <- matrix(character(6 * 33), ncol = 6)
+fm_summary <- matrix(character(6 * 29), ncol = 6)
 colnames(fm_summary) <- names(fm)
 rownames(fm_summary) <- c(as.vector(rbind(names(coef(fm_hurdle, model = "count")), "")),
   as.vector(rbind(names(coef(fm_hurdle, model = "zero")), "")),
   "no.\\ parameters", "$\\log L$", "AIC", "BIC", "$\\sum_i \\hat f_i(0)$")
-rownames(fm_summary)[1:28] <- ifelse(rownames(fm_summary)[1:28] == "", "", 
-  paste("\\code{", rownames(fm_summary)[1:28], "}", sep = ""))
-fm_summary[1:8 * 2 - 1,] <- sapply(fm,
-  function(x) paste("$", format(round(coef(x)[1:8], digits = 3)), "$\\phantom{)}", sep = ""))
-fm_summary[1:8 * 2,] <- sapply(
+rownames(fm_summary)[1:24] <- ifelse(rownames(fm_summary)[1:24] == "", "", 
+  paste("\\code{", rownames(fm_summary)[1:24], "}", sep = ""))
+fm_summary[1:7 * 2 - 1,] <- sapply(fm,
+  function(x) paste("$", format(round(coef(x)[1:7], digits = 3)), "$\\phantom{)}", sep = ""))
+fm_summary[1:7 * 2,] <- sapply(
   c(list("ML-Pois" = vcov(fm_pois), "Adj-Pois" = sandwich(fm_pois)),
   lapply(fm[-(1:2)], function(x) vcov(x))), function(x)
-  paste("(", format(round(sqrt(diag(x))[1:8], digits = 3)), ")", sep = ""))
-fm_summary[1:6 * 2 + 15,] <- cbind(NA, NA, NA, NA, sapply(fm[5:6], function(x)
+  paste("(", format(round(sqrt(diag(x))[1:7], digits = 3)), ")", sep = ""))
+fm_summary[1:5 * 2 + 13,] <- cbind(NA, NA, NA, NA, sapply(fm[5:6], function(x)
   paste("$", format(round(coef(x, model = "zero"), digits = 3)), "$\\phantom{)}", sep = "")))
-fm_summary[1:6 * 2 + 16,] <- cbind(NA, NA, NA, NA, sapply(fm[5:6],
-  function(x) paste("(", format(round(sqrt(diag(vcov(x)))[-(1:8)], digits = 3)),  ")", sep = "")))
-fm_summary[29,] <- sapply(fm, function(x) attr(logLik(x), "df"))
-fm_summary[30,] <- paste("$", format(sapply(fm, function(x) round(logLik(x), digits = 1))), "$", sep = "")
-fm_summary[31,] <- format(round(sapply(fm, AIC), digits = 1))
-fm_summary[32,] <- format(round(sapply(fm, AIC, k = log(nrow(dt))), digits = 1))
-fm_summary[33,] <- round(c("ML-Pois" = sum(dpois(0, fitted(fm_pois))),
+fm_summary[1:5 * 2 + 14,] <- cbind(NA, NA, NA, NA, sapply(fm[5:6],
+  function(x) paste("(", format(round(sqrt(diag(vcov(x)))[-(1:7)], digits = 3)),  ")", sep = "")))
+fm_summary[25,] <- sapply(fm, function(x) attr(logLik(x), "df"))
+fm_summary[26,] <- paste("$", format(sapply(fm, function(x) round(logLik(x), digits = 1))), "$", sep = "")
+fm_summary[27,] <- format(round(sapply(fm, AIC), digits = 1))
+fm_summary[28,] <- format(round(sapply(fm, AIC, k = log(nrow(dt))), digits = 1))
+fm_summary[29,] <- round(c("ML-Pois" = sum(dpois(0, fitted(fm_pois))),
   "Adj-Pois" = NA,
   "Quasi-Pois" = NA,
   "NB" = sum(dnbinom(0, mu = fitted(fm_nbin), size = fm_nbin$theta)),
   "NB-Hurdle" = sum(predict(fm_hurdle, type = "prob")[,1]),
   "ZINB" = sum(predict(fm_zinb, type = "prob")[,1])))
-fm_summary[30:33,2:3] <- NA
+fm_summary[26:29,2:3] <- NA
 fm_summary[is.na(fm_summary)] <- " "
 fm_summary <- paste(apply(cbind(rownames(fm_summary), fm_summary), 1, paste, collapse = " & "), "\\\\")
-fm_summary[c(16, 28, 33)] <- paste(fm_summary[c(16, 28, 33)], "\\hline")
+fm_summary[c(14, 24, 29)] <- paste(fm_summary[c(14, 24, 29)], "\\hline")
 writeLines(fm_summary)
 @
 \end{tabular}
@@ -914,7 +921,7 @@ As for the hurdle model above, all regressors from the count model are also
 used in the zero-inflation model. Again, we can modify the regressors in 
 the zero-inflation part, e.g., by fitting a second model
 <<zinb, eval=FALSE>>=
-fm_zinb <- zeroinfl(ofp ~ . | hosp + numchron + privins + school + gender,
+fm_zinb <- zeroinfl(ofp ~ . | numchron + privins + school + gender,
   data = dt, dist = "negbin")
 @
 that has the same variables in the zero-inflation part as the hurdle
