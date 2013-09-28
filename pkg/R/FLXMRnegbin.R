@@ -115,4 +115,17 @@ rootogram(rf1[[2]])
 rf0 <- lapply(1:2, function(i) glm.nb(y ~ x, data = d, weights = posterior(fm0)[,i]))
 rootogram(rf0[[1]])
 rootogram(rf0[[2]])
+
+"+.rootogram" <- function(e1, e2) {
+  xlab <- paste(unique(c(attr(e1, "xlab"), attr(e2, "xlab"))), collapse = " / ")
+  main <- paste(unique(c(attr(e1, "main"), attr(e2, "main"))), collapse = " / ")
+  e1 <- as.data.frame(e1)
+  e2 <- as.data.frame(e2)
+  e <- e1[e1$x %in% e2$x, ] + e2[e2$x %in% e1$x, ]
+  rootogram.default(structure(e$observed, .Names = e$x/2), e$expected,
+    main = main, xlab = xlab)
+}
+
+rootogram(rf1[[1]]) + rootogram(rf1[[2]])
+rootogram(rf0[[1]]) + rootogram(rf0[[2]])
 }
