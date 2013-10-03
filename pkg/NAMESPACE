@@ -71,6 +71,8 @@ S3method("rootogram", "numeric")
 S3method("rootogram", "zeroinfl")
 S3method("rootogram", "hurdle")
 S3method("rootogram", "glm")
+S3method("rootogram", "gamlss")
+S3method("rootogram", "gam")
 
 ## methods for class rootogram
 S3method("print", "rootogram")
