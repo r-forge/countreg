@@ -1,17 +1,16 @@
 \name{GSOEP}
 \alias{GSOEP}
 
-\title{Data from the German Socioeconomic Panel (GSOEP)}
+\title{Health Services (GSOEP)}
 
 \description{
-Unbalanced panel concerning the usage of health services in Germany for the years 1984-1988, 1991 and 1994 consisting of 27,326 observations on 22 variables taken from the German Socioeconomic Panel (GSOEP).  The number of visits to a doctor and the number of inpatient hospital visits are given along with 
-several personal socioeconomic details. These data were first used by Riphahn, Wambach and Million (2003).
+Unbalanced panel concerning the usage of health services in Germany for the years 1984-1988, 1991 and 1994 consisting of 27,326 observations on 22 variables taken from the German Socioeconomic Panel (GSOEP).  The number of visits to a doctor and the number of inpatient hospital visits are given along with several personal socioeconomic characteristics.
 }
 
 \usage{data("GSOEP")}
 
 \format{
-  A data frame with 27,326 observations on the following 22 variables.
+  A data frame with 27,326 observations on 22 variables.
   \describe{
     \item{id}{identification number indicating 1 to 7 observations for each of the 7,293 cases.}
     \item{female}{factor indicating whether a person is female (\code{yes} or \code{no}).}
@@ -39,7 +38,13 @@ several personal socioeconomic details. These data were first used by Riphahn, W
 }
 
 \details{
+The data were first used by Riphahn, Wambach and Million (2003).
+
 As noted by Greene (2007), there are 40 observations on \code{hsat} taking on values between 6 and 7 although the variable is supposed to be an integer. For three other variables similar problems occur: By construction, \code{handdum} should be a dummy variable but there are 18 observations taking on values between 0 and 1. Also, for \code{handper} 3,290 observations are not integer-valued. Finally, the precision of 148 values of \code{educ} is very suspicious.
+
+Comment and reply in JAE archive.
+
+No attempts are made to fix these issues here. Data is used \sQuote{as is} in order to replicate Greene (2007).
 }
 
 \source{
@@ -49,9 +54,15 @@ Journal of Applied Econometrics Data Archive.
 }
 
 \references{                                                   
-Greene, W. H. (2007). Functional Form and Heterogeneity in Models for Count Data. \emph{Foundations and Trends in Econometrics}, \bold{1}(2), 113--218.
+Greene WH (2007). 
+ \dQuote{Functional Form and Heterogeneity in Models for Count Data}. 
+ \emph{Foundations and Trends in Econometrics}, \bold{1}(2), 113--218.
 
-Riphahn, R., Wambach, A. and Million, A. (2003). Incentive Effects in the Demand for Health Care: A Bivariate Panel Count Data Estimation. \emph{Journal of Applied Econometrics}, \bold{18}(4), 387--405.
+Greene WH (2011). \emph{Econometric Analysis}, 7th edition. Upper Saddle River, NJ: Prentice Hall.
+
+Riphahn RT, Wambach A, Million A (2003). 
+ \dQuote{Incentive Effects in the Demand for Health Care: A Bivariate Panel Count Data Estimation}. 
+ \emph{Journal of Applied Econometrics}, \bold{18}(4), 387--405.
 }
 
 \examples{
