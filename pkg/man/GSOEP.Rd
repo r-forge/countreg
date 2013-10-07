@@ -40,11 +40,9 @@ Unbalanced panel concerning the usage of health services in Germany for the year
 \details{
 The data were first used by Riphahn, Wambach and Million (2003).
 
-As noted by Greene (2007), there are 40 observations on \code{hsat} taking on values between 6 and 7 although the variable is supposed to be an integer. For three other variables similar problems occur: By construction, \code{handdum} should be a dummy variable but there are 18 observations taking on values between 0 and 1. Also, for \code{handper} 3,290 observations are not integer-valued. Finally, the precision of 148 values of \code{educ} is very suspicious.
+As noted by Greene (2007, 2008), there are 40 observations on \code{hsat} taking on values between 6 and 7 although the variable is supposed to be an integer. For three other variables similar problems occur: By construction, \code{handdum} should be a dummy variable but there are 18 observations taking on values between 0 and 1. Also, for \code{handper} 3,290 observations are not integer-valued. Finally, the precision of 148 values of \code{educ} is very suspicious. 
 
-Comment and reply in JAE archive.
-
-No attempts are made to fix these issues here. Data is used \sQuote{as is} in order to replicate Greene (2007).
+As of 2013, a comment and a reply on data issues are available from the JAE archive. No attempts are made to fix these issues here. Data is used \sQuote{as is} in order to replicate Greene (2007, 2008, 2011).
 }
 
 \source{
@@ -58,6 +56,10 @@ Greene WH (2007).
  \dQuote{Functional Form and Heterogeneity in Models for Count Data}. 
  \emph{Foundations and Trends in Econometrics}, \bold{1}(2), 113--218.
 
+Greene WH (2008). 
+ \dQuote{Functional Forms for the Negative Binomial Model for Count Data}. 
+ \emph{Economics Letters}, \bold{99}, 585--590.
+ 
 Greene WH (2011). \emph{Econometric Analysis}, 7th edition. Upper Saddle River, NJ: Prentice Hall.
 
 Riphahn RT, Wambach A, Million A (2003). 
@@ -89,6 +91,18 @@ model.o <- docvis ~ age + I(age^2) + hsat + handdum + handper + married + educ +
 
 # visualization of the fit
 # plot(fm.nbp.o)
+
+# things to replicate from Greene (2011):
+# Ex. 11.16, Tab 11.13, pp 451-452: nonlinear regression
+# Tab. 14.2, pp 580--581: logistic and Poisson 
+# Tab. 14.10, pp 611-613: geometric regression
+# Ex. 17.7: binary Chow test (maybe not?)
+# Tab 18.14, p 850: Poisson, various negbins
+# Tab 18.17, p 860 (panel models, some of)
+# Tab 18.19, p 866: hurdle models
+
+# things to replicate from Greene (2008):
+# Tab 2: Poisson, various negbins, presumably same as book
 
 }
 }
