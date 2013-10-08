@@ -381,12 +381,16 @@ autoplot.rootogram <- function(object,
   rval
 }
 
+
+# Note: family(object)[2] gives "Poisson Zero Inflated" for both ZIP and ZAP,
+# also "Sichel" for both SI and SICHEL
 rootogram.gamlss <- function(object, newdata = NULL, breaks = NULL,
                              max = NULL, xlab = NULL, main = NULL, width = NULL, ...) 
 {
   family <- substr(family(object)[2], 1L, 30L)
   if(!(family %in% c("Negative Binomial type I", "Negative Binomial type II", "Poisson", 
-                     "Poisson.Inverse.Gaussian", "Sichel", "Yule", "Delaporte"))) {
+                     "Poisson.Inverse.Gaussian", "Sichel", "Yule", "Delaporte", "Logarithmic", 
+                     "Zero Adjusted Logarithmic", "Poisson Zero Inflated", "Zero Inflated Poisson 2"))) {
     stop("family currently not supported")
   }
   
