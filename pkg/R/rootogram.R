@@ -4,8 +4,8 @@ rootogram <- function(object, ...) {
 
 rootogram.default <- function(object, fitted, breaks = NULL,
   style = c("hanging", "standing", "suspended"),
-  scale = c("sqrt", "raw"), width = NULL,
-  xlab = NULL, ylab = NULL, main = NULL, ...)
+  scale = c("sqrt", "raw"), plot = TRUE,
+  width = NULL, xlab = NULL, ylab = NULL, main = NULL, ...)
 {
   ## rectangle style
   scale <- match.arg(scale)
@@ -50,7 +50,7 @@ rootogram.default <- function(object, fitted, breaks = NULL,
   y <- if(style == "hanging") expctd - obsrvd else 0
   height <- if(style == "suspended") expctd - obsrvd else obsrvd
 
-  ## return everything as data.frame
+  ## collect everything as data.frame
   rval <- data.frame(observed = as.vector(object), expected = as.vector(fitted),
     x = x, y = y, width = diff(breaks) * width, height = height,
     line = expctd)
@@ -58,7 +58,12 @@ rootogram.default <- function(object, fitted, breaks = NULL,
   attr(rval, "ylab") <- ylab
   attr(rval, "main") <- main
   class(rval) <- c("rootogram", "data.frame")
-  return(rval)
+  
+  ## also plot by default
+  if(plot) plot(rval, ...)
+  
+  ## return invisibly
+  invisible(rval)
 }
 
 c.rootogram <- rbind.rootogram <- function(...)
@@ -91,15 +96,6 @@ c.rootogram <- rbind.rootogram <- function(...)
   attr(rval, "main") <- main
   class(rval) <- c("rootogram", "data.frame")
   return(rval)
-}
-
-print.rootogram <- function(x, plot = TRUE, ...) {
-  if(plot) {
-    plot(x, ...)
-  } else {
-    print.data.frame(x, ...)
-  }
-  invisible(x)
 }
 
 plot.rootogram <- function(x,

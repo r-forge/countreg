@@ -75,7 +75,6 @@ S3method("rootogram", "gamlss")
 S3method("rootogram", "gam")
 
 ## methods for class rootogram
-S3method("print", "rootogram")
 S3method("plot", "rootogram")
 S3method("c", "rootogram")
 S3method("rbind", "rootogram")
