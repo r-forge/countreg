@@ -486,3 +486,39 @@ extractAIC.zerotrunc <- function(fit, scale = NULL, k = 2, ...) {
   c(attr(logLik(fit), "df"), AIC(fit, k = k))
 }
 
+estfun.zerotrunc <- function(x, ...) {
+  ## extract data
+  Y <- if(is.null(x$y)) model.response(model.frame(x)) else x$y
+  X <- model.matrix(x)
+  beta <- coef(x)
+  theta <- x$theta
+  offset <- if(is.null(x$offset)) 0 else x$offset
+  wts <- weights(x)
+  if(is.null(wts)) wts <- 1
+
+  ## count component: working residuals
+  eta <- as.vector(X %*% beta + offset)
+  mu <- exp(eta)
+
+  wres <- as.numeric(Y > 0) * switch(x$dist,
+    "poisson" = {
+      (Y - mu) - exp(ppois(0, lambda = mu, log.p = TRUE) -
+        ppois(0, lambda = mu, lower.tail = FALSE, log.p = TRUE) + eta)    
+    },
+    "geometric" = {
+      (Y - mu * (Y + 1)/(mu + 1)) - exp(pnbinom(0, mu = mu, size = 1, log.p = TRUE) -
+        pnbinom(0, mu = mu, size = 1, lower.tail = FALSE, log.p = TRUE) - log(mu + 1) + eta)
+    },
+    "negbin" = {
+      (Y - mu * (Y + theta)/(mu + theta)) - exp(pnbinom(0, mu = mu, size = theta, log.p = TRUE) -
+        pnbinom(0, mu = mu, size = theta, lower.tail = FALSE, log.p = TRUE) +
+	log(theta) - log(mu + theta) + eta)
+    })
+
+  ## compute gradient from data
+  rval <- cbind(wres * wts * X)
+  colnames(rval) <- names(beta)
+  rownames(rval) <- rownames(X)
+  return(rval)
+}
+

@@ -11,6 +11,7 @@ export(
   
   "zerotrunc",
   "zerotrunc.control",
+  "estfun.zerotrunc",
   
   "rootogram",
   "rootogram.default",
