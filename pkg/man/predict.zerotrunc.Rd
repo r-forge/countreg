@@ -1,6 +1,7 @@
 \name{predict.zerotrunc}
 \alias{predict.zerotrunc}
 \alias{residuals.zerotrunc}
+\alias{estfun.zerotrunc}
 \alias{terms.zerotrunc}
 \alias{model.frame.zerotrunc}
 \alias{model.matrix.zerotrunc}
