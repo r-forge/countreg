@@ -567,3 +567,12 @@ rootogram.gam <- function(object, newdata = NULL, breaks = NULL,
                     width = if(family == "gaussian") 1 else 0.9, ...)  
 }
 
+"+.rootogram" <- function(e1, e2) {
+  xlab <- paste(unique(c(attr(e1, "xlab"), attr(e2, "xlab"))), collapse = " / ")
+  main <- paste(unique(c(attr(e1, "main"), attr(e2, "main"))), collapse = " / ")
+  e1 <- as.data.frame(e1)
+  e2 <- as.data.frame(e2)
+  e <- e1[e1$x %in% e2$x, ] + e2[e2$x %in% e1$x, ]
+  rootogram.default(structure(e$observed, .Names = e$x/2), e$expected,
+    main = main, xlab = xlab, plot = FALSE)
+}
