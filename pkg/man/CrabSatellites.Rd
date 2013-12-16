@@ -67,12 +67,13 @@ plot(jitter(satellites) ~ width, data = CrabSatellites, subset = satellites > 0,
 plot(jitter(satellites) ~ factor(color), data = CrabSatellites, subset = satellites > 0, log = "y")
 
 ## count data models
-cs_p   <-    glm(satellites ~ width + color, data = CrabSatellites, family = poisson)
-cs_nb  <- glm.nb(satellites ~ width + color, data = CrabSatellites)
-cs_hp  <- hurdle(satellites ~ width + color, data = CrabSatellites, dist = "poisson")
-cs_hnb <- hurdle(satellites ~ width + color, data = CrabSatellites, dist = "negbin")
-AIC(cs_p, cs_nb, cs_hp, cs_hnb)
-BIC(cs_p, cs_nb, cs_hp, cs_hnb)
+cs_p    <-    glm(satellites ~ width + color, data = CrabSatellites, family = poisson)
+cs_nb   <- glm.nb(satellites ~ width + color, data = CrabSatellites)
+cs_hp   <- hurdle(satellites ~ width + color, data = CrabSatellites, dist = "poisson")
+cs_hnb  <- hurdle(satellites ~ width + color, data = CrabSatellites, dist = "negbin")
+cs_hnb2 <- hurdle(satellites ~ 1 | width + color, data = CrabSatellites, dist = "negbin")
+AIC(cs_p, cs_nb, cs_hp, cs_hnb, cs_hnb2)
+BIC(cs_p, cs_nb, cs_hp, cs_hnb, cs_hnb2)
 
 ## rootograms
 par(mfrow = c(2, 2))
@@ -91,8 +92,9 @@ with(CrabSatellites, lines(lowess(width, satellites)))
 lines(predict(cs_ag, nd) ~ width, data = nd, col = 4, lwd = 1.5)
 lines(predict(cs_p,  nd) ~ width, data = nd, col = 4, lty = 2, lwd = 1.5)
 lines(predict(cs_hnb, nd) ~ width, data = nd, col = 2, lwd = 1.5)
-legend("topleft", c("Lowess", "Hurdle-NB", "Poisson (id)", "Poisson (log)"),
-  col = c(1, 2, 4, 4), lty = c(1, 1, 1, 2), lwd = 1.5, bty = "n")
+lines(predict(cs_hnb2,nd) ~ width, data = nd, col = 2, lwd = 1.5, lty = 2)
+legend("topleft", c("Lowess", "Hurdle-NB", "Hurdle-NB 2", "Poisson (id)", "Poisson (log)"),
+  col = c(1, 2, 2, 4, 4), lty = c(1, 1, 2, 1, 2), lwd = 1.5, bty = "n")
 }
 
 \keyword{datasets}
