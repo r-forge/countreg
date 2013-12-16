@@ -326,10 +326,6 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
 
       ll_new <- loglikfun(c(start$count, start$zero))
       ll_old <- 2 * ll_new      
-      if(!require("MASS")) {
-        ll_old <- ll_new
-	warning("EM estimation of starting values not available")
-      }
     
       while(abs((ll_old - ll_new)/ll_old) > control$reltol) {
         ll_old <- ll_new
@@ -354,10 +350,6 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
 
       ll_new <- loglikfun(c(start$count, start$zero, log(start$theta)))      
       ll_old <- 2 * ll_new      
-      if(!require("MASS")) {
-        ll_old <- ll_new
-	warning("EM estimation of starting values not available")
-      }
       
       ## offset handling in glm.nb is sub-optimal, hence...
       offset <- offsetx
