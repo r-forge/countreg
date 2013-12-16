@@ -36,7 +36,7 @@ FLXMRnegbin <- function(formula = . ~ ., theta = NULL, offset = NULL)
       }
       
       logLik <- function(x, y, ...)
-        dnbinom(y, mu = predict(x, ...), size = theta, log = TRUE)
+        suppressWarnings(dnbinom(y, mu = predict(x, ...), size = theta, log = TRUE))
     
       new("FLXcomponent",
         parameters = list(coef = coef, theta = theta),
@@ -57,7 +57,7 @@ FLXMRnegbin <- function(formula = . ~ ., theta = NULL, offset = NULL)
       }
       
       logLik <- function(x, y, ...)
-        dnbinom(y, mu = predict(x, ...), size = theta, log = TRUE)
+        suppressWarnings(dnbinom(y, mu = predict(x, ...), size = theta, log = TRUE))
     
       new("FLXcomponent",
         parameters = list(coef = coef),
