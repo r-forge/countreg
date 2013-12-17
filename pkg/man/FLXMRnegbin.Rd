@@ -18,7 +18,7 @@ FLXMRnegbin(formula = . ~ ., theta = NULL, offset = NULL,
     \code{\link{update.formula}}. Default is to use the original
     \code{flexmix} model formula.}
   \item{theta}{numeric or \code{NULL}. Value of the theta parameter
-    of the negative binomial model. If \code{NULL}, theta is estaimted
+    of the negative binomial model. If \code{NULL}, theta is estimated
     along with the regression coefficients.}
   \item{offset}{numeric. Optional offset vector for the linear
     predictor.}
