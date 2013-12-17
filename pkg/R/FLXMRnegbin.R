@@ -1,4 +1,5 @@
-FLXMRnegbin <- function(formula = . ~ ., theta = NULL, offset = NULL)
+FLXMRnegbin <- function(formula = . ~ ., theta = NULL, offset = NULL,
+  control = list(reltol = .Machine$double.eps^(1/1.5), maxit = 500))
 {
   stopifnot(require("flexmix"))
   .theta <- theta
@@ -108,8 +109,7 @@ FLXMRnegbin <- function(formula = . ~ ., theta = NULL, offset = NULL)
       )
 
       ## BFGS optimization
-      opt <- optim(par = start, fn = nll, gr = gr, method = "BFGS",
-        control = list(reltol = .Machine$double.eps^(1/1.5), maxit = 500))
+      opt <- optim(par = start, fn = nll, gr = gr, method = "BFGS", control = control)
       
       ## estimated parameters
       cf <- opt$par[-df]

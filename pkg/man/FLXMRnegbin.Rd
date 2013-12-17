@@ -8,7 +8,8 @@ FlexMix driver for fitting of negative binomial regression models.
 }
 
 \usage{
-FLXMRnegbin(formula = . ~ ., theta = NULL, offset = NULL)
+FLXMRnegbin(formula = . ~ ., theta = NULL, offset = NULL,
+  control = list(reltol = .Machine$double.eps^(1/1.5), maxit = 500))
 }
 
 \arguments{
@@ -21,6 +22,8 @@ FLXMRnegbin(formula = . ~ ., theta = NULL, offset = NULL)
     along with the regression coefficients.}
   \item{offset}{numeric. Optional offset vector for the linear
     predictor.}
+  \item{control}{list with control parameters passed to
+    \code{\link[stats]{optim}}.}
 }
 
 \details{
