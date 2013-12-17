@@ -1,6 +1,6 @@
 Package: countreg
 Version: 0.1-1
-Date: 2013-11-17
+Date: 2013-12-17
 Title: Count Data Regression
 Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org"),
              person(given = "Christian", family = "Kleiber", role = "aut", email = "Christian.Kleiber@unibas.ch"),
@@ -10,6 +10,6 @@ Description: Regression models for count data, including zero-inflated,
              data regression.
 LazyLoad: yes
 Depends: R (>= 2.14.0), MASS
-Suggests: AER, car, flexmix (>= 2.3-11), gamlss, lmtest, pscl, sandwich
+Suggests: AER, car, flexmix (>= 2.3-11), gamlss, lmtest, mboost, pscl, sandwich
 Imports: stats
 License: GPL-2

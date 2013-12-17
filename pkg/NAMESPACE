@@ -1,7 +1,7 @@
 import("stats")
 importFrom("MASS", "fitdistr", "glm.nb", "negative.binomial")
 
-export(
+export(  
   "hurdle",
   "hurdle.control",
   "hurdletest",
@@ -17,7 +17,11 @@ export(
   "rootogram.default",
   "autoplot.rootogram", ## for the moment
   
-  "FLXMRnegbin"
+  "FLXMRnegbin",
+  
+  "MBbinomial",
+  "MBnegbin",
+  "MBztnegbin"
 )
 
 ## methods for class zeroinfl
