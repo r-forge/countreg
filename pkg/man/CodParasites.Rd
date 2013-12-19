@@ -72,7 +72,8 @@ data("CodParasites", package = "countreg")
 ## number of observations
 xtabs(~ area + year, data = CodParasites)
 ## prevalence of parasites (NAs counted as "yes")
-tab <- xtabs(~ area + year + factor(is.na(prevalence) | prevalence == "yes"), data = CodParasites)
+tab <- xtabs(~ area + year + factor(is.na(prevalence) | prevalence == "yes"),
+  data = CodParasites)
 round(100 * prop.table(tab, 1:2)[,,2], digits = 1)
 
 ## omit NAs in response
@@ -82,7 +83,8 @@ CodParasites <- subset(CodParasites, !is.na(intensity))
 par(mfrow = c(2, 2))
 plot(factor(intensity == 0) ~ interaction(year, area), data = CodParasites)
 plot(factor(intensity == 0) ~ length, data = CodParasites, breaks = c(15, 3:8 * 10, 105))
-plot(jitter(intensity) ~ interaction(year, area), data = CodParasites, subset = intensity > 0, log = "y")
+plot(jitter(intensity) ~ interaction(year, area), data = CodParasites,
+  subset = intensity > 0, log = "y")
 plot(jitter(intensity) ~ length, data = CodParasites, subset = intensity > 0, log = "y")
 
 ## count data models
