@@ -85,7 +85,7 @@ cbind(c(coef(m0), "theta" = m0$theta),
 \donttest{
 if(require("mboost")) {
 ## ML estimation
-g <- hurdle(satellites ~ width + color, data = CrabSatellites)
+g <- hurdle(satellites ~ width + color, data = CrabSatellites, dist = "negbin")
 summary(g)
 
 ## boosting of zero hurdle
