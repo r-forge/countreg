@@ -3,13 +3,14 @@ Version: 0.1-1
 Date: 2013-12-17
 Title: Count Data Regression
 Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org"),
-             person(given = "Christian", family = "Kleiber", role = "aut", email = "Christian.Kleiber@unibas.ch"),
-             person(given = "Dominique", family = "Cueni", role = "ctb"))
+             person(given = "Christian", family = "Kleiber", role = "aut", email = "Christian.Kleiber@unibas.ch"))
 Description: Regression models for count data, including zero-inflated,
              zero-truncated, and hurdle models as well as generalized count
-             data regression.
+             data regression. Drivers for combination with flexmix and mboost are
+	     also provided. Furthermore, rootograms for assessing goodness of fit
+	     for (regression) models are available.
 LazyLoad: yes
 Depends: R (>= 2.14.0), MASS
-Suggests: AER, car, flexmix (>= 2.3-11), gamlss, lmtest, mboost, pscl, sandwich
+Suggests: AER, car, flexmix (>= 2.3-11), gamlss, ggplot2, lmtest, mboost, pscl, sandwich
 Imports: stats
-License: GPL-2
+License: GPL-2 | GPL-3
