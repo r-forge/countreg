@@ -360,6 +360,12 @@ autoplot.rootogram <- function(object,
   n <- max(object$group)
   object$group <- factor(object$group, levels = 1L:n, labels = attr(object, "main"))
 
+  ## unneeded copies just to avoid warnings in R CMD check
+  x <- object$x
+  y <- object$y
+  width <- object$width
+  height <- object$height
+  
   ## rectangles and fitted lines
   rval <- ggplot(object, aes(xmin = x - width/2, xmax = x + width/2, ymin = y, ymax = y + height, x = x, y = line)) +
     geom_rect(colour = colour[1L], fill = fill) + geom_line(colour = colour[2L], size = size[1L]) +
