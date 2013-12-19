@@ -141,22 +141,20 @@ hurdle(formula, data, subset, na.action, weights, offset,
 }
 
 \references{
-Cameron, A. Colin and Pravin K. Trivedi. 1998. \emph{Regression Analysis of Count 
-Data}. New York: Cambridge University Press.
+Cameron AC, Trivedi PK (1998). \emph{Regression Analysis of Count Data}.
+  New York: Cambridge University Press.
 
-Cameron, A. Colin and Pravin K. Trivedi 2005. \emph{Microeconometrics: Methods and Applications}.
-Cambridge: Cambridge University Press.
+Cameron AC, Trivedi PK (2005). \emph{Microeconometrics: Methods and Applications}.
+  Cambridge: Cambridge University Press.
 
-Mullahy, J. 1986. Specification and Testing of Some Modified Count Data Models.
-  \emph{Journal of Econometrics}. \bold{33}:341--365.
+Mullahy J (1986). \dQuote{Specification and Testing of Some Modified Count Data Models}.
+  \emph{Journal of Econometrics}. \bold{33}, 341--365.
 
-Zeileis, Achim, Christian Kleiber and Simon Jackman 2008.
-\dQuote{Regression Models for Count Data in R.} 
-\emph{Journal of Statistical Software}, \bold{27}(8).
-URL \url{http://www.jstatsoft.org/v27/i08/}.
+Zeileis A, Kleiber C, Jackman S (2008).
+  \dQuote{Regression Models for Count Data in R.} 
+  \emph{Journal of Statistical Software}, \bold{27}(8), 1--25.
+  URL \url{http://www.jstatsoft.org/v27/i08/}.
 }
-
-\author{Achim Zeileis <Achim.Zeileis@R-project.org>}
 
 \seealso{\code{\link{hurdle.control}}, \code{\link[stats]{glm}},
   \code{\link[stats]{glm.fit}}, \code{\link[MASS]{glm.nb}},
@@ -165,28 +163,30 @@ URL \url{http://www.jstatsoft.org/v27/i08/}.
 
 \examples{
 ## data
-data("bioChemists", package = "pscl")
+data("CrabSatellites", package = "countreg")
+cs <- CrabSatellites[, c("satellites", "width", "color")]
+cs$color <- as.numeric(cs$color)
 
 ## logit-poisson
-## "art ~ ." is the same as "art ~ . | .", i.e.
-## "art ~ fem + mar + kid5 + phd + ment | fem + mar + kid5 + phd + ment"
-fm_hp1 <- hurdle(art ~ ., data = bioChemists)
+## "satellites ~ ." is the same as "satellites ~ . | .", i.e.
+## "satellites ~ width + color | width + color"
+fm_hp1 <- hurdle(satellites ~ ., data = cs)
 summary(fm_hp1)
 
 ## geometric-poisson
-fm_hp2 <- hurdle(art ~ ., data = bioChemists, zero = "geometric")
+fm_hp2 <- hurdle(satellites ~ ., data = cs, zero = "geometric")
 summary(fm_hp2)
 
 ## logit and geometric model are equivalent
 coef(fm_hp1, model = "zero") - coef(fm_hp2, model = "zero")
 
 ## logit-negbin
-fm_hnb1 <- hurdle(art ~ ., data = bioChemists, dist = "negbin")
+fm_hnb1 <- hurdle(satellites ~ ., data = cs, dist = "negbin")
 summary(fm_hnb1)
 
 ## negbin-negbin
-## (poorly conditioned zero hurdle, note the standard errors)
-fm_hnb2 <- hurdle(art ~ ., data = bioChemists, dist = "negbin", zero = "negbin")
+## (poorly conditioned zero hurdle, note increased standard errors)
+fm_hnb2 <- hurdle(satellites ~ ., data = cs, dist = "negbin", zero = "negbin")
 summary(fm_hnb2)
 }
 

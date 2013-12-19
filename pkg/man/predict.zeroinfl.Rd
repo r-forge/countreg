@@ -80,14 +80,12 @@
   can be called to compute information criteria.
 }
 
-\author{Achim Zeileis <Achim.Zeileis@R-project.org>}
-
 \seealso{\code{\link{zeroinfl}}}
 
 \examples{
-data("bioChemists", package = "pscl")
+data("CrabSatellites", package = "countreg")
+fm_zip <- zeroinfl(satellites ~ 1 | width + color, data = CrabSatellites)
 
-fm_zip <- zeroinfl(art ~ ., data = bioChemists)
 plot(residuals(fm_zip) ~ fitted(fm_zip))
 
 coef(fm_zip)

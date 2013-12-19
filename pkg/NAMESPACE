@@ -12,6 +12,7 @@ export(
   "zerotrunc",
   "zerotrunc.control",
   "estfun.zerotrunc",
+  "getSummary.zerotrunc",
   
   "rootogram",
   "rootogram.default",

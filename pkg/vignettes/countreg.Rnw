@@ -31,7 +31,7 @@
   system for statistical computing. After reviewing the conceptual and
   computational features of these methods, a new implementation of
   hurdle and zero-inflated regression models in the functions \fct{hurdle}
-  and \fct{zeroinfl} from the package \pkg{pscl} is introduced. It re-uses
+  and \fct{zeroinfl} from the package \pkg{countreg} is introduced. It re-uses
   design and functionality of the basic \proglang{R} functions just
   as the underlying conceptual tools extend the classical models.
   Both hurdle and zero-inflated model, are able to incorporate over-dispersion and
@@ -115,9 +115,9 @@ in the \pkg{stats} package and \fct{glm.nb} in the \pkg{MASS}
 package \citep{countreg:Venables+Ripley:2002} along with associated
 methods for diagnostics and inference. Here, we discuss the implementation
 of hurdle and zero-inflated models in the functions \fct{hurdle} and
-\fct{zeroinfl} in the \pkg{pscl} package \citep{countreg:Jackman:2008},
+\fct{zeroinfl} in the \pkg{countreg} package \citep{countreg:Zeileis+Kleiber:2013},
 available from the Comprehensive \proglang{R} Archive Network (CRAN)
-at \url{http://CRAN.R-project.org/package=pscl}.
+at \url{http://CRAN.R-project.org/package=countreg}.
 The design of both modeling functions as well as the methods operating
 on the associated fitted model objects follows that of the base \proglang{R}
 functionality so that the new software integrates easily into the
@@ -168,9 +168,9 @@ framework; they are implemented in \proglang{R} by the \fct{glm} function
 \citep{countreg:Chambers+Hastie:1992} in the \pkg{stats} package and the
 \fct{glm.nb} function in the \pkg{MASS} package \citep{countreg:Venables+Ripley:2002}.
 The hurdle and zero-inflated extensions of these models are provided by the
-functions \fct{hurdle} and \fct{zeroinfl} in package \pkg{pscl} \citep{countreg:Jackman:2008}.
+functions \fct{hurdle} and \fct{zeroinfl} in package \pkg{countreg} \citep{countreg:Zeileis+Kleiber:2013}.
 The original implementation of \cite{countreg:Jackman:2008} was improved
-by \cite{countreg:Kleiber+Zeileis:2008} for \pkg{pscl} to make the fitting functions and the
+by \cite{countreg:Kleiber+Zeileis:2008} for \pkg{countreg} to make the fitting functions and the
 fitted model objects more similar to their \fct{glm} and \fct{glm.nb} counterparts.
 The most important features of the new \fct{hurdle} and \fct{zeroinfl} functions
 are discussed below while some technical aspects are deferred to the appendix.
@@ -420,7 +420,7 @@ A test of the hypothesis $\beta = \gamma$ then tests whether the hurdle is
 needed or not.
 
 In \proglang{R}, hurdle count data models can be fitted with the
-\fct{hurdle} function from the \pkg{pscl} package \citep{countreg:Jackman:2008}.
+\fct{hurdle} function from the \pkg{countreg} package \citep{countreg:Zeileis+Kleiber:2013}.
 Both its fitting function and the returned model objects of class \class{hurdle}
 are modelled after the corresponding GLM functionality in \proglang{R}. The
 arguments of \fct{hurdle} are given by
@@ -518,7 +518,7 @@ is typically performed for $\beta$ and $\gamma$, while $\theta$ is treated
 as a nuisance parameter even if a negative binomial model is used.
 
 In \proglang{R}, zero-inflated count data models can be fitted with the
-\fct{zeroinfl} function from the \pkg{pscl} package. Both 
+\fct{zeroinfl} function from the \pkg{countreg} package. Both 
 the fitting function interface and the returned model objects of class \class{zeroinfl}
 are almost identical to the corresponding \fct{hurdle} functionality and again
 modelled after the corresponding GLM functionality in \proglang{R}. The
@@ -1024,7 +1024,7 @@ The model frame for basic count data models from the GLM framework as well
 as their implementation in the \proglang{R} system for statistical computing
 is reviewed. Starting from these basic tools, it is presented how
 hurdle and zero-inflated models extend the classical models and how
-likewise their \proglang{R} implementation in package \pkg{pscl} re-uses
+likewise their \proglang{R} implementation in package \pkg{countreg} re-uses
 design and functionality of the corresponding \proglang{R} software.
 Hence, the new functions \fct{hurdle} and \fct{zeroinfl} are straightforward
 to apply for model fitting. Additionally, standard methods for diagnostics 
@@ -1037,7 +1037,7 @@ re-used.
 The results in this paper were obtained using
 \proglang{R}~\Sexpr{paste(R.Version()[6:7], collapse = ".")} with the packages
 \pkg{MASS}~\Sexpr{gsub("-", "--", packageDescription("MASS")$Version)},
-\pkg{pscl}~\Sexpr{gsub("-", "--", packageDescription("pscl")$Version)},
+\pkg{countreg}~\Sexpr{gsub("-", "--", packageDescription("countreg")$Version)},
 \pkg{sandwich}~\Sexpr{gsub("-", "--", packageDescription("sandwich")$Version)},
 \pkg{car}~\Sexpr{gsub("-", "--", packageDescription("car")$Version)},
 \pkg{lmtest}~\Sexpr{gsub("-", "--", packageDescription("lmtest")$Version)}.
@@ -1192,7 +1192,7 @@ Function & Description \\ \hline
 \citet[p.~204]{countreg:Cameron+Trivedi:1998} use a somewhat extended version
 of the model employed above. Because not all variables in that extended
 model are significant, a reduced set of variables was used throughout the main
-paper. Here, however, we use the full model to show that the tools in \pkg{pscl}
+paper. Here, however, we use the full model to show that the tools in \pkg{countreg}
 reproduce the results of \cite{countreg:Cameron+Trivedi:1998}.
 
 After omitting the responses other than \code{ofp} and setting \code{"other"}

@@ -14,6 +14,7 @@
 \alias{fitted.zerotrunc}
 \alias{predprob.zerotrunc}
 \alias{extractAIC.zerotrunc}
+\alias{getSummary.zerotrunc}
 
 \title{Methods for zerotrunc Objects}
 \description{
@@ -63,14 +64,11 @@
   can be called to compute information criteria.
 }
 
-\author{Achim Zeileis <Achim.Zeileis@R-project.org>}
-
 \seealso{\code{\link{zerotrunc}}}
 
 \examples{
-data("bioChemists", package = "pscl")
-bc <- subset(bioChemists, subset = art > 0)
-fm <- zerotrunc(art ~ ., data = bc, dist = "negbin")
+data("CrabSatellites", package = "countreg")
+fm <- zerotrunc(satellites ~ width + color, data = CrabSatellites, subset = satellites > 0)
 
 plot(residuals(fm, type = "deviance") ~ fitted(fm))
 plot(residuals(fm, type = "pearson") ~ fitted(fm))

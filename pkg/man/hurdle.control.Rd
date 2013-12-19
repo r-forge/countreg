@@ -49,26 +49,24 @@ hurdle.control(method = "BFGS", maxit = 10000, trace = FALSE,
   A list with the arguments specified.
 }
 
-\author{Achim Zeileis <Achim.Zeileis@R-project.org>}
-
 \seealso{\code{\link{hurdle}}}
 
 \examples{
-data("bioChemists", package = "pscl")
+data("CrabSatellites", package = "countreg")
 
 ## default start values
-fm1 <- hurdle(art ~ fem + ment, data = bioChemists,
-              dist = "negbin", zero = "negbin")
+fm1 <- hurdle(satellites ~ width + as.numeric(color), data = CrabSatellites,
+  dist = "negbin", zero = "negbin")
 
 ## user-supplied start values and other options
-fm2 <- hurdle(art ~ fem + ment, data = bioChemists,
-              dist = "negbin",
-              zero = "negbin",
-              trace=TRUE,
-              separate=FALSE,
-              start = list(count = c(0.3, -0.2, 0),
-                           zero = c(4, -2, 0.8),
-                           theta = c(count = 2, zero = 0.1)))
+fm2 <- hurdle(satellites ~ width + as.numeric(color), data = CrabSatellites,
+  dist = "negbin",
+  zero = "negbin",
+  trace = TRUE,
+  separate = FALSE,
+  start = list(count = c(0.5, 0, 0),
+  	       zero = c(-10, 0.5, -0.5),
+  	       theta = c(count = 1, zero = 1)))
 
 }
 

@@ -84,20 +84,11 @@
   can be called to compute information criteria.
 }
 
-\references{
-  Zeileis, Achim, Christian Kleiber and Simon Jackman 2008.
-  \dQuote{Regression Models for Count Data in R.} 
-  \emph{Journal of Statistical Software}, \bold{27}(8).
-  URL \url{http://www.jstatsoft.org/v27/i08/}.
-}
-
-\author{Achim Zeileis <Achim.Zeileis@R-project.org>}
-
 \seealso{\code{\link{hurdle}}}
 
 \examples{
-data("bioChemists", package = "pscl")
-fm <- hurdle(art ~ ., data = bioChemists)
+data("CrabSatellites", package = "countreg")
+fm <- hurdle(satellites ~ 1 | width + color, data = CrabSatellites)
 
 plot(residuals(fm) ~ fitted(fm))
 

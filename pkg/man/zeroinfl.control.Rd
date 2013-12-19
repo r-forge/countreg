@@ -47,22 +47,20 @@ zeroinfl.control(method = "BFGS", maxit = 10000, trace = FALSE,
   A list with the arguments specified.
 }
 
-\author{Achim Zeileis <Achim.Zeileis@R-project.org>}
-
 \seealso{\code{\link{zeroinfl}}}
 
 \examples{
-data("bioChemists", package = "pscl")
+data("CrabSatellites", package = "countreg")
 
 ## default start values
-fm1 <- zeroinfl(art ~ ., data = bioChemists)
+fm1 <- zeroinfl(satellites ~ width + as.numeric(color), data = CrabSatellites)
 
 ## use EM algorithm for start values
-fm2 <- zeroinfl(art ~ ., data = bioChemists, EM = TRUE)
+fm2 <- zeroinfl(satellites ~ width + as.numeric(color), data = CrabSatellites, EM = TRUE)
 
 ## user-supplied start values
-fm3 <- zeroinfl(art ~ ., data = bioChemists,
-  start = list(count = c(0.7, -0.2, 0.1, -0.2, 0, 0), zero = -1.7))
+fm3 <- zeroinfl(satellites ~ width + as.numeric(color), data = CrabSatellites,
+  start = list(count = c(0.5, 0, 0), zero = c(10, -0.5, 0.5)))
 }
 
 \keyword{regression}

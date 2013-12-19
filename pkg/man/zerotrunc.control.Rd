@@ -40,20 +40,18 @@ zerotrunc.control(method = "BFGS", maxit = 10000, start = NULL, \dots)
   A list with the arguments specified.
 }
 
-\author{Achim Zeileis <Achim.Zeileis@R-project.org>}
-
 \seealso{\code{\link{zerotrunc}}}
 
 \examples{
-data("bioChemists", package = "pscl")
-bc <- subset(bioChemists, subset = art > 0)
+data("CrabSatellites", package = "countreg")
 
 ## default start values
-zt_nb <- zerotrunc(art ~ fem + ment, data = bc, dist = "negbin")
+zt_nb <- zerotrunc(satellites ~ width + as.numeric(color), data = CrabSatellites,
+  subset = satellites > 0, dist = "negbin")
 
 ## user-supplied start values and other options
-zt_nb2 <- zerotrunc(art ~ fem + ment, data = bc, dist = "negbin",
-  start = c(0.3, -0.2, 0, 2))
+zt_nb2 <- zerotrunc(satellites ~ width + as.numeric(color), data = CrabSatellites,
+  subset = satellites > 0, dist = "negbin", start = c(0.5, 0, 0))
 }
 
 \keyword{regression}

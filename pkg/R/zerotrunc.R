@@ -522,3 +522,31 @@ estfun.zerotrunc <- function(x, ...) {
   return(rval)
 }
 
+getSummary.zerotrunc <- function(obj, alpha = 0.05, ...) {
+  ## extract summary object
+  s <- summary(obj)
+  
+  ## coefficient matrix and confidence interval
+  ## compute confidence interval manually to include Log(theta)
+  cf <- cbind(s$coefficients,
+    s$coefficients[, 1] + qnorm(alpha/2) * s$coefficients[, 2],
+    s$coefficients[, 1] + qnorm(1 - alpha/2) * s$coefficients[, 2])
+  colnames(cf) <- c("est", "se", "stat", "p", "lwr", "upr")
+
+  ## further summary statistics
+  sstat <- c(
+    "theta" = s$theta,
+    "N" = nobs(obj),
+    "logLik" = as.vector(logLik(obj)),
+    "AIC" = AIC(obj),
+    "BIC" = BIC(obj))
+
+  ## return everything
+  return(list(
+    coef = cf,
+    sumstat = sstat,
+    contrasts = obj$contrasts,
+    xlevels = obj$levels,
+    call = obj$call
+  ))
+}

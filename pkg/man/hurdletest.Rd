@@ -36,20 +36,20 @@ hurdletest(object, \dots)
 }
 
 \references{
-Cameron, A. Colin and Pravin K. Trivedi. 1998. \emph{Regression Analysis of Count 
-Data}. New York: Cambridge University Press.
+Cameron AC, Trivedi PK (1998). \emph{Regression Analysis of Count Data}.
+  New York: Cambridge University Press.
 
-Cameron, A. Colin and Pravin K. Trivedi 2005. \emph{Microeconometrics: Methods and Applications}.
-Cambridge: Cambridge University Press.
+Cameron AC, Trivedi PK (2005). \emph{Microeconometrics: Methods and Applications}.
+  Cambridge: Cambridge University Press.
 }
-
-\author{Achim Zeileis <Achim.Zeileis@R-project.org>}
 
 \seealso{\code{\link{hurdle}}, \code{\link[car]{linearHypothesis}}}
 
 \examples{
-data("bioChemists", package = "pscl")
-fm <- hurdle(art ~ ., data = bioChemists, dist = "negbin", zero = "negbin")
+data("CrabSatellites", package = "countreg")
+cs <- CrabSatellites[, c("satellites", "width", "color")]
+cs$color <- as.numeric(cs$color)
+fm <- hurdle(satellites ~ ., data = cs, dist = "negbin", zero = "negbin")
 if(require("car")) hurdletest(fm)
 }
 

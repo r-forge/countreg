@@ -1,4 +1,18 @@
+Changes in Version 0.1-1
+
+  o New rootogram() function with a wide range methods for creating rootograms
+    based on various fitted model objects (fitdistr, glm, hurdle, zeroinfl, ...)
+  
+  o FLXMRnegbin() driver for estimating mixtures of negative binomial models
+    using flexmix.
+
+  o MBnegbin(), MBztnegbin(), and MBbinomial() families for estimating boosted
+    components of hurdle models using mboost.
+
+
 Changes in Version 0.1-0
 
   o Ported zeroinfl() and hurdle() along with corresponding vignette
     from "pscl" to "countreg".
+
+  o Added zerotrunc() for estimating zero-truncated count regressions.

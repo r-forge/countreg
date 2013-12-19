@@ -102,40 +102,40 @@ zerotrunc(formula, data, subset, na.action, weights, offset,
 }
 
 \references{
-Cameron, A. Colin and Pravin K. Trivedi. 1998. \emph{Regression Analysis of Count 
-Data}. New York: Cambridge University Press.
+Cameron AC, Trivedi PK (1998). \emph{Regression Analysis of Count Data}.
+  New York: Cambridge University Press.
 
-Cameron, A. Colin and Pravin K. Trivedi 2005. \emph{Microeconometrics: Methods and Applications}.
-Cambridge: Cambridge University Press.
+Cameron AC, Trivedi PK (2005). \emph{Microeconometrics: Methods and Applications}.
+  Cambridge: Cambridge University Press.
 
-Zeileis, Achim, Christian Kleiber and Simon Jackman 2008.
-\dQuote{Regression Models for Count Data in R.} 
-\emph{Journal of Statistical Software}, \bold{27}(8).
-URL \url{http://www.jstatsoft.org/v27/i08/}.
+Zeileis A, Kleiber C, Jackman S (2008).
+  \dQuote{Regression Models for Count Data in R.} 
+  \emph{Journal of Statistical Software}, \bold{27}(8), 1--25.
+  URL \url{http://www.jstatsoft.org/v27/i08/}.
 }
-
-\author{Achim Zeileis <Achim.Zeileis@R-project.org>}
 
 \seealso{\code{\link{zerotrunc.control}}, \code{\link[stats]{glm}},
   \code{\link[stats]{glm.fit}}, \code{\link[MASS]{glm.nb}},
-  \code{\link[pscl]{zeroinfl}}, \code{\link[pscl]{hurdle}}
+  \code{\link{zeroinfl}}, \code{\link{hurdle}}
 }
 
 \examples{
 ## data
-data("bioChemists", package = "pscl")
-bc <- subset(bioChemists, subset = art > 0)
+data("CrabSatellites", package = "countreg")
+cs <- CrabSatellites[, c("satellites", "width", "color")]
+cs$color <- as.numeric(cs$color)
+cs <- subset(cs, subset = satellites > 0)
 
 ## poisson
-zt_p <- zerotrunc(art ~ ., data = bc)
+zt_p <- zerotrunc(satellites ~ ., data = cs)
 ## or equivalently
-zt_p <- zerotrunc(art ~ ., data = bc, theta = Inf)
+zt_p <- zerotrunc(satellites ~ ., data = cs, theta = Inf)
 summary(zt_p)
 
 ## negbin
-zt_nb <- zerotrunc(art ~ ., data = bc, dist = "negbin")
+zt_nb <- zerotrunc(satellites ~ ., data = cs, dist = "negbin")
 ## or equivalently
-zt_nb <- zerotrunc(art ~ ., data = bc, theta = NULL)
+zt_nb <- zerotrunc(satellites ~ ., data = cs, theta = NULL)
 summary(zt_nb)
 }
 

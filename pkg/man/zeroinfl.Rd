@@ -136,22 +136,21 @@ zeroinfl(formula, data, subset, na.action, weights, offset,
 }
 
 \references{
-Cameron, A. Colin and Pravin K. Trevedi. 1998. \emph{Regression Analysis of Count 
-Data.} New York: Cambridge University Press.
+Cameron AC, Trivedi PK (1998). \emph{Regression Analysis of Count Data}.
+  New York: Cambridge University Press.
 
-Cameron, A. Colin and Pravin K. Trivedi. 2005. \emph{Microeconometrics: Methods and Applications}.
-Cambridge: Cambridge University Press.
+Cameron AC, Trivedi PK (2005). \emph{Microeconometrics: Methods and Applications}.
+  Cambridge: Cambridge University Press.
 
-Lambert, Diane. 1992. \dQuote{Zero-Inflated Poisson Regression,
-with an Application to Defects in Manufacturing.} \emph{Technometrics}. \bold{34}(1):1-14
+Lambert D (1992).
+  \dQuote{Zero-Inflated Poisson Regression, with an Application to Defects in Manufacturing}.
+  \emph{Technometrics}. \bold{34}(1), 1--14
 
-Zeileis, Achim, Christian Kleiber and Simon Jackman 2008.
-\dQuote{Regression Models for Count Data in R.} 
-\emph{Journal of Statistical Software}, \bold{27}(8).
-URL \url{http://www.jstatsoft.org/v27/i08/}.
+Zeileis A, Kleiber C, Jackman S (2008).
+  \dQuote{Regression Models for Count Data in R.} 
+  \emph{Journal of Statistical Software}, \bold{27}(8), 1--25.
+  URL \url{http://www.jstatsoft.org/v27/i08/}.
 }
-
-\author{Achim Zeileis <Achim.Zeileis@R-project.org>}
 
 \seealso{\code{\link{zeroinfl.control}}, \code{\link[stats]{glm}},
   \code{\link[stats]{glm.fit}}, \code{\link[MASS]{glm.nb}},
@@ -160,22 +159,24 @@ URL \url{http://www.jstatsoft.org/v27/i08/}.
 
 \examples{
 ## data
-data("bioChemists", package = "pscl")
+data("CrabSatellites", package = "countreg")
+cs <- CrabSatellites[, c("satellites", "width", "color")]
+cs$color <- as.numeric(cs$color)
 
 ## without inflation
-## ("art ~ ." is "art ~ fem + mar + kid5 + phd + ment")
-fm_pois <- glm(art ~ ., data = bioChemists, family = poisson)
-fm_qpois <- glm(art ~ ., data = bioChemists, family = quasipoisson)
-fm_nb <- glm.nb(art ~ ., data = bioChemists)
+## ("satellites ~ ." is "satellites ~ width + color")
+fm_pois <- glm(satellites ~ ., data = cs, family = poisson)
+fm_qpois <- glm(satellites ~ ., data = cs, family = quasipoisson)
+fm_nb <- glm.nb(satellites ~ ., data = cs)
 
 ## with simple inflation (no regressors for zero component)
-fm_zip <- zeroinfl(art ~ . | 1, data = bioChemists)
-fm_zinb <- zeroinfl(art ~ . | 1, data = bioChemists, dist = "negbin")
+fm_zip <- zeroinfl(satellites ~ . | 1, data = cs)
+fm_zinb <- zeroinfl(satellites ~ . | 1, data = cs, dist = "negbin")
 
 ## inflation with regressors
-## ("art ~ . | ." is "art ~ fem + mar + kid5 + phd + ment | fem + mar + kid5 + phd + ment")
-fm_zip2 <- zeroinfl(art ~ . | ., data = bioChemists)
-fm_zinb2 <- zeroinfl(art ~ . | ., data = bioChemists, dist = "negbin")
+## ("satellites ~ . | ." is "satellites ~ width + color | width + color")
+fm_zip2 <- zeroinfl(satellites ~ . | ., data = cs)
+fm_zinb2 <- zeroinfl(satellites ~ . | ., data = cs, dist = "negbin")
 }
 
 \keyword{regression}
