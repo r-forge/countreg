@@ -36,6 +36,8 @@ sztnbinom <- function(x, mu, size, parameter = c("mu", "size"), drop = TRUE) {
 }
 
 ## logseries: Log-series
+## Mean: prob / ((prob - 1) * log(1 - prob) ## prob/(1 - prob)  * (-1/log(1 - prob)))
+## Var: -prob * (prob + log(1 - prob)) / ((prob - 1)^2 * log(1 - prob)^2)
 dlogseries <- function(x, prob = 0.5, log = FALSE) { 
   if(any(prob < 0) | any(prob > 1))  stop("'prob' must be in [0, 1]")
   rval <- x * log(prob) - log(abs(x)) - log(-log(1 - prob))
