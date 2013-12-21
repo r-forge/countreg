@@ -157,15 +157,20 @@ rootogram.numeric <- function(object, fitted, breaks = NULL,
   if(substr(fitted, 1L, 1L) != "d") {
     fitted <- match.arg(tolower(fitted),
       c("beta", "cauchy", "chi-squared", "chisquared", "exponential", "f",
-        "gamma", "geometric", "log-normal", "lognormal", "logistic", "negative binomial",
-	"negbin", "normal", "gaussian", "poisson", "t", "weibull"))
+        "gamma", "geometric", "log-normal", "lognormal", "logistic", "logseries", 
+	"negative binomial", "negbin", "normal", "gaussian", "poisson", "t", "weibull"))
     fitted <- switch(fitted,
       "chisquared" = "chi-squared",
       "lognormal" = "log-normal",
       "negbin" = "negative binomial",
       "gaussian" = "normal",
       fitted)
-    if(is.character(dist)) dist <- fitted      
+    if(fitted == "logseries") {
+      dist <- function(x, logit, ...) dlogseries(x, plogis(logit), ...)
+      if(is.null(start)) start <- list(logit = 0)
+    } else {
+      if(is.character(dist)) dist <- fitted
+    }
   }
 
   ## labels
@@ -193,6 +198,7 @@ rootogram.numeric <- function(object, fitted, breaks = NULL,
     "t" = function(x, m, s, df) pt((x - m)/s, df),
     "weibull" = pweibull, 
     paste("p", substr(fitted, 2L, nchar(fitted)), sep = ""))
+  if(fitted == "logseries") pdist <- function(x, logit, ...) plogseries(x, plogis(logit), ...)
   if(is.character(pdist)) pdist <- try(get(pdist), silent = TRUE)
   if(!is.function(pdist)) stop("invalid specification of fitted distribution")
 
@@ -209,8 +215,8 @@ rootogram.numeric <- function(object, fitted, breaks = NULL,
 
   ## different default breaks for discrete distributions
   if(is.null(breaks)) {
-    if(tolower(fitted) %in% c("geometric", "negative binomial", "poisson", "binomial")) {
-      breaks <- -1L:max(object) + 0.5
+    if(tolower(fitted) %in% c("geometric", "negative binomial", "poisson", "binomial", "logseries")) {
+      breaks <- (if(fitted == "logseries") 0L else -1L):max(object) + 0.5
       if(is.null(width)) width <- 0.9
     } else {
       breaks <- "Sturges"
