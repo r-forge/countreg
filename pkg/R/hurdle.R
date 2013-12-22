@@ -353,8 +353,16 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
     theta <- c(count = if(dist == "negbin") as.vector(exp(fit_count$par[kx+1])) else NULL,
                zero = if(zero.dist == "negbin") as.vector(exp(fit_zero$par[kz+1])) else NULL)
     ## covariances
-    vc_count <- -solve(as.matrix(fit_count$hessian))
-    vc_zero <- -solve(as.matrix(fit_zero$hessian))
+    vc_count <- if(hessian) {
+      -solve(as.matrix(fit_count$hessian))
+    } else {
+      matrix(NA_real_, nrow = kx + (dist == "negbin"), ncol = kx + (dist == "negbin"))
+    }
+    vc_zero <- if(hessian) {
+      -solve(as.matrix(fit_zero$hessian))
+    } else {
+      matrix(NA_real_, nrow = kz + (zero.dist == "negbin"), ncol = kz + (zero.dist == "negbin"))
+    }
     SE.logtheta <- list()
     if(dist == "negbin") {
       SE.logtheta$count <- as.vector(sqrt(diag(vc_count)[kx+1]))
@@ -380,7 +388,12 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
     coefc <- fit$par[1:kx]
     coefz <- fit$par[(kx + (dist == "negbin") + 1):(kx + kz + (dist == "negbin"))]
     ## covariances
-    vc <- -solve(as.matrix(fit$hessian))
+    vc <- if(hessian) {
+      -solve(as.matrix(fit$hessian))
+    } else {
+      matrix(NA_real_, nrow = kx + kz + (dist == "negbin") + (zero.dist == "negbin"),
+        ncol = kx + kz + (dist == "negbin") + (zero.dist == "negbin"))
+    }
     np <- c(if(dist == "negbin") kx+1 else NULL,
             if(zero.dist == "negbin") kx+kz+1+(dist == "negbin") else NULL)
     if(length(np) > 0) {
@@ -458,13 +471,14 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
   return(rval)
 }
 
-hurdle.control <- function(method = "BFGS", maxit = 10000, trace = FALSE, separate = TRUE, start = NULL, ...) {
-  rval <- list(method = method, maxit = maxit, trace = trace, separate = separate, start = start)
+hurdle.control <- function(method = "BFGS", maxit = 10000, trace = FALSE,
+  separate = TRUE, start = NULL, hessian = TRUE, ...)
+{
+  rval <- list(method = method, maxit = maxit, trace = trace, separate = separate,
+    start = start, hessian = hessian)
   rval <- c(rval, list(...))
   if(!is.null(rval$fnscale)) warning("fnscale must not be modified")
   rval$fnscale <- -1
-  if(!is.null(rval$hessian)) warning("hessian must not be modified")
-  rval$hessian <- TRUE
   if(is.null(rval$reltol)) rval$reltol <- .Machine$double.eps^(1/1.6)
   rval
 }
@@ -585,7 +599,7 @@ print.summary.hurdle <- function(x, digits = max(3, getOption("digits") - 3), ..
     cat(paste("Zero hurdle model coefficients (", zero_dist, "):\n", sep = ""))
     printCoefmat(x$coefficients$zero, digits = digits, signif.legend = FALSE)
     
-    if(getOption("show.signif.stars") & any(rbind(x$coefficients$count, x$coefficients$zero)[,4] < 0.1))
+    if(getOption("show.signif.stars") & isTRUE(any(rbind(x$coefficients$count, x$coefficients$zero)[,4] < 0.1)))
       cat("---\nSignif. codes: ", "0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1", "\n")
 
     if(!is.null(x$theta)) cat(paste("\nTheta:", paste(names(x$theta), round(x$theta, digits), sep = " = ", collapse = ", ")))

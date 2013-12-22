@@ -414,9 +414,9 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
   coefz <- fit$par[(kx+1):(kx+kz)]
   names(coefz) <- names(start$zero) <- colnames(Z)
 
-  vc <- -solve(as.matrix(fit$hessian))
+  np <- kx + kz + (dist == "negbin")
+  vc <- if(hessian) -solve(as.matrix(fit$hessian)) else matrix(NA_real_, nrow = np, ncol = np)
   if(dist == "negbin") {
-    np <- kx + kz + 1
     theta <- as.vector(exp(fit$par[np]))
     SE.logtheta <- as.vector(sqrt(diag(vc)[np]))
     vc <- vc[-np, -np, drop = FALSE]
@@ -473,13 +473,13 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
   return(rval)
 }
 
-zeroinfl.control <- function(method = "BFGS", maxit = 10000, trace = FALSE, EM = FALSE, start = NULL, ...) {
-  rval <- list(method = method, maxit = maxit, trace = trace, EM = EM, start = start)
+zeroinfl.control <- function(method = "BFGS", maxit = 10000, trace = FALSE,
+  EM = FALSE, start = NULL, hessian = TRUE, ...)
+{
+  rval <- list(method = method, maxit = maxit, trace = trace, EM = EM, start = start, hessian = hessian)
   rval <- c(rval, list(...))
   if(!is.null(rval$fnscale)) warning("fnscale must not be modified")
   rval$fnscale <- -1
-  if(!is.null(rval$hessian)) warning("hessian must not be modified")
-  rval$hessian <- TRUE
   if(is.null(rval$reltol)) rval$reltol <- .Machine$double.eps^(1/1.6)
   rval
 }
@@ -584,7 +584,7 @@ print.summary.zeroinfl <- function(x, digits = max(3, getOption("digits") - 3), 
     cat(paste("\nZero-inflation model coefficients (binomial with ", x$link, " link):\n", sep = ""))
     printCoefmat(x$coefficients$zero, digits = digits, signif.legend = FALSE)
     
-    if(getOption("show.signif.stars") & any(rbind(x$coefficients$count, x$coefficients$zero)[,4] < 0.1))
+    if(getOption("show.signif.stars") & isTRUE(any(rbind(x$coefficients$count, x$coefficients$zero)[,4] < 0.1)))
       cat("---\nSignif. codes: ", "0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1", "\n")
 
     if(x$dist == "negbin") cat(paste("\nTheta =", round(x$theta, digits), "\n")) else cat("\n")

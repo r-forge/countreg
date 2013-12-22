@@ -9,7 +9,7 @@
 
 \usage{
 zeroinfl.control(method = "BFGS", maxit = 10000, trace = FALSE,
-  EM = FALSE, start = NULL, \dots)
+  EM = FALSE, start = NULL, hessian = TRUE, \dots)
 }
 
 \arguments{
@@ -23,6 +23,9 @@ zeroinfl.control(method = "BFGS", maxit = 10000, trace = FALSE,
     maximization) algorithm? See details.}
   \item{start}{an optional list with elements \code{"count"} and \code{"zero"}
     (and potentially \code{"theta"}) containing the coefficients for the corresponding component.}
+  \item{hessian}{logical. Should the Hessian be computed to derive an estimate of the
+    variance-covariance matrix? If \code{FALSE}, the variance-covariance matrix contains only
+    \code{NA}s.}
   \item{\dots}{arguments passed to \code{\link[stats]{optim}}.}
 }
 
