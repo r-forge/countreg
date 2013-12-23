@@ -5,6 +5,7 @@
 \alias{model.matrix.zeroinfl}
 \alias{coef.zeroinfl}
 \alias{vcov.zeroinfl}
+\alias{getSummary.zeroinfl}
 \alias{summary.zeroinfl}
 \alias{print.summary.zeroinfl}
 \alias{logLik.zeroinfl}

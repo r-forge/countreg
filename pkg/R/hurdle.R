@@ -742,6 +742,35 @@ extractAIC.hurdle <- function(fit, scale = NULL, k = 2, ...) {
   c(attr(logLik(fit), "df"), AIC(fit, k = k))
 }
 
+getSummary.hurdle <- getSummary.zeroinfl <- function(obj, alpha = 0.05, ...) {
+  ## extract coefficient summary
+  cf <- summary(obj)$coefficients
+  ## augment with confidence intervals
+  cval <- qnorm(1 - alpha/2)
+  for(i in seq_along(cf)) cf[[i]] <- cbind(cf[[i]],
+    cf[[i]][, 1] - cval * cf[[i]][, 2],
+    cf[[i]][, 1] + cval * cf[[i]][, 2])
+  ## collect in array
+  nam <- unique(unlist(lapply(cf, rownames)))
+  acf <- array(dim = c(length(nam), 6, length(cf)),
+    dimnames = list(nam, c("est", "se", "stat", "p", "lwr", "upr"), names(cf)))
+  for(i in seq_along(cf)) acf[rownames(cf[[i]]), , i] <- cf[[i]]
+  
+  ## return everything
+  return(list(
+    coef = acf,
+    sumstat = c(
+      "N" = obj$n,
+      "logLik" = as.vector(logLik(obj)),
+      "AIC" = AIC(obj),
+      "BIC" = AIC(obj, k = log(obj$n))
+    ),
+    contrasts = c(obj$contrasts$count, obj$contrasts$zero)[unique(unlist(lapply(obj$contrasts, names)))],
+    xlevels = obj$levels,
+    call = obj$call
+  ))
+}
+
 hurdletest <- function(object, ...) {
   stopifnot(inherits(object, "hurdle"))
   stopifnot(object$dist$count == object$dist$zero)

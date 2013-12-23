@@ -5,9 +5,11 @@ export(
   "hurdle",
   "hurdle.control",
   "hurdletest",
+  "getSummary.hurdle",
 
   "zeroinfl",
   "zeroinfl.control",
+  "getSummary.zeroinfl",
   
   "zerotrunc",
   "zerotrunc.control",

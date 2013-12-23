@@ -5,6 +5,7 @@
 \alias{model.matrix.hurdle}
 \alias{coef.hurdle}
 \alias{vcov.hurdle}
+\alias{getSummary.hurdle}
 \alias{summary.hurdle}
 \alias{print.summary.hurdle}
 \alias{logLik.hurdle}
