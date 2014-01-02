@@ -31,7 +31,7 @@ ignoring others. Brockmann (1996) shows that the groupings are not driven
 by environmental factors but by properties of the nesting female crabs.
 Larger females that are in better condition attract more satellites.
 
-Agresti (2002) reanalyzes the number of satellites using count models.
+Agresti (2002, 2013) reanalyzes the number of satellites using count models.
 Explanatory variables are the female crab's color, spine condition, weight,
 and carapace width. Color and spine condition are ordered factors but are
 treated as numeric in some analyses.
@@ -46,20 +46,34 @@ Agresti A (2002).
   \emph{Categorical Data Analysis}, 2nd ed.,
   John Wiley & Sons, Hoboken.
 
+Agresti A (2013).
+  \emph{Categorical Data Analysis}, 3rd ed.,
+  John Wiley & Sons, Hoboken.
+
 Brockmann HJ (1996).
   \dQuote{Satellite Male Groups in Horseshoe Crabs, \emph{Limulus polyphemus}},
   \emph{Ethology}, \bold{102}(1), 1--21.
 }
 
 \examples{
-## load data and use ordered factors as numeric
+## load data, use ordered factors as numeric, and
+## grouped factor version of width
 data("CrabSatellites", package = "countreg")
 CrabSatellites <- transform(CrabSatellites,
   color = as.numeric(color),
-  spine = as.numeric(spine)
-)  
+  spine = as.numeric(spine),
+  cwidth = cut(width, c(-Inf, seq(23.25, 29.25), Inf))
+)
 
-## exploratory displays for hurdle and counts
+## Agresti, Table 4.4
+aggregate(CrabSatellites$satellites, list(CrabSatellites$cwidth), function(x)
+  round(c(Number = length(x), Sum = sum(x), Mean = mean(x), Var = var(x)), digits = 2))
+
+## Agresti, Figure 4.4
+plot(tapply(satellites, cwidth, mean) ~ tapply(width, cwidth, mean),
+  data = CrabSatellites, ylim = c(0, 6), pch = 19)
+
+## alternatively: exploratory displays for hurdle (= 0 vs. > 0) and counts (> 0)
 par(mfrow = c(2, 2))
 plot(factor(satellites == 0) ~ width, data = CrabSatellites, breaks = seq(20, 33.5, by = 1.5))
 plot(factor(satellites == 0) ~ color, data = CrabSatellites, breaks = 1:5 - 0.5)
@@ -85,16 +99,16 @@ rootogram(cs_hnb, max = 15, main = "Hurdle Negative Binomial")
 ## fitted curves
 par(mfrow = c(1, 1))
 plot(jitter(satellites) ~ width, data = CrabSatellites)
-nd <- data.frame(width = 20:34, color = 2.5)
+nd <- data.frame(width = 20:34, color = 2)
+pred <- function(m) predict(m, newdata = nd, type = "response")
 cs_ag <- glm(satellites ~ width, data = CrabSatellites, family = poisson(link = "identity"),
   start = coef(lm(satellites ~ width, data = CrabSatellites)))
-with(CrabSatellites, lines(lowess(width, satellites)))
-lines(predict(cs_ag, nd) ~ width, data = nd, col = 4, lwd = 1.5)
-lines(predict(cs_p,  nd) ~ width, data = nd, col = 4, lty = 2, lwd = 1.5)
-lines(predict(cs_hnb, nd) ~ width, data = nd, col = 2, lwd = 1.5)
-lines(predict(cs_hnb2,nd) ~ width, data = nd, col = 2, lwd = 1.5, lty = 2)
-legend("topleft", c("Lowess", "Hurdle-NB", "Hurdle-NB 2", "Poisson (id)", "Poisson (log)"),
-  col = c(1, 2, 2, 4, 4), lty = c(1, 1, 2, 1, 2), lwd = 1.5, bty = "n")
+lines(pred(cs_ag)   ~ width, data = nd, col = 2, lwd = 1.5)
+lines(pred(cs_p)    ~ width, data = nd, col = 3, lwd = 1.5)
+lines(pred(cs_hnb)  ~ width, data = nd, col = 4, lwd = 1.5)
+lines(pred(cs_hnb2) ~ width, data = nd, col = 4, lwd = 1.5, lty = 2)
+legend("topleft", c("Hurdle NB", "Hurdle NB 2", "Poisson (id)", "Poisson (log)"),
+  col = c(4, 4, 2, 3), lty = c(1, 2, 1, 1), lwd = 1.5, bty = "n")
 }
 
 \keyword{datasets}
