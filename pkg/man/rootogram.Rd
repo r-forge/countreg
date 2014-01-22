@@ -15,6 +15,7 @@
 \alias{rootogram.hurdle}
 \alias{rootogram.numeric}
 \alias{rootogram.zeroinfl}
+\alias{rootogram.zerotrunc}
 
 \encoding{latin1}
 

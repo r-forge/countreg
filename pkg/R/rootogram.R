@@ -272,6 +272,45 @@ rootogram.zeroinfl <- rootogram.hurdle <- function(object, newdata = NULL,
     xlab = xlab, main = main, width = width, ...)  
 }
 
+rootogram.zerotrunc <- function(object, newdata = NULL,
+  max = NULL, xlab = NULL, main = NULL, width = 0.9, ...)
+{
+  ## observed response
+  mt <- terms(object)
+  mf <- if(is.null(newdata)) {
+    model.frame(object)
+  } else {
+    model.frame(mt, newdata, na.action = na.omit)
+  }
+  y <- model.response(mf)
+  w <- model.weights(mf)
+  if(is.null(w)) w <- rep(1, NROW(y))
+  
+  ## observed and expected frequencies
+  max0 <- if(is.null(max)) max(1.5 * max(y[w > 0]), 20L) else max  
+  obsrvd <- as.vector(xtabs(w ~ factor(y, levels = 1L:max0)))
+  expctd <- if(is.null(newdata)) {
+    colSums(predict(object, type = "prob", at = 1L:max0) * w)
+  } else {
+    colSums(predict(object, newdata = newdata, type = "prob", at = 1L:max0, na.action = na.omit) * w)
+  }
+
+  ## try to guess a good maximum
+  if(is.null(max)) {
+    max <- if(all(expctd >= 1L)) max0 else max(ceiling(mean(y)), min(which(expctd < 1L)))
+    max <- min(max, length(expctd))
+  }
+
+  ## observed and expected frequencies
+  obsrvd <- obsrvd[1L:max]
+  expctd <- expctd[1L:max]
+  
+  if(is.null(xlab)) xlab <- as.character(attr(mt, "variables"))[2L]
+  if(is.null(main)) main <- deparse(substitute(object))
+  rootogram.default(obsrvd, expctd, breaks = 0L:max + 0.5,
+    xlab = xlab, main = main, width = width, ...)  
+}
+
 rootogram.glm <- function(object, newdata = NULL, breaks = NULL,
   max = NULL, xlab = NULL, main = NULL, width = NULL, ...) 
 {
