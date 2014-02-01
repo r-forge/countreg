@@ -3,7 +3,7 @@
 \title{Takeover Bids Data}
 
 \description{
-Cross-section data on firms that were targets of takeover bids during the period 1978--1985.  
+Firms that were targets of takeover bids during the period 1978--1985.  
 }
 
 \usage{data("TakeoverBids")}
@@ -12,14 +12,14 @@ Cross-section data on firms that were targets of takeover bids during the period
 A data frame containing 126 observations on 9 variables.
 \describe{
   \item{bids}{Number of takeover bids (after the initial bid received by the target firm).}
-  \item{legalrest}{factor. Equals 1 if legal defense by lawsuit.}
-  \item{realrest}{factor. Equals 1 if proposed changes in asset structure}
-  \item{finrest}{factor. Equals 1 if proposed changes in ownership structure.}
-  \item{whiteknight}{factor. Equals 1 if management invitation for friendly third-party bid.}
+  \item{legalrest}{factor. Equals \code{"yes"}  if target management responded by lawsuit.}
+  \item{realrest}{factor. Equals \code{"yes"} if target management proposed changes in asset structure.}
+  \item{finrest}{factor. Equals \code{"yes"} if target management proposed changes in ownership structure.}
+  \item{whiteknight}{factor. Equals \code{"yes"} if target management invited friendly third-party bid.}
   \item{bidpremium}{Bid price divided by price 14 working days before bid.}
   \item{insthold}{Percentage of stock held by institutions.}
-  \item{size}{Total book value of assets in billions of USD.}
-  \item{regulation}{factor. Equals 1 if intervention by federal regulators.}
+  \item{size}{Total book value of assets (in billions of USD).}
+  \item{regulation}{factor. Equals \code{"yes"} if intervention by federal regulators.}
 }
 }
 
@@ -47,6 +47,7 @@ Jaggia S, Thosar S (1993). \dQuote{Multiple Bids as a Consequence of Target Mana
 data("TakeoverBids")
 
 ## Poisson model:
+## Jaggia and Thosar (1993), Table 3
 ## Cameron and Johansson (1997), Table IV
 m <- glm(bids ~ . + I(size^2), data = TakeoverBids, family = poisson)
 summary(m)
