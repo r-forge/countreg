@@ -51,6 +51,15 @@ data("TakeoverBids")
 ## Cameron and Johansson (1997), Table IV
 m <- glm(bids ~ . + I(size^2), data = TakeoverBids, family = poisson)
 summary(m)
+logLik(m)
+
+## underdispersion
+rootogram(m)
+
+## Parts of Cameron and Trivedi (2013), Table 5.4
+summary(residuals(m, type="response"))
+summary(residuals(m, type="pearson"))
+summary(residuals(m, type="deviance"))
 
 }
 
