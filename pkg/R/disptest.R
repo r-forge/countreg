@@ -1,4 +1,4 @@
-disptest <- function(object, type = c("DL", "DLadj"), 
+disptest <- function(object, type = c("DL", "DLadj"), trafo = NULL, 
   alternative = c("greater", "two.sided", "less"))
 {
 ## sanity checks  

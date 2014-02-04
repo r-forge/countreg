@@ -55,8 +55,7 @@ respectively.
 \value{An object of class \code{"htest"}.}
 
 \references{
-Cameron AC, Trivedi PK (1990). Regression-based Tests for Overdispersion in the Poisson Model.  
-\emph{Journal of Econometrics}, \bold{46}, 347--364.
+Cameron AC, Trivedi PK (1990). \dQuote{Regression-based Tests for Overdispersion in the Poisson Model}. \emph{Journal of Econometrics}, \bold{46}, 347--364.
 
 Cameron AC, Trivedi PK (2005). \emph{Microeconometrics: Methods and Applications}.
 Cambridge: Cambridge University Press.
@@ -64,9 +63,9 @@ Cambridge: Cambridge University Press.
 Cameron AC, Trivedi PK (2013). \emph{Regression Analysis of Count Data}, 2nd ed. 
 Cambridge: Cambridge University Press.
 
-Dean CB (1992). Testing for Overdispersion in Poisson and Binomial Regression Models. \emph{Journal of the American Statistical Association}, \bold{87}, 451--457.
+Dean CB (1992). \dQuote{Testing for Overdispersion in Poisson and Binomial Regression Models}. \emph{Journal of the American Statistical Association}, \bold{87}, 451--457.
 
-Jaggia S, Thosar S (1993). \dQuote{Multiple Bids as a Consequence of Target Management Resistance: A Count Data Approach}, \emph{Review of Quantitative Finance and Accounting}, \bold{3}, 447--457.
+Jaggia S, Thosar S (1993). \dQuote{Multiple Bids as a Consequence of Target Management Resistance: A Count Data Approach}. \emph{Review of Quantitative Finance and Accounting}, \bold{3}, 447--457.
 }
 
 \seealso{\code{\link{glm}}, \code{\link{poisson}}, \code{\link[MASS]{glm.nb}}}
