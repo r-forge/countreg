@@ -9,7 +9,7 @@
 }
 
 \usage{
-dispersiontest(object, type = c("DL", "DLadj"), trafo = NULL, 
+disptest(object, type = c("DL", "DLadj"), trafo = NULL, 
   alternative = c("greater", "two.sided", "less"))
 }
 
@@ -50,6 +50,9 @@ in terms of the parameter \eqn{\alpha}{alpha}. The transformation \code{trafo} c
 be specified as a function or an integer corresponding to the function \code{function(x) x^trafo},
 such that \code{trafo = 1} and \code{trafo = 2} yield the linear and quadratic formulations
 respectively.
+
+Type \code{"DL"} corresponds to the statistic \eqn{T_1} in Dean and Lawless (1989), type \code{"DLadj"} is their \eqn{T_a}.
+
 }
 
 \value{An object of class \code{"htest"}.}
@@ -65,7 +68,11 @@ Cambridge: Cambridge University Press.
 
 Dean CB (1992). \dQuote{Testing for Overdispersion in Poisson and Binomial Regression Models}. \emph{Journal of the American Statistical Association}, \bold{87}, 451--457.
 
+Dean C, Lawless JF (1989). \dQuote{Tests for Detecting Overdispersion in Poisson Regression Models}. \emph{Journal of the American Statistical Association}, \bold{84}, 467--472.
+
 Jaggia S, Thosar S (1993). \dQuote{Multiple Bids as a Consequence of Target Management Resistance: A Count Data Approach}. \emph{Review of Quantitative Finance and Accounting}, \bold{3}, 447--457.
+
+Lee LF (1986). \dQuote{Specification Test for Poisson Regression Models}. \emph{International Economic Review}, \bold{27}, 689--706.
 }
 
 \seealso{\code{\link{glm}}, \code{\link{poisson}}, \code{\link[MASS]{glm.nb}}}
