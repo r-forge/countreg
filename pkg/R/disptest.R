@@ -1,5 +1,6 @@
-disptest <- function(object, type = c("DL", "DLadj"), trafo = NULL, 
-  alternative = c("greater", "two.sided", "less"))
+disptest <- function(object, 
+  type = c("scoreNB2", "scoreNB2adj", "scoreNB1", "scoreNB1adj", "scoreKatz"), 
+  trafo = NULL, alternative = c("greater", "two.sided", "less"))
 {
 ## sanity checks  
   if(!inherits(object, "glm") || family(object)$family != "poisson")
@@ -10,15 +11,27 @@ disptest <- function(object, type = c("DL", "DLadj"), trafo = NULL,
 ## preprocessing
   y <- if(is.null(object$y)) model.response(model.frame(object)) else object$y
   yhat <- fitted(object)
+  n <- nobs(object)
 
 ## test statistics
-  if(type == "DL") 
+  if(type == "scoreNB2") 
   STAT <- sum((y - yhat)^2 - y) / sqrt(2 * sum(yhat^2))
   
-  if(type == "DLadj") {
+  if(type == "scoreNB2adj") {
   h <- hatvalues(object)
   STAT <- sum((y - yhat)^2 - y  + h * yhat) / sqrt(2 * sum(yhat^2)) 
   }
+
+  if(type == "scoreNB1") 
+  STAT <- sum(( (y - yhat)^2 - y) / yhat ) / sqrt(2 * n)
+
+  if(type == "scoreNB1adj") {
+  h <- hatvalues(object)
+  STAT <- sum(( (y - yhat)^2 - y + h * yhat) / yhat ) / sqrt(2 * n)
+  }
+
+  if(type == "scoreKatz") 
+  STAT <- sum(( (y - 1) * y  - yhat^2) / yhat ) / sqrt(2 * n)
 
 ## collect output  
   rval <- list(
