@@ -24,7 +24,9 @@ export(
   
   "MBbinomial",
   "MBnegbin",
-  "MBztnegbin"
+  "MBztnegbin",
+  
+  "disptest"
 )
 
 ## methods for class zeroinfl
