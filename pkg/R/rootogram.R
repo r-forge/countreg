@@ -101,7 +101,7 @@ c.rootogram <- rbind.rootogram <- function(...)
 plot.rootogram <- function(x,
   xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL, main = NULL,
   border = "black", fill = "lightgray", col = "#B61A51",
-  lwd = 2, pch = 19, lty = 1, type = NULL, ...)
+  lwd = 2, pch = 19, lty = 1, type = NULL, axes = TRUE, ...)
 {
   ## handling of groups
   if(is.null(x$group)) x$group <- 1L
@@ -135,8 +135,10 @@ plot.rootogram <- function(x,
     ## draw rootogram
     plot(0, 0, type = "n", xlim = xlim, ylim = ylim,
       xlab = xlab[j], ylab = ylab[j], main = main[j], axes = FALSE, ...)
-    axis(1)
-    axis(2)
+    if(axes) {
+      axis(1)
+      axis(2)
+    }
     rect(xleft, ybottom, xright, ytop, border = border, col = fill)
     abline(h = 0, col = border)
     lines(d$x, d$line,
