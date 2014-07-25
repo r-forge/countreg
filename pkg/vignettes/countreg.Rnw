@@ -951,7 +951,7 @@ interest to inspect the estimated regression coefficients in the count data mode
 <<coef-count, results=hide>>=
 fm <- list("ML-Pois" = fm_pois, "Quasi-Pois" = fm_qpois, "NB" = fm_nbin,
   "Hurdle-NB" = fm_hurdle, "ZINB" = fm_zinb)
-sapply(fm, function(x) coef(x)[1:8])
+sapply(fm, function(x) coef(x)[1:7])
 @
 
 The result (see Table~\ref{tab:summary}) shows that there are some small differences,
@@ -966,7 +966,7 @@ are very similar as well (see Table~\ref{tab:summary}):
 <<se-count, results=hide>>=
 cbind("ML-Pois" = sqrt(diag(vcov(fm_pois))),
   "Adj-Pois" = sqrt(diag(sandwich(fm_pois))),
-  sapply(fm[-1], function(x) sqrt(diag(vcov(x)))[1:8]))
+  sapply(fm[-1], function(x) sqrt(diag(vcov(x)))[1:7]))
 @
 The only exception are the model-based standard errors for the Poisson model,
 when treated as a fully specified model, which is obviously not appropriate for this data set.
