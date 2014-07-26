@@ -15,7 +15,8 @@ A numeric vector of 152 serum potassium levels.
 
 \details{
 The data are taken from Rice (2007) who obtained
-the data from and reports them rounded to one digit.
+the data from Martin, Gudzinowicz and Fanger (1975) 
+and reports them rounded to one digit.
 }
 
 \source{
@@ -24,7 +25,7 @@ Page 350 in Rice (2007).
 
 \references{
 Rice JA (2007). \emph{Mathematical Statistics and Data Analysis},
-  3rd ed. Duxbury
+  3rd ed. Duxbury, Belmont, CA.
 
 Martin HF, Gudzinowicz BJ, Fanger H (1975).
   \emph{Normal Values in Clinical Chemistry: A Guide to Statistical Analysis of Laboratory Data}.
