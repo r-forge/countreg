@@ -129,10 +129,10 @@ is much more limited in scope, hence a function has been created here.
 \references{
 Friendly M (2000), \emph{Visualizing Categorical Data}. SAS Institute, Cary.
 
-Kleiber C, Zeileis A (2014). \dQuote{Rootograms for Assessing Goodness of Fit in Count
-Data Regression}. Working Paper 2014-01. Working Papers in Economics and Statistics,
+Kleiber C, Zeileis A (2014). \dQuote{Visualizing Count Data Regressions Using Rootograms}.
+Working Paper 2014-20. Working Papers in Economics and Statistics,
 Research Platform Empirical and Experimental Economics, Universität Innsbruck.
-\url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2014-01}
+\url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2014-20}
 
 Tukey JW (1977). \emph{Exploratory Data Analysis}. Addison-Wesley, Reading.
 }

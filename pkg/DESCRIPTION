@@ -1,6 +1,6 @@
 Package: countreg
 Version: 0.1-1
-Date: 2013-12-17
+Date: 2014-07-30
 Title: Count Data Regression
 Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org"),
              person(given = "Christian", family = "Kleiber", role = "aut", email = "Christian.Kleiber@unibas.ch"))
