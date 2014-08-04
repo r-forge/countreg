@@ -1,8 +1,8 @@
 Changes in Version 0.1-1
 
-New data sets SerumPotassium, TakeoverBids, VolcanoHeights.
+  o New data sets SerumPotassium, TakeoverBids, VolcanoHeights.
 
-New function disptest() providing several (score) tests for over/underdispersion.
+  o New function disptest() providing several (score) tests for over/underdispersion.
 
   o New rootogram() function with a wide range methods for creating rootograms
     based on various fitted model objects (fitdistr, glm, hurdle, zeroinfl, ...)
