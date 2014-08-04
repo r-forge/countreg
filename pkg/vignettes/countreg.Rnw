@@ -1,7 +1,7 @@
 \documentclass[nojss]{jss}
 
 %% need no \usepackage{Sweave}
-\usepackage{thumbpdf}
+%\usepackage{thumbpdf}
 
 %% new commands
 \newcommand{\class}[1]{`\code{#1}'}
