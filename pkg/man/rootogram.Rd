@@ -87,9 +87,9 @@ that carries out the actual drawing (using base graphics).
 There is a wide range of further \code{rootogram} methods that all take
 the following approach: based on a fitted likelihood model observed and
 expected frequencies are computed and then the default method is called.
-Currently, there are methods for \code{\link[stats]{glm}}, \code{\link[mgcv]{gam}},
-\code{\link[gamlss]{gamlss}}, \code{\link{hurdle}}, and \code{\link{zeroinfl}}
-models.
+Currently, there are methods for \code{\link[stats]{glm}}, 
+\code{\link[mgcv]{gam}}, \code{\link[gamlss]{gamlss}}, \code{\link{hurdle}}, 
+\code{\link{zeroinfl}}, and \code{\link{zerotrunc}} models.
 
 Furthermore, there is a \code{numeric} method that uses \code{link[MASS]{fitdistr}}
 to obtain a fitted maximum likelihood model for a univariate variable. For
