@@ -1,6 +1,6 @@
 ## binom: Binomial
 sbinom <- function(x, prob, size, parameter = "prob", drop = TRUE) {
-  s <- lchoose(size, x) + x/prob - (size - x)/(1 - prob)
+  s <- x/prob - (size - x)/(1 - prob)
   if(drop) s else cbind("prob" = s)
 }
 
