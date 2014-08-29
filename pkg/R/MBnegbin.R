@@ -94,3 +94,23 @@ MBztnegbin <- function(theta = NULL, link = "log",
     response = function(f) link$linkinv(f)
   )
 }
+
+MBztpoisson <- function(link = "log",
+  control = list(reltol = .Machine$double.eps^(1/1.5), maxit = 500))
+{
+  stopifnot(require("mboost"))
+
+  ## link function
+  if(!inherits(link, "link-glm")) link <- make.link(link)
+
+  mboost::Family(
+    ngradient = function(y, f, w = 1)  w * sztpois(y, lambda = link$linkinv(f)) * link$mu.eta(f),
+    loss = function(y, f) -dztpois(y, lambda = link$linkinv(f), log = TRUE),
+    check_y = function(y) {
+      stopifnot(all(y > 0))
+      y
+    },
+    name = "Zero-truncated poisson",
+    response = function(f) link$linkinv(f)
+  )
+}

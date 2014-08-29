@@ -1,9 +1,10 @@
 \name{MBnegbin}
 \alias{MBbinomial}
 \alias{MBnegbin}
+\alias{MBztpoisson}
 \alias{MBztnegbin}
 
-\title{mboost Families for Binary and (Zero-Truncated) Negative Binomial Regression}
+\title{mboost Families for Binary, (Zero-Truncated) Negative Binomial and Zero-Truncated Poisson Regression}
 
 \description{
 Family generators for model-based boosting of count data regressions
@@ -14,6 +15,9 @@ using mboost.
 MBbinomial(link = "logit")
 
 MBnegbin(theta = NULL, link = "log",
+  control = list(reltol = .Machine$double.eps^(1/1.5), maxit = 500))
+
+MBztpoisson <- function(link = "log",
   control = list(reltol = .Machine$double.eps^(1/1.5), maxit = 500))
 
 MBztnegbin(theta = NULL, link = "log",
@@ -31,15 +35,16 @@ MBztnegbin(theta = NULL, link = "log",
 }
 
 \details{
-The family generators \code{MBbinomial},  \code{MBnegbin} \code{MBztnegbin} enable
-boosting of binary regressions, negative binomial count regressions, and zero-truncated
-negative binomial count regressions, respectively. Family \code{MBbinomial} is comparable
+The family generators \code{MBbinomial}, \code{MBnegbin}, \code{MBztpoisson}, \code{MBztnegbin} enable
+boosting of binary regressions, negative binomial count regressions, zero-truncated
+Poisson count regressions, and zero-truncated negative binomial count regressions, respectively. 
+Family \code{MBbinomial} is comparable
 to \code{\link[mboost]{Binomial}} but supports any link function (not just logit and probit).
 Family \code{MBnegbin} is comparable to \code{\link[mboost]{NBinomial}} but is typically
 much faster because the nuisance parameter \code{theta} is estimated using analytical
 gradients (via \code{\link[stats]{optim}}) and setting better starting values.
-\code{MBztnegbin} enables zero-truncated negative binomial regression so that
-also the count part of hurdle models can be easily estimated.
+\code{MBztpoisson} and \code{MBztnegbin} enable zero-truncated Poisson and negative binomial regressions so that
+also the count parts of hurdle models can be easily estimated.
 }
 
 \value{
@@ -51,6 +56,7 @@ An object of class \code{boost_family_glm}.
   \code{\link[mboost]{glmboost}}, 
   \code{\link[mboost]{gamboost}},
   \code{\link[mboost]{Binomial}},
+  \code{\link[mboost]{Poisson}},
   \code{\link[mboost]{NBinomial}}
 }
 

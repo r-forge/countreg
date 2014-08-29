@@ -24,6 +24,7 @@ export(
   
   "MBbinomial",
   "MBnegbin",
+  "MBztpoisson",
   "MBztnegbin",
   
   "disptest"
