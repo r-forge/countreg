@@ -10,14 +10,15 @@
 
 \usage{
 disptest(object, 
-  type = c("scoreNB2", "scoreNB2adj", "scoreNB1", "scoreNB1adj", "scoreKatz"), 
+  type = c("lrtNB2", "scoreNB2", "scoreNB2adj", "scoreNB1", "scoreNB1adj", "scoreKatz"), 
   trafo = NULL, alternative = c("greater", "two.sided", "less"))
 }
 
 \arguments{
  \item{object}{a fitted Poisson GLM of class \code{"glm"} as fitted
     by \code{\link{glm}} with family \code{\link{poisson}}.}
- \item{type}{type of test, one of  \code{scoreNB2}, \code{scoreNB2adj}, \code{scoreNB1}, \code{scoreNB1adj}, \code{scoreKatz}. See details.}  
+ \item{type}{type of test, one of  \code{lrtNB2}, \code{scoreNB2}, \code{scoreNB2adj}, \code{scoreNB1}, 
+   \code{scoreNB1adj}, \code{scoreKatz}. See details.}  
  \item{trafo}{a specification of the alternative (see also details),
    can be numeric or a (positive) function or \code{NULL} (the default).}
  \item{alternative}{a character string specifying the alternative hypothesis:
@@ -52,7 +53,19 @@ be specified as a function or an integer corresponding to the function \code{fun
 such that \code{trafo = 1} and \code{trafo = 2} yield the linear and quadratic formulations
 respectively.
 
-Type \code{"scoreNB2"} corresponds to the statistic \eqn{T_1} in Dean and Lawless (1989), type \code{"scoreNB2adj"} is their \eqn{T_a}. \code{"scoreNB2"}  also appears in Lee (1986). Type \code{"scoreNB1"} corresponds to the statistic \eqn{P_C} in Dean (1992), type \code{"scoreNB1adj"} is her \eqn{P'_C}. Type \code{"scoreKatz"} is the score test against Katz alternatives derived by Lee (1986), these distributions permit overdispersion as well as underdispersion. The score tests against NB1 and NB2 alternatives are also the score tests against Generalized Poisson type 1 and type 2 alternatives (Yang, Hardin, and Addy, 2009).
+Type  \code{"lrtNB2"} is the LRT comparing the classical Poisson and negative binomial regression models. 
+Note that this test has a non-standard null distribution here, since the negative binomial
+shape parameter (called \code{theta} in \code{glm.nb}) is on the boundary of the parameter 
+space under the null hypothesis. Hence the asymptotic distribution of the LRT is that of the arithmetic mean of 
+a point mass at zero and a \eqn{\chi^2_1}{chi-square (1)} distribution, implying that the \eqn{p}-value is 
+half that of the classical case. 
+
+Type \code{"scoreNB2"} corresponds to the statistic \eqn{T_1} in Dean and Lawless (1989), 
+type \code{"scoreNB2adj"} is their \eqn{T_a}. \code{"scoreNB2"}  also appears in Lee (1986). 
+Type \code{"scoreNB1"} corresponds to the statistic \eqn{P_C} in Dean (1992), type \code{"scoreNB1adj"} is her \eqn{P'_C}. 
+Type \code{"scoreKatz"} is the score test against Katz alternatives derived by Lee (1986), 
+these distributions permit overdispersion as well as underdispersion. 
+The score tests against NB1 and NB2 alternatives are also the score tests against Generalized Poisson type 1 and type 2 alternatives (Yang, Hardin, and Addy, 2009).
 
 }
 
@@ -82,15 +95,23 @@ Yang Z, Hardin JW, Addy CL (2009). \dQuote{A Note on Dean's Overdispersion Test}
 \seealso{\code{\link{glm}}, \code{\link{poisson}}, \code{\link[MASS]{glm.nb}}}
 
 \examples{
-data("TakeoverBids")
-m <- glm(bids ~ . + I(size^2), data = TakeoverBids, family = poisson)
+## Data with overdispersion
+data("RecreationDemand", package = "AER")
+rd_p <- glm(trips ~ ., data = RecreationDemand, family = poisson)
+disptest(rd_p, type = "lrtNB2", alternative = "greater")
+
+
+## Data with underdispersion
+data("TakeoverBids", package = "countreg")
+tb_p <- glm(bids ~ . + I(size^2), data = TakeoverBids, family = poisson)
 
 ## Jaggia and Thosar (1993), Table 3
-disptest(m, type = "scoreNB2", alternative = "greater")
-disptest(m, type = "scoreNB2adj", alternative = "greater")
+## testing overdispersion
+disptest(tb_p, type = "scoreNB2", alternative = "greater")
+disptest(tb_p, type = "scoreNB2adj", alternative = "greater")
 
-## further examples
-disptest(m, type = "scoreKatz", alternative = "two.sided")
+## testing underdispersion
+disptest(tb_p, type = "scoreKatz", alternative = "two.sided")
 
 }
 
