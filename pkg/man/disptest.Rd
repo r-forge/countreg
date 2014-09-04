@@ -98,6 +98,8 @@ Yang Z, Hardin JW, Addy CL (2009). \dQuote{A Note on Dean's Overdispersion Test}
 ## Data with overdispersion
 data("RecreationDemand", package = "AER")
 rd_p <- glm(trips ~ ., data = RecreationDemand, family = poisson)
+
+## Cameron and Trivedi (2013), p. 248
 disptest(rd_p, type = "lrtNB2", alternative = "greater")
 
 
