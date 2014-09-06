@@ -1,5 +1,9 @@
-zitest <- function(object){
- stopifnot(object$family$family == "poisson")
+zitest <- function(object, type = c("scoreZIP")){
+ 
+ ## sanity checks
+ if(!inherits(object, "glm") || family(object)$family != "poisson")
+    stop("only Poisson GLMs can be tested")
+ type <- match.arg(type)
 
  n <- nobs(object)
  y <- if (is.null(object$y)) 
@@ -14,7 +18,7 @@ zitest <- function(object){
  rval <- list(statistic = c(S = stat), 
               p.value = pchisq(stat, df = 1, lower.tail = FALSE)/2, 
               alternative = NULL, 
-              method = "Zero-inflation test", 
+              method = "Zero inflation test", 
               data.name = deparse(substitute(object))
               )
  

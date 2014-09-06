@@ -1,7 +1,7 @@
 \name{zitest}
 \alias{zitest}
 
-\title{Zero-Inflation Tests}
+\title{Zero Inflation Tests}
 
 \description{
  Tests the null hypothesis of a Poisson GLM against
@@ -9,18 +9,19 @@
 }
 
 \usage{
-zitest(object)
+zitest(object, type = c("scoreZIP"))
 }
 
 \arguments{
  \item{object}{a fitted Poisson GLM of class \code{"glm"} as fitted
     by \code{\link{glm}} with family \code{\link{poisson}}.}
+ \item{type}{type of test, currently only \code{scoreZIP}. See details.}     
 }
 
 \details{
 Currently alternative contains only intercept term in binary part, as in van den Broek (1995).
 
-Note that under the null hypothesis the parameter is on the boundary of the parameter space, hence p-value is non-standard.
+Note that under the null hypothesis the parameter is on the boundary of the parameter space, hence the p-value is non-standard.
 
 }
 
@@ -42,7 +43,7 @@ CrabSatellites <- transform(CrabSatellites,
   cwidth = cut(width, c(-Inf, seq(23.25, 29.25), Inf))
 )
 
-cs_p    <-    glm(satellites ~ width + color, data = CrabSatellites, family = poisson)
+cs_p <- glm(satellites ~ width + color, data = CrabSatellites, family = poisson)
 zitest(cs_p)
 
 }
