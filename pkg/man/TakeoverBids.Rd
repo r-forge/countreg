@@ -53,7 +53,12 @@ m <- glm(bids ~ . + I(size^2), data = TakeoverBids, family = poisson)
 summary(m)
 logLik(m)
 
-## underdispersion
+## dispersion tests
+## Cameron and Trivedi (2013, p. 185)
+AER::dispersiontest(m, alternative = "less", trafo = 2)
+AER::dispersiontest(m, alternative = "less", trafo = 1)
+
+## visualization of underdispersion
 rootogram(m)
 
 ## Parts of Cameron and Trivedi (2013), Table 5.4
