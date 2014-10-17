@@ -123,7 +123,8 @@ is much more limited in scope, hence a function has been created here.
   \item{width}{widths of the histogram bars,}
   \item{height}{height of the histogram bars,}
   \item{line}{y-coordinates of the fitted curve.}
-  Additionally, \code{xlab}, \code{ylab}, and \code{main} are stored as attributes.
+  Additionally, \code{style}, \code{scale}, \code{xlab}, \code{ylab}, and
+  \code{main} are stored as attributes.
 }
 
 \references{
@@ -152,7 +153,7 @@ rootogram(table(deaths), fitted = length(deaths) * dpois(0:4, mean(deaths)))
 
 ## numeric method: fitted values via fitdistr()
 rootogram(deaths, fitted = "poisson")
-rootogram(deaths, dpois, start = list(lambda = 1),
+rootogram(deaths, fitted = dpois, start = list(lambda = 1),
   breaks = 0:5 - 0.5, width = 0.9)
 
 ## glm method: fitted values via glm()
@@ -170,20 +171,22 @@ if(require("ggplot2")) autoplot(r)
 
 ## different styles
 
-## artificial data from negative binomial distribution (mu = 2, theta = 2)
+## artificial data from negative binomial (mu = 3, theta = 2)
+## and Poisson (mu = 3) distribution
 set.seed(1090)
-x <- rnbinom(100, mu = 2, size = 2)
+y <- rnbinom(100, mu = 3, size = 2)
+x <- rpois(100, lambda = 3)
 
-## misfitting Poisson distribution (mu = 2.22, theta = Inf)
+## correctly specified Poisson model fit (mu = 3.34)
 par(mfrow = c(2, 3))
-rootogram(x, "poisson", style = "standing",  ylim = c(-2, 5.7), main = "Poisson: Standing")
-rootogram(x, "poisson", style = "hanging",   ylim = c(-2, 5.7), main = "Poisson: Hanging")
-rootogram(x, "poisson", style = "suspended", ylim = c(-2, 5.7), main = "Poisson: Suspended")
+rootogram(x, "poisson", style = "standing",  ylim = c(-2.2, 4.8), main = "Standing")
+rootogram(x, "poisson", style = "hanging",   ylim = c(-2.2, 4.8), main = "Hanging")
+rootogram(x, "poisson", style = "suspended", ylim = c(-2.2, 4.8), main = "Suspended")
 
-## correctly specified negative binomial distribution
-rootogram(x, "negbin",  style = "standing",  ylim = c(-2, 5.7), main = "NB: Standing")
-rootogram(x, "negbin",  style = "hanging",   ylim = c(-2, 5.7), main = "NB: Hanging")
-rootogram(x, "negbin",  style = "suspended", ylim = c(-2, 5.7), main = "NB: Suspended")
+## misspecified Poisson model fit (mu = 3.32)
+rootogram(y, "poisson", style = "standing",  ylim = c(-2.2, 4.8), main = "Standing")
+rootogram(y, "poisson", style = "hanging",   ylim = c(-2.2, 4.8), main = "Hanging")
+rootogram(y, "poisson", style = "suspended", ylim = c(-2.2, 4.8), main = "Suspended")
 par(mfrow = c(1, 1))
 
 #-------------------------------------------------------------------------------

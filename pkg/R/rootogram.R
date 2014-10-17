@@ -54,6 +54,8 @@ rootogram.default <- function(object, fitted, breaks = NULL,
   rval <- data.frame(observed = as.vector(object), expected = as.vector(fitted),
     x = x, y = y, width = diff(breaks) * width, height = height,
     line = expctd)
+  attr(rval, "style") <- style
+  attr(rval, "scale") <- scale
   attr(rval, "xlab") <- xlab
   attr(rval, "ylab") <- ylab
   attr(rval, "main") <- main
@@ -78,6 +80,8 @@ c.rootogram <- rbind.rootogram <- function(...)
   n <- lapply(rval, function(r) table(r$group))
 
   ## labels
+  style <- unlist(lapply(rval, function(r) attr(r, "style")))
+  scale <- unlist(lapply(rval, function(r) attr(r, "scale")))
   xlab <- unlist(lapply(rval, function(r) attr(r, "xlab")))
   ylab <- unlist(lapply(rval, function(r) attr(r, "ylab")))
   nam <- names(rval)
@@ -91,6 +95,8 @@ c.rootogram <- rbind.rootogram <- function(...)
   ## combine and return
   rval <- do.call("rbind.data.frame", rval)
   rval$group <- if(length(n) < 2L) NULL else rep.int(seq_along(n), n)
+  attr(rval, "style") <- style
+  attr(rval, "scale") <- scale
   attr(rval, "xlab") <- xlab
   attr(rval, "ylab") <- ylab
   attr(rval, "main") <- main
@@ -621,11 +627,26 @@ rootogram.gam <- function(object, newdata = NULL, breaks = NULL,
 }
 
 "+.rootogram" <- function(e1, e2) {
+  style <- unique(c(attr(e1, "style"), attr(e2, "style")))
+  if(length(style) > 1L) {
+    warning(sprintf("different styles (%s != %s) had been used, result now uses style = %s",
+      style[1L], style[2L], style[1L]))
+    style <- style[1L]
+  }
+  scale <- unique(c(attr(e1, "scale"), attr(e2, "scale")))
+  if(length(scale) > 1L) {
+    warning(sprintf("different scales (%s != %s) had been used, result now uses scale = %s",
+      scale[1L], scale[2L], scale[1L]))
+    scale <- scale[1L]
+  }
+
+  ylab <- attr(e1, "ylab")
   xlab <- paste(unique(c(attr(e1, "xlab"), attr(e2, "xlab"))), collapse = " / ")
   main <- paste(unique(c(attr(e1, "main"), attr(e2, "main"))), collapse = " / ")
   e1 <- as.data.frame(e1)
   e2 <- as.data.frame(e2)
   e <- e1[e1$x %in% e2$x, ] + e2[e2$x %in% e1$x, ]
   rootogram.default(structure(e$observed, .Names = e$x/2), e$expected,
-    main = main, xlab = xlab, plot = FALSE)
+    style = style, scale = scale,
+    main = main, xlab = xlab, ylab = ylab, plot = FALSE)
 }
