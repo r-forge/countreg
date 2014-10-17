@@ -1,3 +1,9 @@
+Changes in Version 0.1-2
+
+  o The "style" and "scale" are now added as attributes to "rootogram"
+    objects so that they can be re-used in the c() and + methods.
+
+
 Changes in Version 0.1-1
 
   o New data sets SerumPotassium, TakeoverBids, VolcanoHeights.
