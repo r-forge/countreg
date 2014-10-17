@@ -40,11 +40,12 @@ Expansion: With Applications}, \emph{Journal of Applied Econometrics}, \bold{12}
 Cameron AC, Trivedi PK (2013). \emph{Regression Analysis of Count Data}, 2nd ed. 
 Cambridge: Cambridge University Press.
 
-Jaggia S, Thosar S (1993). \dQuote{Multiple Bids as a Consequence of Target Management Resistance: A Count Data Approach}, \emph{Review of Quantitative Finance and Accounting}, \bold{3}, 447--457.
+Jaggia S, Thosar S (1993). \dQuote{Multiple Bids as a Consequence of Target Management Resistance:
+A Count Data Approach}, \emph{Review of Quantitative Finance and Accounting}, \bold{3}, 447--457.
 }
 
 \examples{
-data("TakeoverBids")
+data("TakeoverBids", package = "countreg")
 
 ## Poisson model:
 ## Jaggia and Thosar (1993), Table 3
@@ -62,10 +63,9 @@ AER::dispersiontest(m, alternative = "less", trafo = 1)
 rootogram(m)
 
 ## Parts of Cameron and Trivedi (2013), Table 5.4
-summary(residuals(m, type="response"))
-summary(residuals(m, type="pearson"))
-summary(residuals(m, type="deviance"))
-
+summary(residuals(m, type = "response"))
+summary(residuals(m, type = "pearson"))
+summary(residuals(m, type = "deviance"))
 }
 
 \keyword{datasets}

@@ -65,14 +65,15 @@ type \code{"scoreNB2adj"} is their \eqn{T_a}. \code{"scoreNB2"}  also appears in
 Type \code{"scoreNB1"} corresponds to the statistic \eqn{P_C} in Dean (1992), type \code{"scoreNB1adj"} is her \eqn{P'_C}. 
 Type \code{"scoreKatz"} is the score test against Katz alternatives derived by Lee (1986), 
 these distributions permit overdispersion as well as underdispersion. 
-The score tests against NB1 and NB2 alternatives are also the score tests against Generalized Poisson type 1 and type 2 alternatives (Yang, Hardin, and Addy, 2009).
-
+The score tests against NB1 and NB2 alternatives are also the score tests against
+Generalized Poisson type 1 and type 2 alternatives (Yang, Hardin, and Addy, 2009).
 }
 
 \value{An object of class \code{"htest"}.}
 
 \references{
-Cameron AC, Trivedi PK (1990). \dQuote{Regression-based Tests for Overdispersion in the Poisson Model}. \emph{Journal of Econometrics}, \bold{46}, 347--364.
+Cameron AC, Trivedi PK (1990). \dQuote{Regression-based Tests for Overdispersion in the Poisson Model}.
+\emph{Journal of Econometrics}, \bold{46}, 347--364.
 
 Cameron AC, Trivedi PK (2005). \emph{Microeconometrics: Methods and Applications}.
 Cambridge: Cambridge University Press.
@@ -80,16 +81,20 @@ Cambridge: Cambridge University Press.
 Cameron AC, Trivedi PK (2013). \emph{Regression Analysis of Count Data}, 2nd ed. 
 Cambridge: Cambridge University Press.
 
-Dean CB (1992). \dQuote{Testing for Overdispersion in Poisson and Binomial Regression Models}. \emph{Journal of the American Statistical Association}, \bold{87}, 451--457.
+Dean CB (1992). \dQuote{Testing for Overdispersion in Poisson and Binomial Regression Models}.
+\emph{Journal of the American Statistical Association}, \bold{87}, 451--457.
 
-Dean C, Lawless JF (1989). \dQuote{Tests for Detecting Overdispersion in Poisson Regression Models}. \emph{Journal of the American Statistical Association}, \bold{84}, 467--472.
+Dean C, Lawless JF (1989). \dQuote{Tests for Detecting Overdispersion in Poisson Regression Models}.
+\emph{Journal of the American Statistical Association}, \bold{84}, 467--472.
 
-Jaggia S, Thosar S (1993). \dQuote{Multiple Bids as a Consequence of Target Management Resistance: A Count Data Approach}. \emph{Review of Quantitative Finance and Accounting}, \bold{3}, 447--457.
+Jaggia S, Thosar S (1993). \dQuote{Multiple Bids as a Consequence of Target Management Resistance:
+A Count Data Approach}. \emph{Review of Quantitative Finance and Accounting}, \bold{3}, 447--457.
 
-Lee LF (1986). \dQuote{Specification Test for Poisson Regression Models}. \emph{International Economic Review}, \bold{27}, 689--706.
+Lee LF (1986). \dQuote{Specification Test for Poisson Regression Models}.
+\emph{International Economic Review}, \bold{27}, 689--706.
 
-Yang Z, Hardin JW, Addy CL (2009). \dQuote{A Note on Dean's Overdispersion Test}. \emph{Journal of Statistical Planning and Inference}, \bold{139} (10), 3675--3678.
-
+Yang Z, Hardin JW, Addy CL (2009). \dQuote{A Note on Dean's Overdispersion Test}.
+\emph{Journal of Statistical Planning and Inference}, \bold{139} (10), 3675--3678.
 }
 
 \seealso{\code{\link{glm}}, \code{\link{poisson}}, \code{\link[MASS]{glm.nb}}}
@@ -114,7 +119,6 @@ disptest(tb_p, type = "scoreNB2adj", alternative = "greater")
 
 ## testing underdispersion
 disptest(tb_p, type = "scoreKatz", alternative = "two.sided")
-
 }
 
 \keyword{htest}
