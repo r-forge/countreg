@@ -687,23 +687,26 @@ predict.hurdle <- function(object, newdata, type = c("response", "prob", "count"
       rval <- matrix(NA, nrow = length(mu), ncol = nUnique)
       dimnames(rval) <- list(rownames(X), yUnique)
       
-      rval[,1] <- 1 - exp(p0_zero)
       switch(object$dist$count,
              "poisson" = {
-               for(i in 2:nUnique) rval[,i] <- exp(logphi + dpois(yUnique[i], lambda = mu, log = TRUE))
+               for(i in 1:nUnique) rval[,i] <- if(yUnique[i] == 0) 1 - exp(p0_zero) else exp(logphi +
+	         dpois(yUnique[i], lambda = mu, log = TRUE))
 	     },
 	     "negbin" = {
-               for(i in 2:nUnique) rval[,i] <- exp(logphi + dnbinom(yUnique[i], mu = mu, size = object$theta["count"], log = TRUE))
+               for(i in 1:nUnique) rval[,i] <- if(yUnique[i] == 0) 1 - exp(p0_zero) else exp(logphi +
+	         dnbinom(yUnique[i], mu = mu, size = object$theta["count"], log = TRUE))
 	     },
 	     "geometric" = {
-               for(i in 2:nUnique) rval[,i] <- exp(logphi + dnbinom(yUnique[i], mu = mu, size = 1, log = TRUE))
+               for(i in 1:nUnique) rval[,i] <- if(yUnique[i] == 0) 1 - exp(p0_zero) else exp(logphi +
+	         dnbinom(yUnique[i], mu = mu, size = 1, log = TRUE))
 	     },
 	     "binomial" = {
-               for(i in 2:nUnique) rval[,i] <- exp(logphi + dbinom(yUnique[i], prob = mu/object$size, size = object$size, log = TRUE))
+               for(i in 1:nUnique) rval[,i] <- if(yUnique[i] == 0) 1 - exp(p0_zero) else exp(logphi +
+	         dbinom(yUnique[i], prob = mu/object$size, size = object$size, log = TRUE))
 	     })
     }
    
-    rval
+    return(rval)
 }
 
 fitted.hurdle <- function(object, ...) {

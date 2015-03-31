@@ -652,21 +652,21 @@ predict.zeroinfl <- function(object, newdata, type = c("response", "prob", "coun
       
       switch(object$dist,
              "poisson" = {
-    	       rval[, 1] <- phi + (1-phi) * exp(-mu)
-               for(i in 2:nUnique) rval[,i] <- (1-phi) * dpois(yUnique[i], lambda = mu)
+               for(i in 1:nUnique) rval[,i] <- if(yUnique[i] == 0) phi + (1-phi) * exp(-mu) else
+	         (1-phi) * dpois(yUnique[i], lambda = mu)
              },
 	     "negbin" = {
                theta <- object$theta
-               rval[, 1] <- phi + (1-phi) * dnbinom(0, mu = mu, size = theta)
-               for(i in 2:nUnique) rval[,i] <- (1-phi) * dnbinom(yUnique[i], mu = mu, size = theta)
+               for(i in 1:nUnique) rval[,i] <- if(yUnique[i] == 0) phi + (1-phi) * dnbinom(0, mu = mu, size = theta) else
+	         (1-phi) * dnbinom(yUnique[i], mu = mu, size = theta)
              },
 	     "geometric" = {
-               rval[, 1] <- phi + (1-phi) * dnbinom(0, mu = mu, size = 1)
-               for(i in 2:nUnique) rval[,i] <- (1-phi) * dnbinom(yUnique[i], mu = mu, size = 1)
+               for(i in 1:nUnique) rval[,i] <- if(yUnique[i] == 0) phi + (1-phi) * dnbinom(0, mu = mu, size = 1) else
+	         (1-phi) * dnbinom(yUnique[i], mu = mu, size = 1)
 	     })
     }
    
-    rval
+    return(rval)
 }
 
 fitted.zeroinfl <- function(object, ...) {
