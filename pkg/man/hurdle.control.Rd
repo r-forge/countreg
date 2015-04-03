@@ -38,9 +38,14 @@ hurdle.control(method = "BFGS", maxit = 10000, trace = FALSE,
 
   Starting values can be supplied via \code{start} or estimated by
   \code{\link[stats]{glm.fit}} (default).
+  
   If \code{separate = TRUE} (default) the likelihoods of the truncated count component and the
   hurdle zero component will be maximized separately, otherwise the joint likelihood is
-  set up and maximized. Standard errors are derived numerically using
+  set up and maximized. In case of \code{separate = FALSE} and both \code{dist == "negbin"}
+  and \code{zero.dist == "negbin"} the theta parameter is restricted to be identical
+  across both negative binomial distributions.
+  
+  Standard errors are derived numerically using
   the Hessian matrix returned by \code{\link[stats]{optim}}. To supply starting 
   values, \code{start} should be a list with elements \code{"count"} and \code{"zero"}
   and potentially \code{"theta"} (a named vector, for models with negative binomial components 

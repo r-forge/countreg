@@ -172,6 +172,16 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
   gradfun <- function(parms) c(countGrad(parms[1:(kx + (dist == "negbin"))]),
     zeroGrad(parms[(kx + (dist == "negbin") + 1):(kx + kz + (dist == "negbin") + (zero.dist == "negbin"))]))
 
+  if(!control$separate & dist == "negbin" & zero.dist == "negbin") {
+    loglikfun <- function(parms) { 
+      countDist(parms[1:(kx + 1)]) + zeroDist(parms[c((kx + 2):(kx + kz + 1), kx + 1)])
+    }
+    gradfun <- function(parms) {
+      grc <- countGrad(parms[1:(kx + 1)])
+      grz <- zeroGrad(parms[c((kx + 2):(kx + kz + 1), kx + 1)])
+      c(grc[1:kx], grc[kx + 1] + grz[kz + 1], grz[1:kz])
+    }
+  }
 
   ## binary link processing
   linkstr <- match.arg(link)
@@ -331,6 +341,7 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
   separate <- control$separate
   ocontrol <- control
   control$method <- control$hessian <- control$separate <- control$start <- NULL
+  thetaz <- zero.dist == "negbin" & !(dist == "negbin" & !separate)
 
   ## ML estimation
   ## separate estimation of censored and truncated component...
@@ -379,7 +390,7 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
     if(control$trace) cat("calling optim() for joint count and zero hurlde estimation:\n")
     fit <- optim(fn = loglikfun, gr = gradfun,
       par = c(start$count, if(dist == "negbin") log(start$theta["count"]) else NULL,
-              start$zero,  if(zero.dist == "negbin") log(start$theta["zero"]) else NULL),
+              start$zero,  if(thetaz) log(start$theta["zero"]) else NULL),
       method = method, hessian = hessian, control = control)
     if(fit$convergence > 0) warning("optimization failed to converge")
     if(control$trace) cat("done\n")
@@ -391,17 +402,22 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
     vc <- if(hessian) {
       -solve(as.matrix(fit$hessian))
     } else {
-      matrix(NA_real_, nrow = kx + kz + (dist == "negbin") + (zero.dist == "negbin"),
-        ncol = kx + kz + (dist == "negbin") + (zero.dist == "negbin"))
+      matrix(NA_real_, nrow = kx + kz + (dist == "negbin") + (thetaz),
+        ncol = kx + kz + (dist == "negbin") + (thetaz))
     }
-    np <- c(if(dist == "negbin") kx+1 else NULL,
-            if(zero.dist == "negbin") kx+kz+1+(dist == "negbin") else NULL)
+    np <- c(if(dist == "negbin") kx + 1 else NULL,
+            if(thetaz) kx + kz + 1 + (dist == "negbin") else NULL)
     if(length(np) > 0) {
       theta <- as.vector(exp(fit$par[np]))
       SE.logtheta <- as.vector(sqrt(diag(vc)[np]))
       names(theta) <- names(SE.logtheta) <- c(if(dist == "negbin") "count" else NULL,
-                                              if(zero.dist == "negbin") "zero" else NULL)
+                                              if(thetaz) "zero" else NULL)
       vc <- vc[-np, -np, drop = FALSE]
+      if(dist == "negbin" & zero.dist == "negbin" & !separate) {
+        theta <- rep(theta, length.out = 2)
+        SE.logtheta <- rep(SE.logtheta, length.out = 2)
+        names(theta) <- names(SE.logtheta) <- c("count", "zero")
+      }
     } else {
       theta <- NULL
       SE.logtheta <- NULL
@@ -445,8 +461,8 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
     offset = list(count = if(identical(offsetx, rep.int(0, n))) NULL else offsetx,
       zero = if(identical(offsetz, rep.int(0, n))) NULL else offsetz),
     n = nobs,
-    df.null = nobs - 2,
-    df.residual = nobs - (kx + kz + (dist == "negbin") + (zero.dist == "negbin")),
+    df.null = nobs - (2 + (dist == "negbin") + thetaz),
+    df.residual = nobs - (kx + kz + (dist == "negbin") + thetaz),
     terms = list(count = mtX, zero = mtZ, full = mt),
     theta = theta,
     SE.logtheta = SE.logtheta,
