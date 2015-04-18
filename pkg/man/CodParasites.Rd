@@ -6,7 +6,7 @@
 \title{Parasite Infections in Cod}
 
 \description{
-Date on parasite infection in cod along the coast of Finmark.
+Data on parasite infection in cod along the coast of Finmark.
 }
 
 \usage{data("CodParasites")}
