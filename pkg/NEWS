@@ -5,6 +5,11 @@ Changes in Version 0.1-3
     zero and truncated count components. The restriction is applied if
     dist = "negbin", zero.dist = "negbin", separate = FALSE.
 
+  o Bug fix in the computation of the standard error of log(theta)
+    in zeroinfl() when with weighted data. The weights were used
+    for the estimation of log(theta) but the standard error was not
+    scaled accordingly.
+
 
 Changes in Version 0.1-2
 

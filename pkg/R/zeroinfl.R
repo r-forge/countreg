@@ -120,7 +120,7 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
       exp(-log(dens0) + log(1 - muz) + clogdens0) *
       (log(theta) - log(mu + theta) + 1 - theta/(mu + theta)))
 
-    colSums(cbind(wres_count * weights * X, wres_zero * weights * Z, wres_theta))
+    colSums(cbind(wres_count * weights * X, wres_zero * weights * Z, wres_theta) * weights)
   }
     
   gradBinom <- function(parms) {
