@@ -112,7 +112,7 @@ plot.rootogram <- function(x,
   ## handling of groups
   if(is.null(x$group)) x$group <- 1L
   n <- max(x$group)
-  if(is.null(type)) type <- ifelse(any(table(x$group) > 15L), "l", "b")
+  if(is.null(type)) type <- ifelse(any(table(x$group) > 20L), "l", "b")
 
   ## annotation
   if(is.null(xlab)) xlab <- TRUE
