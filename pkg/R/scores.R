@@ -98,7 +98,7 @@ qlogseries <- function(p, prob = 0.5, lower.tail = TRUE, log.p = FALSE, round = 
   if(round) q <- as.integer(round(q))
   q[p >= 1] <- Inf
   if(any(nan)) {
-  q[nan] <- NaN
+    q[nan] <- NaN
     warning("NaNs produced")
   }
   q
