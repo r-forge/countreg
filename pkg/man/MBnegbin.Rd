@@ -17,7 +17,7 @@ MBbinomial(link = "logit")
 MBnegbin(theta = NULL, link = "log",
   control = list(reltol = .Machine$double.eps^(1/1.5), maxit = 500))
 
-MBztpoisson <- function(link = "log",
+MBztpoisson(link = "log",
   control = list(reltol = .Machine$double.eps^(1/1.5), maxit = 500))
 
 MBztnegbin(theta = NULL, link = "log",
