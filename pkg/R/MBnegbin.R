@@ -1,6 +1,5 @@
 MBbinomial <- function(link = "logit")
 {
-  stopifnot(require("mboost"))
   if(!inherits(link, "link-glm")) link <- make.link(link)
   mboost::Family(
     ngradient = function(y, f, w = 1) w * sbinom(y, prob = link$linkinv(f), size = 1L) * link$mu.eta(f),
@@ -20,8 +19,6 @@ MBbinomial <- function(link = "logit")
 MBnegbin <- function(theta = NULL, link = "log",
   control = list(reltol = .Machine$double.eps^(1/1.5), maxit = 500))
 {
-  stopifnot(require("mboost"))
-  
   ## currently used value of theta (possibly fixed)
   if(is.null(theta)) {
     theta <- 1
@@ -59,8 +56,6 @@ MBnegbin <- function(theta = NULL, link = "log",
 MBztnegbin <- function(theta = NULL, link = "log",
   control = list(reltol = .Machine$double.eps^(1/1.5), maxit = 500))
 {
-  stopifnot(require("mboost"))
-
   ## currently used value of theta (possibly fixed)
   if(is.null(theta)) {
     theta <- 1
@@ -98,8 +93,6 @@ MBztnegbin <- function(theta = NULL, link = "log",
 MBztpoisson <- function(link = "log",
   control = list(reltol = .Machine$double.eps^(1/1.5), maxit = 500))
 {
-  stopifnot(require("mboost"))
-
   ## link function
   if(!inherits(link, "link-glm")) link <- make.link(link)
 

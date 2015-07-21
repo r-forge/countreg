@@ -1,7 +1,6 @@
 FLXMRnegbin <- function(formula = . ~ ., theta = NULL, offset = NULL,
   control = list(reltol = .Machine$double.eps^(1/1.5), maxit = 500))
 {
-  stopifnot(require("flexmix"))
   .theta <- theta
   
   nbrefit <- function(x, y, w) {

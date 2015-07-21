@@ -794,7 +794,6 @@ hurdletest <- function(object, ...) {
   stopifnot(inherits(object, "hurdle"))
   stopifnot(object$dist$count == object$dist$zero)
   stopifnot(all(sort(names(object$coefficients$count)) == sort(names(object$coefficients$zero))))
-  stopifnot(require("car"))
   nam <- names(object$coefficients$count)
   lh <- paste("count_", nam, " = ", "zero_", nam, sep = "")
   rval <- car::linearHypothesis(object, lh, ...)

@@ -413,24 +413,24 @@ autoplot.rootogram <- function(object,
   n <- max(object$group)
   object$group <- factor(object$group, levels = 1L:n, labels = attr(object, "main"))
 
-  ## unneeded copies just to avoid warnings in R CMD check
+  ## FIXME: unneeded copies just to avoid warnings in R CMD check
   x <- object$x
   y <- object$y
   width <- object$width
   height <- object$height
   
   ## rectangles and fitted lines
-  rval <- ggplot(object, aes(xmin = x - width/2, xmax = x + width/2, ymin = y, ymax = y + height, x = x, y = line)) +
-    geom_rect(colour = colour[1L], fill = fill) + geom_line(colour = colour[2L], size = size[1L]) +
-    geom_hline(yintercept = 0)
-  if(all(table(object$group) <= 15L)) rval <- rval + geom_point(colour = colour[2L], size = size[2L])
+  rval <- ggplot2::ggplot(object, ggplot2::aes(xmin = x - width/2, xmax = x + width/2, ymin = y, ymax = y + height, x = x, y = line)) +
+    ggplot2::geom_rect(colour = colour[1L], fill = fill) + ggplot2::geom_line(colour = colour[2L], size = size[1L]) +
+    ggplot2::geom_hline(yintercept = 0)
+  if(all(table(object$group) <= 15L)) rval <- rval + ggplot2::geom_point(colour = colour[2L], size = size[2L])
 
   ## grouping (if any)
-  if(n > 1L) rval <- rval + facet_grid(group ~ .)
+  if(n > 1L) rval <- rval + ggplot2::facet_grid(group ~ .)
   
   ## annotation
-  rval <- rval + xlab(paste(unique(attr(object, "xlab")), collapse = "/")) +
-    ylab(paste(unique(attr(object, "ylab")), collapse = "/"))
+  rval <- rval + ggplot2::xlab(paste(unique(attr(object, "xlab")), collapse = "/")) +
+    ggplot2::ylab(paste(unique(attr(object, "ylab")), collapse = "/"))
 
   ## return with annotation
   rval
@@ -504,22 +504,22 @@ rootogram.gamlss <- function(object, newdata = NULL, breaks = NULL,
       for(i in at) p[, i + 1L] <- dpois(i, lambda = mu)
     } 
     if(family == "Poisson.Inverse.Gaussian") {
-      for(i in at) p[, i + 1L] <- dPIG(i, mu = mu, sigma = sigma)
+      for(i in at) p[, i + 1L] <- gamlss.dist::dPIG(i, mu = mu, sigma = sigma)
     } 
     if(family == "Negative Binomial type II") {
-      for(i in at) p[, i + 1L] <- dNBII(i, mu = mu, sigma = sigma)
+      for(i in at) p[, i + 1L] <- gamlss.dist::dNBII(i, mu = mu, sigma = sigma)
     } 
     if(family == "Negative Binomial type I") {
-      for(i in at) p[, i + 1L] <- dNBI(i, mu = mu, sigma = sigma)
+      for(i in at) p[, i + 1L] <- gamlss.dist::dNBI(i, mu = mu, sigma = sigma)
     } 
     if(family == "YULE") {
-      for(i in at) p[, i + 1L] <- dYULE(i, mu = mu)
+      for(i in at) p[, i + 1L] <- gamlss.dist::dYULE(i, mu = mu)
     } 
     if(family == "SICHEL") {
-      for(i in at) p[, i + 1L] <- dSICHEL(i, mu = mu, sigma = sigma, nu = nu)
+      for(i in at) p[, i + 1L] <- gamlss.dist::dSICHEL(i, mu = mu, sigma = sigma, nu = nu)
     } 
     if(family == "DEL") {
-      for(i in at) p[, i + 1L] <- dDEL(i, mu = mu, sigma = sigma, nu = nu)
+      for(i in at) p[, i + 1L] <- gamlss.dist::dDEL(i, mu = mu, sigma = sigma, nu = nu)
     } 
     expctd <- colSums(p * w)
     
