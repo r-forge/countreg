@@ -1,2 +1,3 @@
 data/GSOEP.rda
 man/GSOEP.Rd
+R/nbreg.R
