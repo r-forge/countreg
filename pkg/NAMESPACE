@@ -1,4 +1,5 @@
 import("stats")
+importFrom("utils", "head", "tail")
 importFrom("MASS", "fitdistr", "glm.nb", "negative.binomial")
 
 export(  
@@ -19,6 +20,10 @@ export(
   "rootogram",
   "rootogram.default",
   "autoplot.rootogram", ## for the moment
+
+  "qresiduals",
+  "qresiduals.default",
+  "qqrplot",
   
   "FLXMRnegbin",
   
@@ -76,6 +81,13 @@ S3method("terms", "zerotrunc")
 S3method("model.frame", "zerotrunc")
 S3method("model.matrix", "zerotrunc")
 S3method("extractAIC", "zerotrunc")
+
+## methods for qresiduals
+S3method("qresiduals", "default")
+S3method("qresiduals", "zeroinfl")
+S3method("qresiduals", "zerotrunc")
+S3method("qresiduals", "hurdle")
+S3method("qresiduals", "glm")
 
 ## methods for rootograms
 S3method("rootogram", "default")

@@ -1,16 +1,15 @@
 Package: countreg
-Version: 0.1-3
-Date: 2015-07-21
+Version: 0.1-4
+Date: 2015-11-01
 Title: Count Data Regression
 Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org"),
              person(given = "Christian", family = "Kleiber", role = "aut", email = "Christian.Kleiber@unibas.ch"))
-Description: Regression models for count data, including zero-inflated,
-             zero-truncated, and hurdle models as well as generalized count
-             data regression. Drivers for combination with flexmix and mboost are
-	     also provided. Furthermore, rootograms for assessing goodness of fit
-	     for (regression) models are available.
+Description: Regression models for count data, including zero-inflated, zero-truncated, and
+             hurdle models as well as generalized count data regression. Drivers for combination
+	     with flexmix and mboost are also provided. For (graphically) assessing the goodness
+	     of fit for (regression) models, rootograms and quantile residuals are available.
 LazyLoad: yes
 Depends: R (>= 2.14.0), MASS
 Suggests: AER, car, flexmix (>= 2.3-11), gamlss, gamlss.dist, ggplot2, lmtest, mboost, sandwich
-Imports: stats
+Imports: stats, utils
 License: GPL-2 | GPL-3

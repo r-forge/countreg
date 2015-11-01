@@ -1,3 +1,13 @@
+Changes in Version 0.1-4
+
+  o New qresiduals() generic for computing (randomized) quantile residuals
+    along with methods for various objects. (This is somewhat more flexible
+    than statmod::qresiduals which is not generic.)
+    
+  o A Q-Q plot based on quantile residuals is available in the new function
+    qqrplot().
+
+
 Changes in Version 0.1-3
 
   o The hurdle() function now allows for the restriction of the theta
