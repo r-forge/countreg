@@ -93,36 +93,30 @@ qresiduals.zerotrunc <- function(object, ...)
   qresiduals(pr, ...)
 }
 
-qresiduals.default <- function(object, aggregate = c("median", "mean", "range", "none"),
-  nsim = 10L, ...)
+qresiduals.default <- function(object, type = c("random", "quantile"), nsim = 1L, prob = 0.5, ...)
 {
-  ## type of aggregation (if any)
-  aggregate <- match.arg(aggregate)
+  ## type of residual for discrete distribution (if any)
+  type <- match.arg(type)
 
   ## preprocess supplied probabilities
   nc <- NCOL(object)
   nr <- NROW(object)
   if(nc > 2L) stop("quantiles must either be 1- or 2-dimensional")
-  if(nc == 2L & aggregate == "median") {
-    object <- rowMeans(object)
-    nc <- 1L
-  }
-  if(aggregate == "range") {
-    if(nc == 1L) object <- cbind(object, object)
-    colnames(object) <- c("lower", "upper")
+  if(nc == 2L) {
+    if(type == "random") {
+      object <- matrix(
+        runif(nr * nsim, min = rep(object[, 1L], nsim), max = rep(object[, 2L], nsim)),
+        nrow = nr, ncol = nsim, dimnames = list(rownames(object), paste("r", 1L:nsim, sep = "_"))
+      )
+    } else {
+      nam <- rownames(object)
+      object <- object[, 1L]  %*% t(1 - prob) + object[, 2L] %*% t(prob)
+      dimnames(object) <- list(nam, paste("q", prob, sep = "_"))
+    }
+    nc <- NCOL(object)
   }
   if(!is.null(dim(object)) & nc == 1L) object <- drop(object)
 
-  ## draw random probabilities (if necessary)
-  if(nc == 2L & aggregate %in% c("mean", "none")) {
-    object <- matrix(
-      runif(nr * nsim, min = rep(object[, 1L], nsim), max = rep(object[, 2L], nsim)),
-      nrow = nr, ncol = nsim, dimnames = list(rownames(object), paste0("s", 1L:nsim))
-    )
-  }
-
   ## compute quantile residuals  
-  qres <- qnorm(object)
-  if(aggregate == "mean") qres <- rowMeans(qres)  
-  return(qres)
+  qnorm(object)
 }

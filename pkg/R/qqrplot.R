@@ -1,11 +1,11 @@
-qqrplot <- function(object, aggregate = c("median", "mean", "none"), nsim = 1L,
-  range = FALSE, diag = TRUE, xlim = NULL, ylim = NULL,
+qqrplot <- function(object, type = c("random", "quantile"),
+  nsim = 1L, prob = 0.5, range = FALSE, diag = TRUE,
+  col = "black", fill = "lightgray", xlim = NULL, ylim = NULL,
   main = "Q-Q residuals plot", xlab = "Theoretical quantiles", ylab = "Quantile residuals",
   ...)
 {
   ## compute quantile residuals
-  aggregate <- match.arg(aggregate)
-  qres <- qresiduals(object, aggregate = aggregate, nsim = nsim)
+  qres <- qresiduals(object, type = type, nsim = nsim, prob = prob)
   if(is.null(dim(qres))) qres <- matrix(qres, ncol = 1L)
 
   ## corresponding normal quantiles
@@ -21,20 +21,20 @@ qqrplot <- function(object, aggregate = c("median", "mean", "none"), nsim = 1L,
 
   ## polygon for range
   if(!identical(range, FALSE)) {
-    if(isTRUE(range)) range <- "lightgray"
-    rg <- qresiduals(object, aggregate = "range")
+    if(isTRUE(range)) range <- c(0.01, 0.99)
+    rg <- qresiduals(object, type = "quantile", prob = range)
     y1 <- sort(rg[,1])
     y2 <- sort(rg[,2])
     x <- c(q2q(y1), rev(q2q(y2)))
     y <- c(y1, rev(y2))
     y[!is.finite(y)] <- 100 * sign(y[!is.finite(y)])
     x[!is.finite(x)] <- 100 * sign(x[!is.finite(x)])
-    polygon(x, y, col = range, border = range)
+    polygon(x, y, col = fill, border = fill)
     box()
   }
 
   ## add Q-Q plot(s)
-  for(i in 1L:ncol(qres)) points(qnor[, i], qres[, i], ...)
+  for(i in 1L:ncol(qres)) points(qnor[, i], qres[, i], col = col, ...)
   
   ## reference diagol
   if(!identical(diag, FALSE)) {

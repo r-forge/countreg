@@ -9,20 +9,22 @@
 }
 
 \usage{
-qqrplot(object, aggregate = c("median", "mean", "none"), nsim = 1L,
-  range = FALSE, diag = TRUE, xlim = NULL, ylim = NULL,
+qqrplot(object, type = c("random", "quantile"),
+  nsim = 1L, prob = 0.5, range = FALSE, diag = TRUE,
+  col = "black", fill = "lightgray", xlim = NULL, ylim = NULL,
   main = "Q-Q residuals plot", xlab = "Theoretical quantiles", ylab = "Quantile residuals",
   \dots)
 }
 
 \arguments{
   \item{object}{an object (for which a \code{\link{qresiduals}} method exists).}
-  \item{aggregate, nsim}{arguments passed to \code{qresiduals}.}
-  \item{range}{logical or color specification. Should the range of
-    quantile residuals be visualized?}
+  \item{type, nsim, prob}{arguments passed to \code{qresiduals}.}
+  \item{range}{logical or quantile specification. Should the range of
+    quantiles of the randomized quantile residuals be visualized? If \code{TRUE},
+    then \code{range = c(0.01, 0.99)} is used.}
   \item{diag}{logical or color specification. Should a diagonal
     reference line be drawn?}
-  \item{xlim, ylim, main, xlab, ylab, \dots}{graphical plotting parameters
+  \item{col, fill, xlim, ylim, main, xlab, ylab, \dots}{graphical plotting parameters
     passed to \code{\link[graphics]{plot}} or \code{\link[graphics]{points}},
     respectively.}
 }
@@ -32,7 +34,7 @@ Q-Q residual plots essentially correspond to carrying out a
 \code{qqnorm(qresiduals(object, \dots))}, i.e., a Q-Q plot comparing the quantile
 residuals against theoretical quantiles from a standard normal distribution.
 The function \code{qqrplot} is provided mainly to offer a few more options
-for models with discrete responses where randomization or aggregation is
+for models with discrete responses where randomization or quantiles are
 needed. See below for some examples.
 }
 
@@ -67,11 +69,10 @@ par(mfrow = c(1, 1))
 
 ## Q-Q residual plots
 par(mfrow = c(2, 2))
-qqrplot(cs_p, main = "Median")
-qqrplot(cs_p, main = "One Random Sample", aggregate = "none")
-qqrplot(cs_p, main = "Mean + Range", range = TRUE, aggregate = "mean", nsim = 100)
-qqrplot(cs_p, main = "100 Random Samples", aggregate = "none", nsim = 100,
-  pch = 19, col = gray(0, alpha = 0.01))
+qqrplot(cs_p, main = "One Random Sample")
+qqrplot(cs_p, main = "Median", type = "quantile")
+qqrplot(cs_p, main = "5 Random Samples and Range", nsim = 10, range = c(0.005, 0.995))
+qqrplot(cs_p, main = "100 Random Samples", nsim = 100, pch = 19, col = gray(0, alpha = 0.01))
 par(mfrow = c(1, 1))
 
 }

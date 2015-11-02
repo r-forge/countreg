@@ -16,8 +16,7 @@
 \usage{
 qresiduals(object, \dots)
 
-\method{qresiduals}{default}(object, aggregate = c("median", "mean", "range", "none"),
-  nsim = 10L, \dots)
+\method{qresiduals}{default}(object, type = c("random", "quantile"), nsim = 1L, prob = 0.5, \dots)
 }
 
 \arguments{
@@ -25,11 +24,12 @@ qresiduals(object, \dots)
     be a vector or 2-dimensional matrix of probabilities. Currently, there
     are also methods for \code{lm}, \code{glm}, \code{hurdle}, \code{zeroinfl}, and
     \code{zerotrunc} objects.}
-  \item{aggregate}{character specifying which type of aggregation should be used
-    for the distribution of the randomized quantile residuals in case of discrete
-    response distributions.}
+  \item{type}{character specifying whether - in the case of discrete response distributions - 
+    randomized quantile residuals or their corresponding quantiles should be computed.}
   \item{nsim}{numeric. The number of simulated randomized quantile residuals
-    per observation (for \code{aggregate = "mean"} or \code{"none"}).}
+    per observation (for \code{type = "numeric"}).}
+  \item{prob}{numeric. The probabilities at which quantile residuals should be
+    computed (for \code{type = "quantile"}), defaulting to the median.}
   \item{\dots}{further parameters passed to methods.}
 }
 
@@ -42,11 +42,9 @@ quantile is drawn from the range of probabilities corresponding to each observat
 
 The default \code{qresiduals} method can compute randomized quantile residuals
 from a vector (which essentially just call \code{\link[stats]{qnorm}}) or
-a 2-column matrix of probabilities. The latter offers various options for aggregation:
-The default is to return only the \code{"median"} of the quantile residual distribution.
-Alternatively, the \code{"range"} can be returned or the \code{"mean"} from \code{nsim}
-simulations. Finally, one or more random quantile residuals per observation can
-be simulated if \code{aggregate = "none"}.
+a 2-column matrix of probabilities. The latter offers to either draw \code{"random"}
+samples from the distribution or compute corresponding \code{"quantile"}s such as
+the median etc.
 
 Currently, there are methods for \code{\link[stats]{lm}},  \code{\link[stats]{glm}}, 
 \code{\link{hurdle}}, \code{\link{zeroinfl}}, and \code{\link{zerotrunc}} models. All
@@ -75,14 +73,12 @@ data("CrabSatellites", package = "countreg")
 cs_p <- glm(satellites ~ width + color, data = CrabSatellites, family = poisson)
 
 qres <- cbind(
-  median = qresiduals(cs_p),
-  mean10 = qresiduals(cs_p, aggregate = "mean"),
-  mean100 = qresiduals(cs_p, aggregate = "mean", nsim = 100),
-  range = qresiduals(cs_p, aggregate = "range"),
-  sample = qresiduals(cs_p, aggregate = "none", nsim = 3)
+  sample = qresiduals(cs_p, nsim = 3),
+  median = qresiduals(cs_p, type = "quantile"),
+  mean100 = rowMeans(qresiduals(cs_p, nsim = 100)),
+  range = qresiduals(cs_p, type = "quantile", prob = c(0, 1))
 )
 qres[1:5, ]
-
 }
 
 \keyword{regression}
