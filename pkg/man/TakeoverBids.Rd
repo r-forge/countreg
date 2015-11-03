@@ -50,22 +50,30 @@ data("TakeoverBids", package = "countreg")
 ## Poisson model:
 ## Jaggia and Thosar (1993), Table 3
 ## Cameron and Johansson (1997), Table IV
-m <- glm(bids ~ . + I(size^2), data = TakeoverBids, family = poisson)
-summary(m)
-logLik(m)
+tb_p <- glm(bids ~ . + I(size^2), data = TakeoverBids, family = poisson)
+summary(tb_p)
+logLik(tb_p)
 
 ## dispersion tests
 ## Cameron and Trivedi (2013, p. 185)
-AER::dispersiontest(m, alternative = "less", trafo = 2)
-AER::dispersiontest(m, alternative = "less", trafo = 1)
+AER::dispersiontest(tb_p, alternative = "less", trafo = 2)
+AER::dispersiontest(tb_p, alternative = "less", trafo = 1)
 
 ## visualization of underdispersion
-rootogram(m)
+rootogram(tb_p)
+qqrplot(tb_p)
 
 ## Parts of Cameron and Trivedi (2013), Table 5.4
-summary(residuals(m, type = "response"))
-summary(residuals(m, type = "pearson"))
-summary(residuals(m, type = "deviance"))
+summary(residuals(tb_p, type = "response"))
+summary(residuals(tb_p, type = "pearson"))
+summary(residuals(tb_p, type = "deviance"))
+
+## hurdle Poisson model mitigates underdispersion
+tb_hp <- hurdle(bids ~ . + I(size^2), data = TakeoverBids, dist = "poisson")
+AIC(tb_p, tb_hp)
+rootogram(tb_hp)
+qqrplot(tb_hp)
+
 }
 
 \keyword{datasets}
