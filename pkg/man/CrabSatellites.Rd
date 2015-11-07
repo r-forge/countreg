@@ -91,10 +91,10 @@ BIC(cs_p, cs_nb, cs_hp, cs_hnb, cs_hnb2)
 
 ## rootograms
 par(mfrow = c(2, 2))
-rootogram(cs_p, max = 15, main = "Poisson")
-rootogram(cs_nb, max = 15, main = "Negative Binomial")
-rootogram(cs_hp, max = 15, main = "Hurdle Poisson")
-rootogram(cs_hnb, max = 15, main = "Hurdle Negative Binomial")
+r_p   <- rootogram(cs_p,   max = 15, main = "Poisson")
+r_nb  <- rootogram(cs_nb,  max = 15, main = "Negative Binomial")
+r_hp  <- rootogram(cs_hp,  max = 15, main = "Hurdle Poisson")
+r_hnb <- rootogram(cs_hnb, max = 15, main = "Hurdle Negative Binomial")
 
 ## fitted curves
 par(mfrow = c(1, 1))
@@ -109,6 +109,33 @@ lines(pred(cs_hnb)  ~ width, data = nd, col = 4, lwd = 1.5)
 lines(pred(cs_hnb2) ~ width, data = nd, col = 4, lwd = 1.5, lty = 2)
 legend("topleft", c("Hurdle NB", "Hurdle NB 2", "Poisson (id)", "Poisson (log)"),
   col = c(4, 4, 2, 3), lty = c(1, 2, 1, 1), lwd = 1.5, bty = "n")
+
+## alternative displays: Q-Q residuals plot, barplot, residuals vs. fitted
+par(mfrow= c(3, 2))
+
+qqrplot(cs_p, range = c(0.05, 0.95), main = "Q-Q residuals plot: Poisson")
+qqrplot(cs_hnb, range = c(0.05, 0.95), main = "Q-Q residuals plot: Hurdle NB")
+
+barplot(t(matrix(c(r_p$observed, r_p$expected), ncol = 2,
+  dimnames = list(r_p$x, c("Observed", "Expected")))),
+  beside = TRUE, main = "Barplot: Poisson",
+  xlab = "satellites", ylab = "Frequency",
+  legend.text = TRUE, args.legend = list(x = "topright", bty = "n"))
+barplot(t(matrix(c(r_hnb$observed, r_hnb$expected), ncol = 2,
+  dimnames = list(r_hnb$x, c("Observed", "Expected")))),
+  beside = TRUE, main = "Barplot: Hurdle NB",
+  xlab = "satellites", ylab = "Frequency",
+  legend.text = TRUE, args.legend = list(x = "topright", bty = "n"))
+
+plot(predict(cs_p, type = "response"),
+  residuals(cs_p, type = "pearson"),
+  xlab = "Fitted values", ylab = "Pearson residuals",
+  main = "Residuals vs. fitted: Poisson")
+plot(predict(cs_hnb, type = "response"),
+  residuals(cs_hnb, type = "pearson"),
+  xlab = "Fitted values", ylab = "Pearson residuals",
+  main = "Residuals vs. fitted: Hurdle NB")
+
 }
 
 \keyword{datasets}

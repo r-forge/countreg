@@ -61,7 +61,7 @@ AER::dispersiontest(tb_p, alternative = "less", trafo = 1)
 
 ## visualization of underdispersion
 rootogram(tb_p)
-qqrplot(tb_p)
+qqrplot(tb_p, range = c(0.05, 0.95))
 
 ## Parts of Cameron and Trivedi (2013), Table 5.4
 summary(residuals(tb_p, type = "response"))
@@ -72,7 +72,7 @@ summary(residuals(tb_p, type = "deviance"))
 tb_hp <- hurdle(bids ~ . + I(size^2), data = TakeoverBids, dist = "poisson")
 AIC(tb_p, tb_hp)
 rootogram(tb_hp)
-qqrplot(tb_hp)
+qqrplot(tb_hp, range = c(0.05, 0.95))
 
 }
 
