@@ -1,3 +1,13 @@
+Changes in Version 0.1-5
+
+  o New d/p/q/r/s functions for the zero-truncated Poisson distribution
+    where the parameter can either be specified in terms of the zero-truncated
+    "mean" or the untruncated mean "lambda".
+    
+  o New ztpoisson() family object for the estimation of zero-truncated
+    Poisson regression model via glm().
+
+
 Changes in Version 0.1-4
 
   o New qresiduals() generic for computing (randomized) quantile residuals
@@ -34,7 +44,7 @@ Changes in Version 0.1-1
   o New function disptest() providing several (score) tests for over/underdispersion.
 
   o New rootogram() function with a wide range methods for creating rootograms
-    based on various fitted model objects (fitdistr, glm, hurdle, zeroinfl, zerotrunc …)
+    based on various fitted model objects (fitdistr, glm, hurdle, zeroinfl, zerotrunc, ...)
   
   o FLXMRnegbin() driver for estimating mixtures of negative binomial models
     using flexmix.

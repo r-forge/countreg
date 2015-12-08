@@ -24,13 +24,20 @@ export(
   "qresiduals",
   "qresiduals.default",
   "qqrplot",
-  
-  "FLXMRnegbin",
+
+  "ztpoisson",
+  "dztpois",
+  "pztpois",
+  "qztpois",
+  "rztpois",
+  "sztpois",
   
   "MBbinomial",
   "MBnegbin",
   "MBztpoisson",
   "MBztnegbin",
+  
+  "FLXMRnegbin",
   
   "disptest",
   "zitest"

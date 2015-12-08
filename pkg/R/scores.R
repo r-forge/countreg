@@ -16,17 +16,18 @@ snbinom <- function(x, mu, size, parameter = c("mu", "size"), drop = TRUE) {
   if(drop) drop(s) else s
 }
 
-## ztpoisson: zero-truncated Poisson
-dztpois <- function(x, lambda, log = FALSE) {
-  rval <- dpois(x, lambda = lambda, log = TRUE) -
-    ppois(0, lambda = lambda, lower.tail = FALSE, log.p = TRUE)
-  if(log) rval else exp(rval)
-}
-
-sztpois <- function(x, lambda, parameter = "lambda", drop = TRUE) {
-  s <- x/lambda - 1 - exp(-lambda)/(1 - exp(-lambda))
-  if(drop) s else cbind("lambda" = s)
-}
+## ## ztpoisson: zero-truncated Poisson
+## ## -> more flexible implementation in ztpois.R now
+## dztpois <- function(x, lambda, log = FALSE) {
+##   rval <- dpois(x, lambda = lambda, log = TRUE) -
+##     ppois(0, lambda = lambda, lower.tail = FALSE, log.p = TRUE)
+##   if(log) rval else exp(rval)
+## }
+## 
+## sztpois <- function(x, lambda, parameter = "lambda", drop = TRUE) {
+##   s <- x/lambda - 1 - exp(-lambda)/(1 - exp(-lambda))
+##   if(drop) s else cbind("lambda" = s)
+## }
 
 ## ztnbinom: Zero-truncated negative binomial
 dztnbinom <- function(x, mu, size, log = FALSE) {
