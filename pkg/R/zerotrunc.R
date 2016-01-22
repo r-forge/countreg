@@ -444,7 +444,7 @@ residuals.zerotrunc <- function(object, type = c("deviance", "pearson", "respons
   
   "deviance" = {
     yhat <- object$fitted.values
-    y <- yhat + sqrt(wts) * object$residuals
+    y <- yhat + object$residuals/sqrt(wts)
     mu <- predict(object, type = "count")
     theta <- object$theta
     
