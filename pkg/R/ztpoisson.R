@@ -16,6 +16,7 @@ dztpois <- function(x, lambda, mean, log = FALSE) {
   if(!missing(mean)) lambda <- .ztpois_mean_to_lambda(mean)
   rval <- ifelse(x < 1, -Inf,
     dpois(x, lambda, log = TRUE) - ppois(0, lambda, lower.tail = FALSE, log.p = TRUE))
+  rval[lambda <= 0] <- 0
   if(log) rval else exp(rval)
 }
 
@@ -83,7 +84,7 @@ ztpoisson <- function() {
   }
   validmu <- function(mu) all(mu > 1)
   dev.resids <- function(y, mu, wt) {
-    -2 * wt * (dztpois(y, mean = mu, log = TRUE) - dztpois(y, lambda = y, log = TRUE))
+    -2 * wt * (dztpois(y, mean = mu, log = TRUE) - dztpois(y, mean = y, log = TRUE))
   }
   aic <- function(y, n, mu, wt, dev) {
     -2 * sum(dztpois(y, mean = mu, log = TRUE) * wt)
