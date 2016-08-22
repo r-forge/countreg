@@ -15,3 +15,9 @@ snbinom <- function(x, mu, size, parameter = c("mu", "size"), drop = TRUE) {
   colnames(s) <- c("mu", "size")[c("mu", "size") %in% parameter]
   if(drop) drop(s) else s
 }
+
+## pois: Poisson
+spois <- function(x, lambda, parameter = "lambda", drop = TRUE) {
+  s <- x/lambda - 1
+  if(drop) s else cbind("lambda" = s)
+}
