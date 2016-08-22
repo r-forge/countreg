@@ -14,8 +14,8 @@
 dztpois <- function(x, lambda, mean, log = FALSE) {
   if(!missing(lambda) & !missing(mean)) stop("only 'lambda' or 'mean' may be specified")
   if(!missing(mean)) lambda <- .ztpois_mean_to_lambda(mean)
-  rval <- ifelse(x < 1, -Inf,
-    dpois(x, lambda, log = TRUE) - ppois(0, lambda, lower.tail = FALSE, log.p = TRUE))
+  rval <- dpois(x, lambda, log = TRUE) - ppois(0, lambda, lower.tail = FALSE, log.p = TRUE)
+  rval[x < 1] <- -Inf
   rval[lambda <= 0] <- 0
   if(log) rval else exp(rval)
 }
@@ -23,9 +23,9 @@ dztpois <- function(x, lambda, mean, log = FALSE) {
 pztpois <- function(q, lambda, mean, lower.tail = TRUE, log.p = FALSE) {
   if(!missing(lambda) & !missing(mean)) stop("only 'lambda' or 'mean' may be specified")
   if(!missing(mean)) lambda <- .ztpois_mean_to_lambda(mean)
-  rval <- ifelse(q < 1, if(lower.tail) -Inf else 0,
-    log(ppois(q, lambda, lower.tail = lower.tail, log.p = FALSE) - dpois(0, lambda)) -
-    ppois(0, lambda, lower.tail = FALSE, log.p = TRUE))
+  rval <- log(ppois(q, lambda, lower.tail = lower.tail, log.p = FALSE) - dpois(0, lambda)) -
+    ppois(0, lambda, lower.tail = FALSE, log.p = TRUE)
+  rval[q < 1] <- if(lower.tail) -Inf else 0
   if(log.p) rval else exp(rval)
 }
 
@@ -36,8 +36,9 @@ qztpois <- function(p, lambda, mean, lower.tail = TRUE, log.p = FALSE) {
   p <- if(log.p) p else log(p)
   p <- p + ppois(0, lambda, lower.tail = FALSE, log.p = TRUE)
   p <- exp(p) + dpois(0, lambda)
-  rval <- qpois(p, lambda, lower.tail = lower.tail, log.p = FALSE) 
-  if(lower.tail) ifelse(p_orig < dztpois(1, lambda, log = log.p), 1, rval) else rval
+  rval <- qpois(p, lambda, lower.tail = lower.tail, log.p = FALSE)
+  if(lower.tail) rval[p_orig < dztpois(1, lambda, log = log.p)] <- 1
+  rval
 }
 
 rztpois <- function(n, lambda, mean) {

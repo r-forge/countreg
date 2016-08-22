@@ -29,9 +29,11 @@ sztpois(x, lambda, mean, parameter = "lambda", drop = TRUE)
   \item{p}{vector of probabilities.}
   \item{n}{number of random values to return.}
   \item{lambda}{vector of (non-negative) means of the untruncated
-    Poisson distribution.}
+    Poisson distribution. Only one of \code{lambda} or \code{mean}
+    should be specified.}
   \item{mean}{vector of means (greater than 1) of the zero-truncated
-    Poisson distribution.}
+    Poisson distribution. Only one of \code{lambda} or \code{mean}
+    should be specified.}
   \item{log, log.p}{logical. If \code{TRUE}, probabilities p are given as log(p).}
   \item{lower.tail}{logical. If \code{TRUE} (default), probabilities are
     \eqn{P[X \le x]}, otherwise, \eqn{P[X > x]}.}
@@ -42,6 +44,13 @@ sztpois(x, lambda, mean, parameter = "lambda", drop = TRUE)
 }
 
 \details{
+The untruncted Poisson distribution has density
+\deqn{f(x) = \frac{\lambda^x e^{-\lambda}}{x!}}{f(x) = \lambda^x exp(-\lambda)/x!}
+for \eqn{x = 0, 1, 2, \ldots}. The zero-truncted density is then
+simply obtained as
+\deqn{g(x) = \frac{f(x)}{1 - f(0)}}{g(x) = f(x)/(1 - f(0))}
+for \eqn{x = 1, 2, \ldots}.
+
 The zero-truncated distribution has expectation
 \eqn{E(X) = \mu = \lambda / (1 - \exp(-\lambda))} and variance
 \eqn{Var(X) = \mu \cdot (\lambda + 1 - \mu)}, where \eqn{\lambda}
@@ -62,8 +71,7 @@ numerically if needed.
 }
 
 
-\seealso{\code{\link{ztpoisson}}, \code{\link[stats]{dpois}},
-  \code{\link{zerotrunc}}
+\seealso{\code{\link{ztpoisson}}, \code{\link[stats]{dpois}}, \code{\link{zerotrunc}}
 }
 
 \keyword{distribution}
