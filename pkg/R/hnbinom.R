@@ -5,7 +5,7 @@ dhnbinom <- function(x, mu, theta, size, pi, log = FALSE) {
   rval <- dnbinom(x, mu = mu, size = theta, log = TRUE) -
     pnbinom(0, mu = mu, size = theta, lower.tail = FALSE, log.p = TRUE) + 
     log(pi)
-  rval[x == 0L] <- log(1 - pi)
+  rval[x == 0L] <- log(1 - pi)[x == 0L]
   if(log) rval else exp(rval)
 }
 
@@ -53,7 +53,7 @@ shnbinom <- function(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi"),
   }
   if("pi" %in% parameter) {
     sp <- rep(1/pi, length.out = n)
-    sp[x == 0L] <- -1/(1 - pi)
+    sp[x == 0L] <- -1/(1 - pi)[x == 0L]
     sp[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps))] <- 0
     s <- cbind(s, "pi" = sp)
   }

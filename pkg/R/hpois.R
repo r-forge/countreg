@@ -3,7 +3,7 @@ dhpois <- function(x, lambda, pi, log = FALSE) {
   rval <- dpois(x, lambda = lambda, log = TRUE) -
     ppois(0, lambda = lambda, lower.tail = FALSE, log.p = TRUE) + 
     log(pi)
-  rval[x == 0L] <- log(1 - pi)
+  rval[x == 0L] <- log(1 - pi)[x == 0L]
   if(log) rval else exp(rval)
 }
 
@@ -38,7 +38,7 @@ shpois <- function(x, lambda, pi, parameter = c("lambda", "pi"), drop = TRUE) {
   n <- max(length(x), length(lambda), length(pi))
   if("pi" %in% parameter) {
     sp <- rep(1/pi, length.out = n)
-    sp[x == 0L] <- -1/(1 - pi)
+    sp[x == 0L] <- -1/(1 - pi)[x == 0L]
     sp[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps))] <- 0
   }
   s <- cbind(
