@@ -52,6 +52,18 @@ export(
   "rzinbinom",
   "szinbinom",
   
+  "dhpois",
+  "phpois",
+  "qhpois",
+  "rhpois",
+  "shpois",
+  
+  "dhnbinom",
+  "phnbinom",
+  "qhnbinom",
+  "rhnbinom",
+  "shnbinom",
+  
   "MBbinomial",
   "MBnegbin",
   "MBztpoisson",

@@ -45,7 +45,7 @@ szipois(x, lambda, pi, parameter = c("lambda", "pi"), drop = TRUE)
 The uninflated Poisson distribution has density
 \deqn{f(x) = \frac{\lambda^x e^{-\lambda}}{x!}}{f(x) = \lambda^x exp(-\lambda)/x!}
 for \eqn{x = 0, 1, 2, \ldots}. The zero-inflated density is then simply obtained as
-\eqn{g(x) = \pi I_{\{0\}}(x) + (1 - \pi) f(x)}{g(x) = \pi I(x = 0) + (1 - \pi) f(x)}
+\deqn{g(x) = \pi \cdot I_{\{0\}}(x) + (1 - \pi) \cdot f(x)}{g(x) = \pi I(x = 0) + (1 - \pi) f(x)}
 where \eqn{I} is the indicator function (for the point mass at zero).
 }
 

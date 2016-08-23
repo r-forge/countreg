@@ -40,7 +40,7 @@ szinbinom(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi"), drop = TRU
   \item{lower.tail}{logical. If \code{TRUE} (default), probabilities are
     \eqn{P[X \le x]}, otherwise, \eqn{P[X > x]}.}
   \item{parameter}{character. Should the derivative with respect to
-    \code{"mu"} and/or \code{"size"} be computed?}
+    \code{"mu"} and/or \code{"theta"} and/or \code{"pi"} be computed?}
   \item{drop}{logical. Should the result be a matrix (\code{drop = FALSE})
     or should the dimension be dropped (\code{drop = TRUE}, the default)?}
 }
@@ -51,7 +51,7 @@ The uninflated negative binomial distribution has density
   \frac{\Gamma(x + \theta)}{\Gamma(\theta) x!} \cdot \frac{\mu^y \theta^\theta}{(\mu + \theta)^{y + \theta}}}{
   \Gamma(x + \theta)/(\Gamma(\theta) x!) (\mu^y \theta^\theta)/((\mu + \theta)^(y + \theta)}
 for \eqn{x = 0, 1, 2, \ldots}. The zero-inflated density is then simply obtained as
-\eqn{g(x) = \pi I_{\{0\}}(x) + (1 - \pi) f(x)}{g(x) = \pi I(x = 0) + (1 - \pi) f(x)}
+\deqn{g(x) = \pi \cdot I_{\{0\}}(x) + (1 - \pi) \cdot f(x)}{g(x) = \pi I(x = 0) + (1 - \pi) f(x)}
 where \eqn{I} is the indicator function (for the point mass at zero).
 }
 
