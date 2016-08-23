@@ -10,15 +10,8 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
     ## count mean
     mu <- as.vector(exp(X %*% parms[1:kx] + offsetx))
     ## binary mean
-    phi <- as.vector(linkinv(Z %*% parms[(kx+1):(kx+kz)] + offsetz))
-    
-    ## log-likelihood for y = 0 and y >= 1
-    loglik0 <- log( phi + exp( log(1-phi) - mu ) ) ## -mu = dpois(0, lambda = mu, log = TRUE)
-    loglik1 <- log(1-phi) + dpois(Y, lambda = mu, log = TRUE)
-    
-    ## collect and return
-    loglik <- sum(weights[Y0] * loglik0[Y0]) + sum(weights[Y1] * loglik1[Y1])
-    loglik
+    phi <- as.vector(linkinv(Z %*% parms[(kx+1):(kx+kz)] + offsetz))    
+    sum(suppressWarnings(dzipois(Y, lambda = mu, pi = phi, log = TRUE)) * weights)
   }
   
   ziNegBin <- function(parms) {
@@ -28,14 +21,7 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
     phi <- as.vector(linkinv(Z %*% parms[(kx+1):(kx+kz)] + offsetz))
     ## negbin size
     theta <- exp(parms[(kx+kz)+1])
-    
-    ## log-likelihood for y = 0 and y >= 1
-    loglik0 <- log( phi + exp( log(1-phi) + suppressWarnings(dnbinom(0, size = theta, mu = mu, log = TRUE)) ) )
-    loglik1 <- log(1-phi) + suppressWarnings(dnbinom(Y, size = theta, mu = mu, log = TRUE))
-
-    ## collect and return
-    loglik <- sum(weights[Y0] * loglik0[Y0]) + sum(weights[Y1] * loglik1[Y1])
-    loglik
+    sum(suppressWarnings(dzinbinom(Y, mu = mu, theta = theta, pi = phi, log = TRUE)) * weights)
   }
   
   ziGeom <- function(parms) ziNegBin(c(parms, 0))
@@ -63,64 +49,32 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
     etaz <- as.vector(Z %*% parms[(kx+1):(kx+kz)] + offsetz)
     muz <- linkinv(etaz)
   
-    ## densities at 0
-    clogdens0 <- -mu
-    dens0 <- muz * (1 - as.numeric(Y1)) + exp(log(1 - muz) + clogdens0)
-
-    ## working residuals  
-    wres_count <- ifelse(Y1, Y - mu, -exp(-log(dens0) + log(1 - muz) + clogdens0 + log(mu)))
-    wres_zero <- ifelse(Y1, -1/(1-muz) * linkobj$mu.eta(etaz),
-      (linkobj$mu.eta(etaz) - exp(clogdens0) * linkobj$mu.eta(etaz))/dens0)
-      
-    colSums(cbind(wres_count * weights * X, wres_zero * weights * Z))
+    wres <- szipois(Y, lambda = mu, pi = muz)
+    colSums(weights * cbind(wres[, "lambda"] * mu * X, wres[, "pi"] * linkobj$mu.eta(etaz) * Z))
   }
   
   gradGeom <- function(parms) {
     ## count mean
-    eta <- as.vector(X %*% parms[1:kx] + offsetx)
-    mu <- exp(eta)
+    mu <- exp(as.vector(X %*% parms[1:kx] + offsetx))
     ## binary mean
     etaz <- as.vector(Z %*% parms[(kx+1):(kx+kz)] + offsetz)
     muz <- linkinv(etaz)
 
-    ## densities at 0
-    clogdens0 <- dnbinom(0, size = 1, mu = mu, log = TRUE)
-    dens0 <- muz * (1 - as.numeric(Y1)) + exp(log(1 - muz) + clogdens0)
-
-    ## working residuals  
-    wres_count <- ifelse(Y1, Y - mu * (Y + 1)/(mu + 1), -exp(-log(dens0) +
-      log(1 - muz) + clogdens0 - log(mu + 1) + log(mu)))
-    wres_zero <- ifelse(Y1, -1/(1-muz) * linkobj$mu.eta(etaz),
-      (linkobj$mu.eta(etaz) - exp(clogdens0) * linkobj$mu.eta(etaz))/dens0)
-      
-    colSums(cbind(wres_count * weights * X, wres_zero * weights * Z))
+    wres <- szinbinom(Y, mu = mu, theta = 1, pi = muz, parameter = c("mu", "pi"))
+    colSums(weights * cbind(wres[, "mu"] * mu * X, wres[, "pi"] * linkobj$mu.eta(etaz) * Z))
   }
 
   gradNegBin <- function(parms) {
     ## count mean
-    eta <- as.vector(X %*% parms[1:kx] + offsetx)
-    mu <- exp(eta)
+    mu <- exp(as.vector(X %*% parms[1:kx] + offsetx))
     ## binary mean
     etaz <- as.vector(Z %*% parms[(kx+1):(kx+kz)] + offsetz)
     muz <- linkinv(etaz)
     ## negbin size
     theta <- exp(parms[(kx+kz)+1])
 
-    ## densities at 0
-    clogdens0 <- dnbinom(0, size = theta, mu = mu, log = TRUE)
-    dens0 <- muz * (1 - as.numeric(Y1)) + exp(log(1 - muz) + clogdens0)
-
-    ## working residuals  
-    wres_count <- ifelse(Y1, Y - mu * (Y + theta)/(mu + theta), -exp(-log(dens0) +
-      log(1 - muz) + clogdens0 + log(theta) - log(mu + theta) + log(mu)))
-    wres_zero <- ifelse(Y1, -1/(1-muz) * linkobj$mu.eta(etaz),
-      (linkobj$mu.eta(etaz) - exp(clogdens0) * linkobj$mu.eta(etaz))/dens0)
-    wres_theta <- theta * ifelse(Y1, digamma(Y + theta) - digamma(theta) +
-      log(theta) - log(mu + theta) + 1 - (Y + theta)/(mu + theta),
-      exp(-log(dens0) + log(1 - muz) + clogdens0) *
-      (log(theta) - log(mu + theta) + 1 - theta/(mu + theta)))
-
-    colSums(cbind(wres_count * weights * X, wres_zero * weights * Z, wres_theta) * weights)
+    wres <- szinbinom(Y, mu = mu, theta = theta, pi = muz)
+    colSums(weights * cbind(wres[, "mu"] * mu * X, wres[, "pi"] * linkobj$mu.eta(etaz) * Z, wres[, "theta"] * theta))
   }
     
   gradBinom <- function(parms) {
