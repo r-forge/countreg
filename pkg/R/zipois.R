@@ -37,8 +37,7 @@ szipois <- function(x, lambda, pi, parameter = c("lambda", "pi"), drop = TRUE) {
     sl[x > 0L] <- (x/lambda)[x > 0] - 1
   }
   if("pi" %in% parameter) {
-    sp <- (1 - exp(clp0))/p0
-    sp[x > 0L] <- -1/(1 - pi)
+    sp <- ifelse(x > 0L, -1/(1 - pi), (1 - exp(clp0))/p0)
   }
   s <- cbind(
     if("lambda" %in% parameter) sl else NULL,

@@ -52,8 +52,7 @@ szinbinom <- function(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi")
     st[x1] <- (digamma(x + theta) - digamma(theta) + log(theta) - log(mu + theta) + 1 - (x + theta)/(mu + theta))[x1]
   }
   if("pi" %in% parameter) {
-    sp <- (1 - exp(clp0))/p0
-    sp[x1] <- -1/(1 - pi)
+    sp <- ifelse(x1, -1/(1 - pi), (1 - exp(clp0))/p0)
   }
   s <- cbind(
     if("mu" %in% parameter) sm else NULL,
