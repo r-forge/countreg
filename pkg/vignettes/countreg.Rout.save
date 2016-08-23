@@ -1,0 +1,366 @@
+
+> library("sandwich")
+
+> library("lmtest")
+Loading required package: zoo
+
+Attaching package: 'zoo'
+
+The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+
+> library("MASS")
+
+> library("car")
+
+> library("countreg")
+
+> load("DebTrivedi.rda")
+
+> clog <- function(x) log(x + 0.5)
+
+> cfac <- function(x, breaks = NULL) {
++     if (is.null(breaks)) 
++         breaks <- unique(quantile(x, 0:10/10))
++     x <- cut(x, breaks, include. .... [TRUNCATED] 
+
+> refit_models <- TRUE
+
+> dt <- DebTrivedi[, c(1, 7, 8, 13, 15, 18)]
+
+> dt2 <- DebTrivedi[, -(2:6)]
+
+> dt2$region <- relevel(dt2$region, "other")
+
+> plot(table(dt$ofp), xlab = "Number of physician office visits", 
++     ylab = "Frequency", axes = FALSE)
+
+> axis(2)
+
+> axis(1, at = 0:18 * 5, labels = FALSE)
+
+> axis(1, at = 0:9 * 10)
+
+> par(mfrow = c(1, 2))
+
+> plot(ofp ~ numchron, data = dt)
+
+> plot(clog(ofp) ~ cfac(numchron), data = dt)
+
+> clog <- function(x) log(x + 0.5)
+
+> cfac <- function(x, breaks = NULL) {
++     if (is.null(breaks)) 
++         breaks <- unique(quantile(x, 0:10/10))
++     x <- cut(x, breaks, include. .... [TRUNCATED] 
+
+> par(mfrow = c(3, 2))
+
+> plot(clog(ofp) ~ health, data = dt, varwidth = TRUE, 
++     ylab = "Physician office visits (in clogs)", xlab = "Self-perceived health status", 
++   .... [TRUNCATED] 
+
+> plot(clog(ofp) ~ cfac(numchron), data = dt, ylab = "Physician office visits (in clogs)", 
++     xlab = "Number of chronic conditions", main = "numch ..." ... [TRUNCATED] 
+
+> plot(clog(ofp) ~ privins, data = dt, varwidth = TRUE, 
++     ylab = "Physician office visits (in clogs)", xlab = "Covered by private insurance", 
++  .... [TRUNCATED] 
+
+> plot(clog(ofp) ~ gender, data = dt, varwidth = TRUE, 
++     ylab = "Physician office visits (in clogs)", xlab = "Gender", 
++     main = "gender")
+
+> plot(cfac(ofp, c(0:2, 4, 6, 10, 100)) ~ school, data = dt, 
++     breaks = 9, ylab = "Physician office visits (number of visits)", 
++     xlab = "Nu ..." ... [TRUNCATED] 
+
+> if (refit_models & file.exists("countreg-models.rda")) file.remove("countreg-models.rda")
+
+> if (file.exists("countreg-models.rda")) {
++     load("countreg-models.rda")
++ } else {
++     fm_pois <- glm(ofp ~ ., data = dt, family = poisson)
++  .... [TRUNCATED] 
+
+> summary(fm_pois)
+
+Call:
+glm(formula = ofp ~ ., family = poisson, data = dt)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-6.2816  -2.0370  -0.7143   0.7301  16.2655  
+
+Coefficients:
+                 Estimate Std. Error z value Pr(>|z|)    
+(Intercept)      1.034542   0.023857  43.364   <2e-16 ***
+healthpoor       0.318205   0.017479  18.205   <2e-16 ***
+healthexcellent -0.379045   0.030291 -12.514   <2e-16 ***
+numchron         0.168793   0.004471  37.755   <2e-16 ***
+gendermale      -0.108014   0.012943  -8.346   <2e-16 ***
+school           0.025754   0.001843  13.972   <2e-16 ***
+privinsyes       0.216007   0.016872  12.803   <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 26943  on 4405  degrees of freedom
+Residual deviance: 23808  on 4399  degrees of freedom
+AIC: 36597
+
+Number of Fisher Scoring iterations: 5
+
+
+> coeftest(fm_pois, vcov = sandwich)
+
+z test of coefficients:
+
+                  Estimate Std. Error z value  Pr(>|z|)    
+(Intercept)      1.0345418  0.0648436 15.9544 < 2.2e-16 ***
+healthpoor       0.3182048  0.0555787  5.7253 1.032e-08 ***
+healthexcellent -0.3790454  0.0777311 -4.8764 1.081e-06 ***
+numchron         0.1687932  0.0121860 13.8514 < 2.2e-16 ***
+gendermale      -0.1080145  0.0357357 -3.0226  0.002506 ** 
+school           0.0257542  0.0051316  5.0187 5.202e-07 ***
+privinsyes       0.2160070  0.0430293  5.0200 5.167e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+
+> summary(fm_hurdle0)
+
+Call:
+hurdle(formula = ofp ~ ., data = dt, dist = "negbin")
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-1.1362 -0.7069 -0.2790  0.3066 17.1420 
+
+Count model coefficients (truncated negbin with log link):
+                 Estimate Std. Error z value Pr(>|z|)    
+(Intercept)      1.194286   0.060182  19.844  < 2e-16 ***
+healthpoor       0.382645   0.048855   7.832 4.79e-15 ***
+healthexcellent -0.368340   0.067493  -5.457 4.83e-08 ***
+numchron         0.147537   0.012654  11.659  < 2e-16 ***
+gendermale      -0.056464   0.033144  -1.704  0.08846 .  
+school           0.021187   0.004632   4.574 4.79e-06 ***
+privinsyes       0.130454   0.043511   2.998  0.00272 ** 
+Log(theta)       0.269981   0.043070   6.268 3.65e-10 ***
+Zero hurdle model coefficients (binomial with logit link):
+                Estimate Std. Error z value Pr(>|z|)    
+(Intercept)      0.07459    0.13919   0.536   0.5920    
+healthpoor       0.04995    0.15969   0.313   0.7544    
+healthexcellent -0.30883    0.14256  -2.166   0.0303 *  
+numchron         0.55842    0.04505  12.395  < 2e-16 ***
+gendermale      -0.40145    0.08737  -4.595 4.33e-06 ***
+school           0.05821    0.01196   4.867 1.13e-06 ***
+privinsyes       0.74670    0.10059   7.424 1.14e-13 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Theta: count = 1.3099
+Number of iterations in BFGS optimization: 14 
+Log-likelihood: -1.215e+04 on 15 Df
+
+> waldtest(fm_hurdle0, fm_hurdle)
+Wald test
+
+Model 1: ofp ~ .
+Model 2: ofp ~ . | numchron + privins + school + gender
+  Res.Df Df  Chisq Pr(>Chisq)  
+1   4391                       
+2   4393 -2 4.8785    0.08723 .
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+> fm <- list(`ML-Pois` = fm_pois, `Adj-Pois` = fm_pois, 
++     `Quasi-Pois` = fm_qpois, NB = fm_nbin, `Hurdle-NB` = fm_hurdle, 
++     ZINB = fm_zinb)
+
+> fm_summary <- matrix(character(6 * 29), ncol = 6)
+
+> colnames(fm_summary) <- names(fm)
+
+> rownames(fm_summary) <- c(as.vector(rbind(names(coef(fm_hurdle, 
++     model = "count")), "")), as.vector(rbind(names(coef(fm_hurdle, 
++     model = .... [TRUNCATED] 
+
+> rownames(fm_summary)[1:24] <- ifelse(rownames(fm_summary)[1:24] == 
++     "", "", paste("\\code{", rownames(fm_summary)[1:24], "}", 
++     sep = "") .... [TRUNCATED] 
+
+> fm_summary[1:7 * 2 - 1, ] <- sapply(fm, function(x) paste("$", 
++     format(round(coef(x)[1:7], digits = 3)), "$\\phantom{)}", 
++     sep = ""))
+
+> fm_summary[1:7 * 2, ] <- sapply(c(list(`ML-Pois` = vcov(fm_pois), 
++     `Adj-Pois` = sandwich(fm_pois)), lapply(fm[-(1:2)], function(x) vcov(x))),  .... [TRUNCATED] 
+
+> fm_summary[1:5 * 2 + 13, ] <- cbind(NA, NA, NA, NA, 
++     sapply(fm[5:6], function(x) paste("$", format(round(coef(x, 
++         model = "zero"), d .... [TRUNCATED] 
+
+> fm_summary[1:5 * 2 + 14, ] <- cbind(NA, NA, NA, NA, 
++     sapply(fm[5:6], function(x) paste("(", format(round(sqrt(diag(vcov(x)))[-(1:7)], 
++       .... [TRUNCATED] 
+
+> fm_summary[25, ] <- sapply(fm, function(x) attr(logLik(x), 
++     "df"))
+
+> fm_summary[26, ] <- paste("$", format(sapply(fm, function(x) round(logLik(x), 
++     digits = 1))), "$", sep = "")
+
+> fm_summary[27, ] <- format(round(sapply(fm, AIC), 
++     digits = 1))
+
+> fm_summary[28, ] <- format(round(sapply(fm, AIC, k = log(nrow(dt))), 
++     digits = 1))
+
+> fm_summary[29, ] <- round(c(`ML-Pois` = sum(dpois(0, 
++     fitted(fm_pois))), `Adj-Pois` = NA, `Quasi-Pois` = NA, NB = sum(dnbinom(0, 
++     mu = f .... [TRUNCATED] 
+
+> fm_summary[26:29, 2:3] <- NA
+
+> fm_summary[is.na(fm_summary)] <- " "
+
+> fm_summary <- paste(apply(cbind(rownames(fm_summary), 
++     fm_summary), 1, paste, collapse = " & "), "\\\\")
+
+> fm_summary[c(14, 24, 29)] <- paste(fm_summary[c(14, 
++     24, 29)], "\\hline")
+
+> writeLines(fm_summary)
+\code{(Intercept)} & $ 1.035$\phantom{)} & $ 1.035$\phantom{)} & $ 1.035$\phantom{)} & $ 0.940$\phantom{)} & $ 1.194$\phantom{)} & $ 1.198$\phantom{)} \\
+ & (0.024) & (0.065) & (0.063) & (0.055) & (0.060) & (0.057) \\
+\code{healthpoor} & $ 0.318$\phantom{)} & $ 0.318$\phantom{)} & $ 0.318$\phantom{)} & $ 0.368$\phantom{)} & $ 0.383$\phantom{)} & $ 0.349$\phantom{)} \\
+ & (0.017) & (0.056) & (0.046) & (0.049) & (0.049) & (0.046) \\
+\code{healthexcellent} & $-0.379$\phantom{)} & $-0.379$\phantom{)} & $-0.379$\phantom{)} & $-0.374$\phantom{)} & $-0.368$\phantom{)} & $-0.354$\phantom{)} \\
+ & (0.030) & (0.078) & (0.080) & (0.062) & (0.067) & (0.061) \\
+\code{numchron} & $ 0.169$\phantom{)} & $ 0.169$\phantom{)} & $ 0.169$\phantom{)} & $ 0.196$\phantom{)} & $ 0.148$\phantom{)} & $ 0.150$\phantom{)} \\
+ & (0.004) & (0.012) & (0.012) & (0.012) & (0.013) & (0.012) \\
+\code{gendermale} & $-0.108$\phantom{)} & $-0.108$\phantom{)} & $-0.108$\phantom{)} & $-0.115$\phantom{)} & $-0.056$\phantom{)} & $-0.072$\phantom{)} \\
+ & (0.013) & (0.036) & (0.034) & (0.032) & (0.033) & (0.032) \\
+\code{school} & $ 0.026$\phantom{)} & $ 0.026$\phantom{)} & $ 0.026$\phantom{)} & $ 0.027$\phantom{)} & $ 0.021$\phantom{)} & $ 0.022$\phantom{)} \\
+ & (0.002) & (0.005) & (0.005) & (0.004) & (0.005) & (0.004) \\
+\code{privinsyes} & $ 0.216$\phantom{)} & $ 0.216$\phantom{)} & $ 0.216$\phantom{)} & $ 0.250$\phantom{)} & $ 0.130$\phantom{)} & $ 0.151$\phantom{)} \\
+ & (0.017) & (0.043) & (0.045) & (0.040) & (0.044) & (0.042) \\ \hline
+\code{(Intercept)} &   &   &   &   & $ 0.054$\phantom{)} & $-0.098$\phantom{)} \\
+ &   &   &   &   & (0.137) & (0.274) \\
+\code{numchron} &   &   &   &   & $ 0.577$\phantom{)} & $-1.302$\phantom{)} \\
+ &   &   &   &   & (0.043) & (0.191) \\
+\code{privinsyes} &   &   &   &   & $ 0.742$\phantom{)} & $-1.193$\phantom{)} \\
+ &   &   &   &   & (0.100) & (0.228) \\
+\code{school} &   &   &   &   & $ 0.056$\phantom{)} & $-0.087$\phantom{)} \\
+ &   &   &   &   & (0.012) & (0.027) \\
+\code{gendermale} &   &   &   &   & $-0.406$\phantom{)} & $ 0.583$\phantom{)} \\
+ &   &   &   &   & (0.087) & (0.204) \\ \hline
+no.\ parameters & 7 & 7 & 7 & 8 & 13 & 13 \\
+$\log L$ & $-18291.5$ &   &   & $-12227.0$ & $-12152.6$ & $-12155.4$ \\
+AIC & 36597.0 &   &   & 24469.9 & 24331.1 & 24336.9 \\
+BIC & 36641.7 &   &   & 24521.0 & 24414.2 & 24419.9 \\
+$\sum_i \hat f_i(0)$ & 46 &   &   & 618 & 683 & 712 \\ \hline
+
+> waldtest(fm_zinb0, fm_zinb)
+Wald test
+
+Model 1: ofp ~ .
+Model 2: ofp ~ . | numchron + privins + school + gender
+  Res.Df Df  Chisq Pr(>Chisq)
+1   4391                     
+2   4393 -2 0.0937     0.9542
+
+> fm <- list(`ML-Pois` = fm_pois, `Quasi-Pois` = fm_qpois, 
++     NB = fm_nbin, `Hurdle-NB` = fm_hurdle, ZINB = fm_zinb)
+
+> sapply(fm, function(x) coef(x)[1:7])
+                    ML-Pois  Quasi-Pois          NB   Hurdle-NB        ZINB
+(Intercept)      1.03454180  1.03454180  0.94030651  1.19428584  1.19798750
+healthpoor       0.31820481  0.31820481  0.36766462  0.38264530  0.34917061
+healthexcellent -0.37904544 -0.37904544 -0.37364737 -0.36833996 -0.35427868
+numchron         0.16879315  0.16879315  0.19576013  0.14753660  0.14986492
+gendermale      -0.10801447 -0.10801447 -0.11513007 -0.05646385 -0.07243660
+school           0.02575415  0.02575415  0.02717928  0.02118664  0.02183151
+privinsyes       0.21600699  0.21600699  0.25015441  0.13045362  0.15124420
+
+> cbind(`ML-Pois` = sqrt(diag(vcov(fm_pois))), `Adj-Pois` = sqrt(diag(sandwich(fm_pois))), 
++     sapply(fm[-1], function(x) sqrt(diag(vcov(x)))[1:7]) .... [TRUNCATED] 
+                    ML-Pois    Adj-Pois  Quasi-Pois          NB   Hurdle-NB
+(Intercept)     0.023856895 0.064843621 0.063028478 0.055295635 0.060182249
+healthpoor      0.017479293 0.055578691 0.046179238 0.048733278 0.048855206
+healthexcellent 0.030290747 0.077731145 0.080026329 0.061669286 0.067492545
+numchron        0.004470760 0.012186038 0.011811479 0.012066608 0.012654413
+gendermale      0.012942560 0.035735745 0.034193463 0.031609462 0.033144339
+school          0.001843311 0.005131634 0.004869917 0.004450926 0.004631975
+privinsyes      0.016872104 0.043029341 0.044575081 0.040008170 0.043510520
+                       ZINB
+(Intercept)     0.057328275
+healthpoor      0.045535150
+healthexcellent 0.061101876
+numchron        0.012066654
+gendermale      0.031523179
+school          0.004428223
+privinsyes      0.042199788
+
+> rbind(logLik = sapply(fm, function(x) round(logLik(x), 
++     digits = 0)), Df = sapply(fm, function(x) attr(logLik(x), 
++     "df")))
+       ML-Pois Quasi-Pois     NB Hurdle-NB   ZINB
+logLik  -18291         NA -12227    -12153 -12155
+Df           7          7      8        13     13
+
+> round(c(Obs = sum(dt$ofp < 1), `ML-Pois` = sum(dpois(0, 
++     fitted(fm_pois))), NB = sum(dnbinom(0, mu = fitted(fm_nbin), 
++     size = fm_nbin$th .... [TRUNCATED] 
+      Obs   ML-Pois        NB NB-Hurdle      ZINB 
+      683        46       618       683       712 
+
+> t(sapply(fm[4:5], function(x) round(x$coefficients$zero, 
++     digits = 3)))
+          (Intercept) numchron privinsyes school gendermale
+Hurdle-NB       0.054    0.577      0.742  0.056     -0.406
+ZINB           -0.098   -1.302     -1.193 -0.087      0.583
+
+> cfz <- coef(fm_hurdle2, model = "zero")
+
+> cfc <- coef(fm_hurdle2, model = "count")
+
+> se <- sqrt(diag(sandwich(fm_hurdle2)))
+
+> round(cbind(zero = cfz, zero_t = cfz/se[-seq(along = cfc)], 
++     count = cfc, count_t = cfc/se[seq(along = cfc)]), digits = 3)[c(3, 
++     2, 4, 5 .... [TRUNCATED] 
+                  zero zero_t  count count_t
+healthexcellent -0.329 -2.310 -0.378  -4.312
+healthpoor       0.071  0.420  0.333   5.863
+numchron         0.557 10.547  0.143  10.520
+adldiffyes      -0.188 -1.448  0.129   2.504
+regionnoreast    0.129  1.033  0.104   1.974
+regionmidwest    0.101  0.880 -0.016  -0.344
+regionwest       0.202  1.509  0.123   2.444
+age              0.190  2.348 -0.075  -2.339
+blackyes        -0.327 -2.450  0.002   0.023
+gendermale      -0.464 -4.715  0.004   0.098
+marriedyes       0.247  2.379 -0.092  -2.110
+school           0.054  4.109  0.022   3.824
+faminc           0.007  0.365 -0.002  -0.380
+employedyes     -0.012 -0.085  0.030   0.401
+privinsyes       0.762  6.501  0.227   4.007
+medicaidyes      0.554  3.055  0.185   2.777
+(Intercept)     -1.475 -2.283  1.631   6.017
+
+> logLik(fm_hurdle2)
+'log Lik.' -12110.49 (df=35)
+
+> 1/fm_hurdle2$theta
+    count 
+0.7437966 
+
+ *** Run successfully completed ***
+> proc.time()
+   user  system elapsed 
+ 16.716   0.112  16.819 

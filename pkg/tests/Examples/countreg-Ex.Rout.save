@@ -1,0 +1,1536 @@
+
+R version 3.3.1 (2016-06-21) -- "Bug in Your Hair"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "countreg"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> library('countreg')
+Loading required package: MASS
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("CodParasites")
+> ### * CodParasites
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: CodParasites
+> ### Title: Parasite Infections in Cod
+> ### Aliases: CodParasites
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> ## load data
+> data("CodParasites", package = "countreg")
+> 
+> ## Table 1 from Hemmingsen et al. (2005)
+> ## number of observations
+> xtabs(~ area + year, data = CodParasites)
+               year
+area            1999 2000 2001
+  soroya         147   55   70
+  mageroya        98   50  107
+  tanafjord      183   75  157
+  varangerfjord  139   50  123
+> ## prevalence of parasites (NAs counted as "yes")
+> tab <- xtabs(~ area + year + factor(is.na(prevalence) | prevalence == "yes"),
++   data = CodParasites)
+> round(100 * prop.table(tab, 1:2)[,,2], digits = 1)
+               year
+area            1999 2000 2001
+  soroya        61.2 70.9 10.0
+  mageroya      32.7 36.0 31.8
+  tanafjord     33.9 57.3 28.7
+  varangerfjord 75.5 88.0 65.9
+> 
+> ## omit NAs in response
+> CodParasites <- subset(CodParasites, !is.na(intensity))
+> 
+> ## exploratory displays for hurdle and counts
+> par(mfrow = c(2, 2))
+> plot(factor(intensity == 0) ~ interaction(year, area), data = CodParasites)
+> plot(factor(intensity == 0) ~ length, data = CodParasites, breaks = c(15, 3:8 * 10, 105))
+> plot(jitter(intensity) ~ interaction(year, area), data = CodParasites,
++   subset = intensity > 0, log = "y")
+> plot(jitter(intensity) ~ length, data = CodParasites, subset = intensity > 0, log = "y")
+> 
+> ## count data models
+> cp_p   <-    glm(intensity ~ length + area * year, data = CodParasites, family = poisson)
+> cp_nb  <- glm.nb(intensity ~ length + area * year, data = CodParasites)
+> cp_hp  <- hurdle(intensity ~ length + area * year, data = CodParasites, dist = "poisson")
+> cp_hnb <- hurdle(intensity ~ length + area * year, data = CodParasites, dist = "negbin")
+> AIC(cp_p, cp_nb, cp_hp, cp_hnb)
+       df       AIC
+cp_p   13 20377.862
+cp_nb  14  5030.673
+cp_hp  26 13687.576
+cp_hnb 27  4937.085
+> BIC(cp_p, cp_nb, cp_hp, cp_hnb)
+       df       BIC
+cp_p   13 20443.935
+cp_nb  14  5101.829
+cp_hp  26 13819.722
+cp_hnb 27  5074.314
+> 
+> ## rootograms
+> par(mfrow = c(2, 2))
+> rootogram(cp_p, max = 50, main = "Poisson")
+> rootogram(cp_nb, max = 50, main = "Negative Binomial")
+> rootogram(cp_hp, max = 50, main = "Hurdle Poisson")
+> rootogram(cp_hnb, max = 50, main = "Hurdle Negative Binomial")
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+> nameEx("CrabSatellites")
+> ### * CrabSatellites
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: CrabSatellites
+> ### Title: Horseshoe Crab Mating
+> ### Aliases: CrabSatellites
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> ## load data, use ordered factors as numeric, and
+> ## grouped factor version of width
+> data("CrabSatellites", package = "countreg")
+> CrabSatellites <- transform(CrabSatellites,
++   color = as.numeric(color),
++   spine = as.numeric(spine),
++   cwidth = cut(width, c(-Inf, seq(23.25, 29.25), Inf))
++ )
+> 
+> ## Agresti, Table 4.4
+> aggregate(CrabSatellites$satellites, list(CrabSatellites$cwidth), function(x)
++   round(c(Number = length(x), Sum = sum(x), Mean = mean(x), Var = var(x)), digits = 2))
+      Group.1 x.Number  x.Sum x.Mean  x.Var
+1 (-Inf,23.2]    14.00  14.00   1.00   2.77
+2 (23.2,24.2]    14.00  20.00   1.43   8.88
+3 (24.2,25.2]    28.00  67.00   2.39   6.54
+4 (25.2,26.2]    39.00 105.00   2.69  11.38
+5 (26.2,27.2]    22.00  63.00   2.86   6.89
+6 (27.2,28.2]    24.00  93.00   3.88   8.81
+7 (28.2,29.2]    18.00  71.00   3.94  16.88
+8 (29.2, Inf]    14.00  72.00   5.14   8.29
+> 
+> ## Agresti, Figure 4.4
+> plot(tapply(satellites, cwidth, mean) ~ tapply(width, cwidth, mean),
++   data = CrabSatellites, ylim = c(0, 6), pch = 19)
+> 
+> ## alternatively: exploratory displays for hurdle (= 0 vs. > 0) and counts (> 0)
+> par(mfrow = c(2, 2))
+> plot(factor(satellites == 0) ~ width, data = CrabSatellites, breaks = seq(20, 33.5, by = 1.5))
+> plot(factor(satellites == 0) ~ color, data = CrabSatellites, breaks = 1:5 - 0.5)
+> plot(jitter(satellites) ~ width, data = CrabSatellites, subset = satellites > 0, log = "y")
+> plot(jitter(satellites) ~ factor(color), data = CrabSatellites, subset = satellites > 0, log = "y")
+> 
+> ## count data models
+> cs_p    <-    glm(satellites ~ width + color, data = CrabSatellites, family = poisson)
+> cs_nb   <- glm.nb(satellites ~ width + color, data = CrabSatellites)
+> cs_hp   <- hurdle(satellites ~ width + color, data = CrabSatellites, dist = "poisson")
+> cs_hnb  <- hurdle(satellites ~ width + color, data = CrabSatellites, dist = "negbin")
+> cs_hnb2 <- hurdle(satellites ~ 1 | width + color, data = CrabSatellites, dist = "negbin")
+> AIC(cs_p, cs_nb, cs_hp, cs_hnb, cs_hnb2)
+        df      AIC
+cs_p     3 921.4990
+cs_nb    4 756.9323
+cs_hp    6 736.2160
+cs_hnb   7 714.7255
+cs_hnb2  5 712.0658
+> BIC(cs_p, cs_nb, cs_hp, cs_hnb, cs_hnb2)
+        df      BIC
+cs_p     3 930.9589
+cs_nb    4 769.5455
+cs_hp    6 755.1358
+cs_hnb   7 736.7985
+cs_hnb2  5 727.8323
+> 
+> ## rootograms
+> par(mfrow = c(2, 2))
+> r_p   <- rootogram(cs_p,   max = 15, main = "Poisson")
+> r_nb  <- rootogram(cs_nb,  max = 15, main = "Negative Binomial")
+> r_hp  <- rootogram(cs_hp,  max = 15, main = "Hurdle Poisson")
+> r_hnb <- rootogram(cs_hnb, max = 15, main = "Hurdle Negative Binomial")
+> 
+> ## fitted curves
+> par(mfrow = c(1, 1))
+> plot(jitter(satellites) ~ width, data = CrabSatellites)
+> nd <- data.frame(width = 20:34, color = 2)
+> pred <- function(m) predict(m, newdata = nd, type = "response")
+> cs_ag <- glm(satellites ~ width, data = CrabSatellites, family = poisson(link = "identity"),
++   start = coef(lm(satellites ~ width, data = CrabSatellites)))
+> lines(pred(cs_ag)   ~ width, data = nd, col = 2, lwd = 1.5)
+> lines(pred(cs_p)    ~ width, data = nd, col = 3, lwd = 1.5)
+> lines(pred(cs_hnb)  ~ width, data = nd, col = 4, lwd = 1.5)
+> lines(pred(cs_hnb2) ~ width, data = nd, col = 4, lwd = 1.5, lty = 2)
+> legend("topleft", c("Hurdle NB", "Hurdle NB 2", "Poisson (id)", "Poisson (log)"),
++   col = c(4, 4, 2, 3), lty = c(1, 2, 1, 1), lwd = 1.5, bty = "n")
+> 
+> ## alternative displays: Q-Q residuals plot, barplot, residuals vs. fitted
+> par(mfrow= c(3, 2))
+> 
+> qqrplot(cs_p, range = c(0.05, 0.95), main = "Q-Q residuals plot: Poisson")
+> qqrplot(cs_hnb, range = c(0.05, 0.95), main = "Q-Q residuals plot: Hurdle NB")
+> 
+> barplot(t(matrix(c(r_p$observed, r_p$expected), ncol = 2,
++   dimnames = list(r_p$x, c("Observed", "Expected")))),
++   beside = TRUE, main = "Barplot: Poisson",
++   xlab = "satellites", ylab = "Frequency",
++   legend.text = TRUE, args.legend = list(x = "topright", bty = "n"))
+> barplot(t(matrix(c(r_hnb$observed, r_hnb$expected), ncol = 2,
++   dimnames = list(r_hnb$x, c("Observed", "Expected")))),
++   beside = TRUE, main = "Barplot: Hurdle NB",
++   xlab = "satellites", ylab = "Frequency",
++   legend.text = TRUE, args.legend = list(x = "topright", bty = "n"))
+> 
+> plot(predict(cs_p, type = "response"),
++   residuals(cs_p, type = "pearson"),
++   xlab = "Fitted values", ylab = "Pearson residuals",
++   main = "Residuals vs. fitted: Poisson")
+> plot(predict(cs_hnb, type = "response"),
++   residuals(cs_hnb, type = "pearson"),
++   xlab = "Fitted values", ylab = "Pearson residuals",
++   main = "Residuals vs. fitted: Hurdle NB")
+> 
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+> nameEx("FLXMRnegbin")
+> ### * FLXMRnegbin
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: FLXMRnegbin
+> ### Title: FlexMix Interface to Negative Binomial Regression Models
+> ### Aliases: FLXMRnegbin
+> ### Keywords: models
+> 
+> ### ** Examples
+> 
+> ## artificial data from a two-component mixture of geometric regressions
+> set.seed(1)
+> d <- data.frame(x = runif(500, -1, 1))
+> d$cluster <- rep(1:2, each = 250)
+> d$y <- rnbinom(500, mu = exp(c(1, -1)[d$cluster] + c(0, 3)[d$cluster] * d$x), size = 1)
+> 
+> if(require("flexmix")) {
++ ## fit mixture models with known correct theta and unknown theta
++ fm1 <- flexmix(y ~ x, data = d, k = 2, model = FLXMRnegbin(theta = 1))
++ fm0 <- flexmix(y ~ x, data = d, k = 2, model = FLXMRnegbin())
++ 
++ ## parameter recovery
++ parameters(fm1)
++ parameters(fm0)
++ 
++ ## refit to obtain joint summary
++ summary(refit(fm1, gradient = NULL))
++ summary(refit(fm0, gradient = NULL))
++ 
++ ## refitting both components manually for rootograms
++ rf1 <- lapply(1:2, function(i)
++   glm(y ~ x, data = d, family = negative.binomial(1), weights = posterior(fm1)[,i]))
++ rf0 <- lapply(1:2, function(i)
++   glm.nb(y ~ x, data = d, weights = posterior(fm0)[,i]))
++ 
++ ## Rootograms
++ par(mfrow = c(1, 2))
++ 
++ r11 <- rootogram(rf1[[1]])
++ r12 <- rootogram(rf1[[2]])
++ 
++ r01 <- rootogram(rf0[[1]])
++ r02 <- rootogram(rf0[[2]])
++ 
++ rootogram(glm.nb(y ~ x, data = d))
++ plot(r01 + r02)
++ }
+Loading required package: flexmix
+Loading required package: lattice
+$Comp.1
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept) 1.027477   0.117141  8.7713   <2e-16 ***
+x           0.048125   0.214572  0.2243   0.8225    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+$Comp.2
+            Estimate Std. Error z value  Pr(>|z|)    
+(Intercept) -0.86166    0.35676 -2.4153   0.01572 *  
+x            2.95928    0.50637  5.8441 5.093e-09 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+$Comp.1
+            Estimate Std. Error z value  Pr(>|z|)    
+(Intercept) 1.107731   0.208688  5.3081 1.108e-07 ***
+x           0.027095   0.220164  0.1231    0.9021    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+$Comp.2
+            Estimate Std. Error z value  Pr(>|z|)    
+(Intercept) -0.79527    0.40674 -1.9552   0.05055 .  
+x            2.79622    0.63995  4.3694 1.246e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+> 
+> ## Not run: 
+> ##D ## two-component mixture model fro NMES1988 physician office visits
+> ##D ## (fitting takes some time...)
+> ##D if(require("flexmix") & require("AER")) {
+> ##D 
+> ##D ## data from AER
+> ##D data("NMES1988", package = "AER")
+> ##D nmes <- NMES1988[, c(1, 7:8, 13, 15, 18:19)] 
+> ##D 
+> ##D ## single-component model
+> ##D nmes_nb <- glm.nb(visits ~ ., data = nmes)
+> ##D 
+> ##D ## two-component model
+> ##D set.seed(1090)
+> ##D nmes_fnb <- stepFlexmix(visits ~ ., data = nmes, k = 2, model = FLXMRnegbin())
+> ##D 
+> ##D ## refit to obtain summary with estimate of joint covariance matrix
+> ##D summary(refit(nmes_fnb, gradient = NULL))
+> ##D 
+> ##D ## refit individual models manually for rootograms
+> ##D nmes_fnb_rf <- lapply(1:2, function(i)
+> ##D   glm.nb(visits ~ ., data = nmes, weights = posterior(nmes_fnb)[,i]))
+> ##D 
+> ##D r1 <- rootogram(nmes_fnb_rf[[1]], max = 50, plot = FALSE)
+> ##D r2 <- rootogram(nmes_fnb_rf[[2]], max = 50, plot = FALSE)
+> ##D 
+> ##D par(mfrow = c(2, 2))
+> ##D rootogram(nmes_nb, max = 50, main = "Negative Binomial", ylim = c(-1, 25))
+> ##D plot(r1 + r2, xlab = "visits", main = "Mixture Negative Binomial", ylim = c(-1, 25))
+> ##D plot(r1, main = "Mixture Negative Binomial (Component 1)", ylim = c(-1, 25))
+> ##D plot(r2, main = "Mixture Negative Binomial (Component 2)", ylim = c(-1, 25))
+> ##D }
+> ## End(Not run)
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+
+detaching 'package:flexmix', 'package:lattice'
+
+> nameEx("MBnegbin")
+> ### * MBnegbin
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: MBnegbin
+> ### Title: mboost Families for Binary, (Zero-Truncated) Negative Binomial
+> ###   and Zero-Truncated Poisson Regression
+> ### Aliases: MBbinomial MBnegbin MBztpoisson MBztnegbin
+> ### Keywords: models
+> 
+> ### ** Examples
+> 
+> ### Negative binomial regression for CrabSatellites ----------------------------
+> 
+> if(require("mboost")) {
++ ## crab satellite data using ordered factors as numeric
++ data("CrabSatellites", package = "countreg")
++ CrabSatellites <- transform(CrabSatellites,
++   color = as.numeric(color),
++   spine = as.numeric(spine)
++ )  
++ 
++ ## comparison of ML and boosting with NBinomial() vs. MBnegbin()
++ system.time(m0 <- glm.nb(satellites ~ width + color, data = CrabSatellites))
++ system.time(m1 <- glmboost(satellites ~ width + color, data = CrabSatellites,
++   family = NBinomial(), control = boost_control(mstop = 500)))
++ system.time(m2 <- glmboost(satellites ~ width + color, data = CrabSatellites,
++   family = MBnegbin(), control = boost_control(mstop = 500)))
++ ## note that mstop is _not_ tuned here to (ab)use mboost to get the ML estimator
++ 
++ ## compare coefficients
++ cbind(c(coef(m0), "theta" = m0$theta),
++   c(coef(m1, off2int = TRUE, which = ""), nuisance(m1)),
++   c(coef(m1, off2int = TRUE, which = ""), nuisance(m1))
++ )
++ }
+Loading required package: mboost
+Loading required package: parallel
+Loading required package: stabs
+This is mboost 2.6-0. See 'package?mboost' and 'news(package  = "mboost")'
+for a complete list of changes.
+
+                  [,1]       [,2]       [,3]
+(Intercept) -3.2409842 -3.2409580 -3.2409580
+width        0.1776543  0.1776532  0.1776532
+color       -0.1815656 -0.1815635 -0.1815635
+theta        0.9290420  0.9290599  0.9290599
+> 
+> ### Hurdle regression for CrabSatellites using spline terms --------------------
+> 
+> 
+> ### Hurdle regression for RecreationDemand using linear terms ------------------
+> 
+> ## Not run: 
+> ##D library("mboost")
+> ##D data("RecreationDemand", package = "AER")
+> ##D 
+> ##D ### Zero hurdle ##
+> ##D 
+> ##D ## ML vs. boosting
+> ##D z0 <- glm(factor(trips > 0) ~ ., data = RecreationDemand, family = binomial)
+> ##D z1 <- glmboost(factor(trips > 0) ~ ., data = RecreationDemand, family = MBbinomial(),
+> ##D   control = boost_control(mstop = 5000))
+> ##D plot(z1)
+> ##D 
+> ##D ## tune mstop
+> ##D set.seed(0)
+> ##D z1cv <- cvrisk(z1)
+> ##D z1cv
+> ##D plot(z1cv)
+> ##D ## very flat (presumably due to separation?)
+> ##D ## -> stop earlier manually
+> ##D z1[3000]
+> ##D 
+> ##D ## compare coefficients
+> ##D cbind(coef(z0), coef(z1, off2int = TRUE, which = ""))
+> ##D ## -> some shrunken entirely to zero,
+> ##D ## coefficient of variable with separation (userfee) shrunken considerably
+> ##D 
+> ##D 
+> ##D ### Count (zero-truncated)
+> ##D 
+> ##D ## ML and boosting count part
+> ##D c0 <- zerotrunc(trips ~ ., data = subset(RecreationDemand, trips > 0), dist = "negbin")
+> ##D c1 <- glmboost(trips ~ ., data = subset(RecreationDemand, trips > 0),
+> ##D   family = MBztnegbin(), control = boost_control(mstop = 5000))
+> ##D plot(c1)
+> ##D 
+> ##D ## tune mstop
+> ##D set.seed(0)
+> ##D c1cv <- cvrisk(c1)
+> ##D c1cv
+> ##D plot(c1cv)
+> ##D 
+> ##D ## use mstop from cvrisk
+> ##D c1[mstop(c1cv)]
+> ##D 
+> ##D ## compare coefficients
+> ##D cbind(c(coef(c0), "theta" = c0$theta),
+> ##D   c(coef(c1, off2int = TRUE, which = ""), nuisance(c1)))
+> ##D ## -> not much difference
+> ## End(Not run)
+> 
+> 
+> 
+> cleanEx()
+
+detaching 'package:mboost', 'package:stabs', 'package:parallel'
+
+> nameEx("SerumPotassium")
+> ### * SerumPotassium
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: SerumPotassium
+> ### Title: Serum Potassium Levels
+> ### Aliases: SerumPotassium
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> data("SerumPotassium", package = "countreg")
+> 
+> ## Figure 9.3a-c from Rice (2007), and actual hanging rootogram
+> ## (note that Rice erroneously refers to suspended rootograms as hanging)
+> br <- 32:54/10 - 0.05
+> rootogram(SerumPotassium, "normal", scale = "raw", style = "standing",
++   breaks = br, col = "transparent")
+> rootogram(SerumPotassium, "normal", scale = "raw", style = "suspended",
++   breaks = br, col = "transparent", ylim = c(2.8, -4))
+> rootogram(SerumPotassium, "normal", scale = "sqrt", style = "suspended",
++   breaks = br, col = "transparent", ylim = c(1, -1.5))
+> rootogram(SerumPotassium, "normal", breaks = br)
+> 
+> 
+> 
+> cleanEx()
+> nameEx("TakeoverBids")
+> ### * TakeoverBids
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: TakeoverBids
+> ### Title: Takeover Bids Data
+> ### Aliases: TakeoverBids
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> data("TakeoverBids", package = "countreg")
+> 
+> ## Poisson model:
+> ## Jaggia and Thosar (1993), Table 3
+> ## Cameron and Johansson (1997), Table IV
+> tb_p <- glm(bids ~ . + I(size^2), data = TakeoverBids, family = poisson)
+> summary(tb_p)
+
+Call:
+glm(formula = bids ~ . + I(size^2), family = poisson, data = TakeoverBids)
+
+Deviance Residuals: 
+     Min        1Q    Median        3Q       Max  
+-2.27187  -0.55501  -0.06922   0.28720   2.39771  
+
+Coefficients:
+                Estimate Std. Error z value Pr(>|z|)   
+(Intercept)     0.986060   0.533920   1.847  0.06477 . 
+legalrestyes    0.260146   0.150959   1.723  0.08484 . 
+realrestyes    -0.195660   0.192631  -1.016  0.30976   
+finrestyes      0.074030   0.216522   0.342  0.73242   
+whiteknightyes  0.481382   0.158870   3.030  0.00245 **
+bidpremium     -0.677696   0.376737  -1.799  0.07204 . 
+insthold       -0.361991   0.424329  -0.853  0.39361   
+size            0.178503   0.060022   2.974  0.00294 **
+regulationyes  -0.029439   0.160568  -0.183  0.85453   
+I(size^2)      -0.007569   0.003122  -2.425  0.01532 * 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 121.862  on 125  degrees of freedom
+Residual deviance:  88.615  on 116  degrees of freedom
+AIC: 389.9
+
+Number of Fisher Scoring iterations: 5
+
+> logLik(tb_p)
+'log Lik.' -184.9483 (df=10)
+> 
+> ## dispersion tests
+> ## Cameron and Trivedi (2013, p. 185)
+> AER::dispersiontest(tb_p, alternative = "less", trafo = 2)
+
+	Underdispersion test
+
+data:  tb_p
+z = -1.1863, p-value = 0.1177
+alternative hypothesis: true alpha is less than 0
+sample estimates:
+      alpha 
+-0.06829684 
+
+> AER::dispersiontest(tb_p, alternative = "less", trafo = 1)
+
+	Underdispersion test
+
+data:  tb_p
+z = -3.0281, p-value = 0.001231
+alternative hypothesis: true alpha is less than 0
+sample estimates:
+     alpha 
+-0.3175595 
+
+> 
+> ## visualization of underdispersion
+> rootogram(tb_p)
+> qqrplot(tb_p, range = c(0.05, 0.95))
+> 
+> ## Parts of Cameron and Trivedi (2013), Table 5.4
+> summary(residuals(tb_p, type = "response"))
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+-3.22500 -0.71960 -0.07505  0.00000  0.37180  5.57200 
+> summary(residuals(tb_p, type = "pearson"))
+     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+-1.606000 -0.521400 -0.068440  0.001562  0.297000  3.027000 
+> summary(residuals(tb_p, type = "deviance"))
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+-2.27200 -0.55500 -0.06922 -0.08986  0.28720  2.39800 
+> 
+> ## hurdle Poisson model mitigates underdispersion
+> tb_hp <- hurdle(bids ~ . + I(size^2), data = TakeoverBids, dist = "poisson")
+> AIC(tb_p, tb_hp)
+      df      AIC
+tb_p  10 389.8967
+tb_hp 20 358.9549
+> rootogram(tb_hp)
+> qqrplot(tb_hp, range = c(0.05, 0.95))
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("VolcanoHeights")
+> ### * VolcanoHeights
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: VolcanoHeights
+> ### Title: Tukey's Volcano Heights
+> ### Aliases: VolcanoHeights
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> ## Rootograms from Tukey (1972)
+> ## (some 'breaks' don't match exactly)
+> data("VolcanoHeights", package = "countreg")
+> 
+> ## Figure 16
+> rootogram(VolcanoHeights, "normal", style = "standing",
++   breaks = 0:20 - 0.01, col = "transparent")
+> 
+> ## Figure 17
+> rootogram(sqrt(1000 * VolcanoHeights), "normal", style = "standing",
++   breaks = 0:17 * 10 - 1.1, col = "transparent")
+> 
+> ## Figure 18
+> rootogram(sqrt(1000 * VolcanoHeights), "normal", style = "hanging",
++   breaks = -2:18 * 10 - 1.1)
+> 
+> ## Figure 19
+> rootogram(sqrt(1000 * VolcanoHeights), "normal", style = "suspended",
++   breaks = -2:18 * 10 - 1.1, ylim = c(6, -2))
+> abline(h = c(-1.5, -1, 1, 1.5), lty = c(2, 3, 3, 2))
+> 
+> 
+> 
+> cleanEx()
+> nameEx("disptest")
+> ### * disptest
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: disptest
+> ### Title: Dispersion Tests
+> ### Aliases: disptest
+> ### Keywords: htest
+> 
+> ### ** Examples
+> 
+> ## Data with overdispersion
+> data("RecreationDemand", package = "AER")
+> rd_p <- glm(trips ~ ., data = RecreationDemand, family = poisson)
+> 
+> ## Cameron and Trivedi (2013), p. 248
+> disptest(rd_p, type = "lrtNB2", alternative = "greater")
+
+	Overdispersion test
+
+data:  rd_p
+z = 1407.7, p-value < 2.2e-16
+alternative hypothesis: greater
+
+> 
+> 
+> ## Data with underdispersion
+> data("TakeoverBids", package = "countreg")
+> tb_p <- glm(bids ~ . + I(size^2), data = TakeoverBids, family = poisson)
+> 
+> ## Jaggia and Thosar (1993), Table 3
+> ## testing overdispersion
+> disptest(tb_p, type = "scoreNB2", alternative = "greater")
+
+	Overdispersion test
+
+data:  tb_p
+z = -1.0173, p-value = 0.8455
+alternative hypothesis: greater
+
+> disptest(tb_p, type = "scoreNB2adj", alternative = "greater")
+
+	Overdispersion test
+
+data:  tb_p
+z = -0.29924, p-value = 0.6176
+alternative hypothesis: greater
+
+> 
+> ## testing underdispersion
+> disptest(tb_p, type = "scoreKatz", alternative = "two.sided")
+
+	Dispersion test
+
+data:  tb_p
+z = -2.5206, p-value = 0.01172
+alternative hypothesis: two.sided
+
+> 
+> 
+> 
+> cleanEx()
+> nameEx("hurdle")
+> ### * hurdle
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: hurdle
+> ### Title: Hurdle Models for Count Data Regression
+> ### Aliases: hurdle print.hurdle
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> ## data
+> data("CrabSatellites", package = "countreg")
+> cs <- CrabSatellites[, c("satellites", "width", "color")]
+> cs$color <- as.numeric(cs$color)
+> 
+> ## logit-poisson
+> ## "satellites ~ ." is the same as "satellites ~ . | .", i.e.
+> ## "satellites ~ width + color | width + color"
+> fm_hp1 <- hurdle(satellites ~ ., data = cs)
+> summary(fm_hp1)
+
+Call:
+hurdle(formula = satellites ~ ., data = cs)
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-1.7371 -0.8383 -0.2976  0.6431  4.2699 
+
+Count model coefficients (truncated poisson with log link):
+            Estimate Std. Error z value Pr(>|z|)
+(Intercept) 0.562699   0.645439   0.872    0.383
+width       0.034238   0.022227   1.540    0.123
+color       0.007165   0.066627   0.108    0.914
+Zero hurdle model coefficients (binomial with logit link):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -10.0708     2.8065  -3.588 0.000333 ***
+width         0.4583     0.1040   4.407 1.05e-05 ***
+color        -0.5090     0.2237  -2.276 0.022862 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Number of iterations in BFGS optimization: 13 
+Log-likelihood: -362.1 on 6 Df
+> 
+> ## geometric-poisson
+> fm_hp2 <- hurdle(satellites ~ ., data = cs, zero = "geometric")
+> summary(fm_hp2)
+
+Call:
+hurdle(formula = satellites ~ ., data = cs, zero.dist = "geometric")
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-1.7371 -0.8383 -0.2976  0.6431  4.2699 
+
+Count model coefficients (truncated poisson with log link):
+            Estimate Std. Error z value Pr(>|z|)
+(Intercept) 0.562699   0.645439   0.872    0.383
+width       0.034238   0.022227   1.540    0.123
+color       0.007165   0.066627   0.108    0.914
+Zero hurdle model coefficients (censored geometric with log link):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -10.0708     2.8065  -3.588 0.000333 ***
+width         0.4583     0.1040   4.407 1.05e-05 ***
+color        -0.5090     0.2237  -2.276 0.022862 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Number of iterations in BFGS optimization: 13 
+Log-likelihood: -362.1 on 6 Df
+> 
+> ## logit and geometric model are equivalent
+> coef(fm_hp1, model = "zero") - coef(fm_hp2, model = "zero")
+ (Intercept)        width        color 
+3.594458e-11 1.073255e-09 6.707657e-11 
+> 
+> ## logit-negbin
+> fm_hnb1 <- hurdle(satellites ~ ., data = cs, dist = "negbin")
+> summary(fm_hnb1)
+
+Call:
+hurdle(formula = satellites ~ ., data = cs, dist = "negbin")
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-1.3835 -0.7244 -0.2636  0.5557  3.6080 
+
+Count model coefficients (truncated negbin with log link):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept) 0.428567   0.941077   0.455    0.649    
+width       0.037845   0.032749   1.156    0.248    
+color       0.006929   0.091078   0.076    0.939    
+Log(theta)  1.527382   0.352950   4.327 1.51e-05 ***
+Zero hurdle model coefficients (binomial with logit link):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -10.0708     2.8065  -3.588 0.000333 ***
+width         0.4583     0.1040   4.407 1.05e-05 ***
+color        -0.5090     0.2237  -2.276 0.022862 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Theta: count = 4.6061
+Number of iterations in BFGS optimization: 17 
+Log-likelihood: -350.4 on 7 Df
+> 
+> ## negbin-negbin
+> ## (poorly conditioned zero hurdle, note increased standard errors)
+> fm_hnb2 <- hurdle(satellites ~ ., data = cs, dist = "negbin", zero = "negbin")
+> summary(fm_hnb2)
+
+Call:
+hurdle(formula = satellites ~ ., data = cs, dist = "negbin", zero.dist = "negbin")
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-1.3984 -0.7163 -0.2724  0.5615  3.6221 
+
+Count model coefficients (truncated negbin with log link):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept) 0.428567   0.941077   0.455    0.649    
+width       0.037845   0.032749   1.156    0.248    
+color       0.006929   0.091078   0.076    0.939    
+Log(theta)  1.527382   0.352950   4.327 1.51e-05 ***
+Zero hurdle model coefficients (censored negbin with log link):
+            Estimate Std. Error z value Pr(>|z|)
+(Intercept)  -8.7334     5.6289  -1.552    0.121
+width         0.3872     0.2840   1.363    0.173
+color        -0.4097     0.4230  -0.969    0.333
+Log(theta)    0.5124     2.5691   0.199    0.842
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Theta: count = 4.6061, zero = 1.6693
+Number of iterations in BFGS optimization: 35 
+Log-likelihood: -350.3 on 8 Df
+> 
+> 
+> 
+> cleanEx()
+> nameEx("hurdle.control")
+> ### * hurdle.control
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: hurdle.control
+> ### Title: Control Parameters for Hurdle Count Data Regression
+> ### Aliases: hurdle.control
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> data("CrabSatellites", package = "countreg")
+> 
+> ## default start values
+> fm1 <- hurdle(satellites ~ width + as.numeric(color), data = CrabSatellites,
++   dist = "negbin", zero = "negbin")
+> 
+> ## user-supplied start values and other options
+> fm2 <- hurdle(satellites ~ width + as.numeric(color), data = CrabSatellites,
++   dist = "negbin",
++   zero = "negbin",
++   trace = TRUE,
++   separate = FALSE,
++   start = list(count = c(0.5, 0, 0),
++   	       zero = c(-10, 0.5, -0.5),
++   	       theta = c(count = 1, zero = 1)))
+Hurdle Count Model
+count model: negbin with log link
+zero hurdle model: negbin with log link
+dependent variable:
+   0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15 
+  62   16    9   19   19   15   13    4    6    3    3    1    1    0    1    1 
+<NA> 
+   0 
+calling optim() for joint count and zero hurlde estimation:
+initial  value 408.872181 
+iter  10 value 350.643112
+final  value 350.367259 
+converged
+done
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("hurdletest")
+> ### * hurdletest
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: hurdletest
+> ### Title: Testing for the Presence of a Zero Hurdle
+> ### Aliases: hurdletest
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> data("CrabSatellites", package = "countreg")
+> cs <- CrabSatellites[, c("satellites", "width", "color")]
+> cs$color <- as.numeric(cs$color)
+> fm <- hurdle(satellites ~ ., data = cs, dist = "negbin", zero = "negbin")
+> if(require("car")) hurdletest(fm)
+Loading required package: car
+Wald test for hurdle models
+
+Restrictions:
+count_((Intercept) - zero_(Intercept) = 0
+count_width - zero_width = 0
+count_color - zero_color = 0
+
+Model 1: restricted model
+Model 2: satellites ~ .
+
+  Res.Df Df  Chisq Pr(>Chisq)    
+1    168                         
+2    165  3 50.362  6.689e-11 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+> 
+> 
+> 
+> cleanEx()
+
+detaching 'package:car'
+
+> nameEx("predict.hurdle")
+> ### * predict.hurdle
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: predict.hurdle
+> ### Title: Methods for hurdle Objects
+> ### Aliases: predict.hurdle residuals.hurdle terms.hurdle
+> ###   model.matrix.hurdle coef.hurdle vcov.hurdle getSummary.hurdle
+> ###   summary.hurdle print.summary.hurdle logLik.hurdle nobs.hurdle
+> ###   fitted.hurdle predprob.hurdle extractAIC.hurdle
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> data("CrabSatellites", package = "countreg")
+> fm <- hurdle(satellites ~ 1 | width + color, data = CrabSatellites)
+> 
+> plot(residuals(fm) ~ fitted(fm))
+> 
+> coef(fm)
+count_(Intercept)  zero_(Intercept)        zero_width      zero_color.L 
+       1.50384532      -11.75551773        0.46795599       -0.95837247 
+     zero_color.Q      zero_color.C 
+      -0.58926921       -0.09867217 
+> coef(fm, model = "zero")
+ (Intercept)        width      color.L      color.Q      color.C 
+-11.75551773   0.46795599  -0.95837247  -0.58926921  -0.09867217 
+> 
+> summary(fm)
+
+Call:
+hurdle(formula = satellites ~ 1 | width + color, data = CrabSatellites)
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-1.6805 -0.8220 -0.3307  0.5894  4.4785 
+
+Count model coefficients (truncated poisson with log link):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.50385    0.04567   32.93   <2e-16 ***
+Zero hurdle model coefficients (binomial with logit link):
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -11.75552    2.74141  -4.288 1.80e-05 ***
+width         0.46796    0.10553   4.434 9.23e-06 ***
+color.L      -0.95837    0.58033  -1.651   0.0986 .  
+color.Q      -0.58927    0.47472  -1.241   0.2145    
+color.C      -0.09867    0.33738  -0.292   0.7699    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Number of iterations in BFGS optimization: 7 
+Log-likelihood: -362.5 on 6 Df
+> logLik(fm)
+'log Lik.' -362.4638 (df=6)
+> 
+> 
+> 
+> cleanEx()
+> nameEx("predict.zeroinfl")
+> ### * predict.zeroinfl
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: predict.zeroinfl
+> ### Title: Methods for zeroinfl Objects
+> ### Aliases: predict.zeroinfl residuals.zeroinfl terms.zeroinfl
+> ###   model.matrix.zeroinfl coef.zeroinfl vcov.zeroinfl getSummary.zeroinfl
+> ###   summary.zeroinfl print.summary.zeroinfl logLik.zeroinfl nobs.zeroinfl
+> ###   fitted.zeroinfl predprob.zeroinfl extractAIC.zeroinfl
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> data("CrabSatellites", package = "countreg")
+> fm_zip <- zeroinfl(satellites ~ 1 | width + color, data = CrabSatellites)
+> 
+> plot(residuals(fm_zip) ~ fitted(fm_zip))
+> 
+> coef(fm_zip)
+count_(Intercept)  zero_(Intercept)        zero_width      zero_color.L 
+       1.50478077       11.93600259       -0.47633984        0.98356312 
+     zero_color.Q      zero_color.C 
+       0.58845929        0.09246361 
+> coef(fm_zip, model = "count")
+(Intercept) 
+   1.504781 
+> 
+> summary(fm_zip)
+
+Call:
+zeroinfl(formula = satellites ~ 1 | width + color, data = CrabSatellites)
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-1.6684 -0.8202 -0.3252  0.5901  4.4682 
+
+Count model coefficients (poisson with log link):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.50478    0.04556   33.02   <2e-16 ***
+
+Zero-inflation model coefficients (binomial with logit link):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept) 11.93600    2.81853   4.235 2.29e-05 ***
+width       -0.47634    0.10868  -4.383 1.17e-05 ***
+color.L      0.98356    0.59803   1.645    0.100    
+color.Q      0.58846    0.48886   1.204    0.229    
+color.C      0.09246    0.34567   0.267    0.789    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Number of iterations in BFGS optimization: 17 
+Log-likelihood: -362.6 on 6 Df
+> logLik(fm_zip)
+'log Lik.' -362.5605 (df=6)
+> 
+> 
+> 
+> cleanEx()
+> nameEx("predict.zerotrunc")
+> ### * predict.zerotrunc
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: predict.zerotrunc
+> ### Title: Methods for zerotrunc Objects
+> ### Aliases: predict.zerotrunc residuals.zerotrunc estfun.zerotrunc
+> ###   terms.zerotrunc model.frame.zerotrunc model.matrix.zerotrunc
+> ###   coef.zerotrunc vcov.zerotrunc summary.zerotrunc
+> ###   print.summary.zerotrunc logLik.zerotrunc nobs.zerotrunc
+> ###   fitted.zerotrunc predprob.zerotrunc extractAIC.zerotrunc
+> ###   getSummary.zerotrunc
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> data("CrabSatellites", package = "countreg")
+> fm <- zerotrunc(satellites ~ width + color, data = CrabSatellites, subset = satellites > 0)
+> 
+> plot(residuals(fm, type = "deviance") ~ fitted(fm))
+> plot(residuals(fm, type = "pearson") ~ fitted(fm))
+> 
+> coef(fm)
+(Intercept)       width     color.L     color.Q     color.C 
+ 0.52666751  0.03971107  0.10777950  0.39487848  0.16936889 
+> summary(fm)
+
+Call:
+zerotrunc(formula = satellites ~ width + color, data = CrabSatellites, 
+    subset = satellites > 0)
+
+Deviance residuals:
+    Min      1Q  Median      3Q     Max 
+-2.5416 -1.0496 -0.1063  0.6271  3.7814 
+
+Coefficients (truncated poisson with log link):
+            Estimate Std. Error z value Pr(>|z|)   
+(Intercept)  0.52667    0.60017   0.878  0.38020   
+width        0.03971    0.02228   1.783  0.07466 . 
+color.L      0.10778    0.14402   0.748  0.45425   
+color.Q      0.39488    0.12110   3.261  0.00111 **
+color.C      0.16937    0.09365   1.808  0.07054 . 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Number of iterations in BFGS optimization: 8 
+Log-likelihood: -261.9 on 5 Df
+> logLik(fm)
+'log Lik.' -261.9177 (df=5)
+> AIC(fm)
+[1] 533.8354
+> 
+> 
+> 
+> cleanEx()
+> nameEx("qqrplot")
+> ### * qqrplot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: qqrplot
+> ### Title: Q-Q Plots for Quantile Residuals
+> ### Aliases: qqrplot
+> ### Keywords: hplot
+> 
+> ### ** Examples
+> 
+> ## count data regression models: crab satellites
+> data("CrabSatellites", package = "countreg")
+> cs_p   <-    glm(satellites ~     width + color, data = CrabSatellites, family = poisson)
+> cs_nb  <- glm.nb(satellites ~     width + color, data = CrabSatellites)
+> cs_hp  <- hurdle(satellites ~ 1 | width + color, data = CrabSatellites, dist = "poisson")
+> cs_hnb <- hurdle(satellites ~ 1 | width + color, data = CrabSatellites, dist = "negbin")
+> 
+> ## Q-Q residual plots
+> par(mfrow = c(2, 2))
+> qqrplot(cs_p, main = "Poisson")
+> qqrplot(cs_nb, main = "Negative Binomial")
+> qqrplot(cs_hp, main = "Hurdle Poisson")
+> qqrplot(cs_hnb, main = "Hurdle Negative Binomial")
+> par(mfrow = c(1, 1))
+> 
+> ## Q-Q residual plots
+> par(mfrow = c(2, 2))
+> qqrplot(cs_p, main = "One Random Sample")
+> qqrplot(cs_p, main = "Median", type = "quantile")
+> qqrplot(cs_p, main = "5 Random Samples and Range", nsim = 10, range = c(0.005, 0.995))
+> qqrplot(cs_p, main = "100 Random Samples", nsim = 100, pch = 19, col = gray(0, alpha = 0.01))
+> par(mfrow = c(1, 1))
+> 
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+> nameEx("qresiduals")
+> ### * qresiduals
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: qresiduals
+> ### Title: (Randomized) Quantile Residuals
+> ### Aliases: qresiduals qresiduals.default qresiduals.glm qresiduals.hurdle
+> ###   qresiduals.zeroinfl qresiduals.zerotrunc
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> ## count data regression models: crab satellites
+> data("CrabSatellites", package = "countreg")
+> cs_p <- glm(satellites ~ width + color, data = CrabSatellites, family = poisson)
+> 
+> qres <- cbind(
++   sample = qresiduals(cs_p, nsim = 3),
++   median = qresiduals(cs_p, type = "quantile"),
++   mean100 = rowMeans(qresiduals(cs_p, nsim = 100)),
++   range = qresiduals(cs_p, type = "quantile", prob = c(0, 1))
++ )
+> qres[1:5, ]
+        r_1        r_2        r_3     median   mean100        q_0        q_1
+1  1.736009  1.7783079  1.8061715  1.8175679  1.832230  1.6557574  2.0487206
+2  1.065500  1.0695697  0.9728868  1.1297344  1.136869  0.8996436  1.4435472
+3 -1.469025 -1.2220391 -1.6880413 -1.5390620 -1.592488       -Inf -1.1562515
+4 -0.464480 -0.7459894 -0.6541393 -0.9276086 -1.161948       -Inf -0.3755906
+5 -1.991589 -1.6221517 -1.7672206 -1.7583396 -1.797331 -2.2476707 -1.5032201
+> 
+> 
+> 
+> cleanEx()
+> nameEx("rootogram")
+> ### * rootogram
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rootogram
+> ### Title: Rootograms for Assessing Goodness of Fit of Likelihood Models
+> ### Aliases: rootogram plot.rootogram autoplot.rootogram +.rootogram
+> ###   c.rootogram rbind.rootogram rootogram.default rootogram.gam
+> ###   rootogram.gamlss rootogram.glm rootogram.hurdle rootogram.numeric
+> ###   rootogram.zeroinfl rootogram.zerotrunc
+> ### Keywords: hplot
+> 
+> ### ** Examples
+> 
+> ## different interfaces
+> 
+> ## number of deaths by horsekicks in Prussian army (Von Bortkiewicz 1898)
+> deaths <- rep(0:4, c(109, 65, 22, 3, 1))
+> 
+> ## default method: fitted values "by hand"
+> rootogram(table(deaths), fitted = length(deaths) * dpois(0:4, mean(deaths)))
+> 
+> ## numeric method: fitted values via fitdistr()
+> rootogram(deaths, fitted = "poisson")
+> rootogram(deaths, fitted = dpois, start = list(lambda = 1),
++   breaks = 0:5 - 0.5, width = 0.9)
+> 
+> ## glm method: fitted values via glm()
+> m <- glm(deaths ~ 1, family = poisson)
+> rootogram(m)
+> 
+> ## inspect output (without plotting)
+> r <- rootogram(m, plot = FALSE)
+> r
+  observed    expected x           y width    height       line
+1      109 108.6701738 0 -0.01580778   0.9 10.440307 10.4244987
+2       65  66.2888061 1  0.07953604   0.9  8.062258  8.1417938
+3       22  20.2180859 2 -0.19396317   0.9  4.690416  4.4964526
+4        3   4.1110108 3  0.29551196   0.9  1.732051  2.0275628
+5        1   0.6269291 4 -0.20821143   0.9  1.000000  0.7917886
+> 
+> ## create ggplot2 version
+> if(require("ggplot2")) autoplot(r)
+Loading required package: ggplot2
+> 
+> #-------------------------------------------------------------------------------
+> 
+> ## different styles
+> 
+> ## artificial data from negative binomial (mu = 3, theta = 2)
+> ## and Poisson (mu = 3) distribution
+> set.seed(1090)
+> y <- rnbinom(100, mu = 3, size = 2)
+> x <- rpois(100, lambda = 3)
+> 
+> ## correctly specified Poisson model fit (mu = 3.34)
+> par(mfrow = c(2, 3))
+> rootogram(x, "poisson", style = "standing",  ylim = c(-2.2, 4.8), main = "Standing")
+> rootogram(x, "poisson", style = "hanging",   ylim = c(-2.2, 4.8), main = "Hanging")
+> rootogram(x, "poisson", style = "suspended", ylim = c(-2.2, 4.8), main = "Suspended")
+> 
+> ## misspecified Poisson model fit (mu = 3.32)
+> rootogram(y, "poisson", style = "standing",  ylim = c(-2.2, 4.8), main = "Standing")
+> rootogram(y, "poisson", style = "hanging",   ylim = c(-2.2, 4.8), main = "Hanging")
+> rootogram(y, "poisson", style = "suspended", ylim = c(-2.2, 4.8), main = "Suspended")
+> par(mfrow = c(1, 1))
+> 
+> #-------------------------------------------------------------------------------
+> 
+> ## artificial data from a t_4 distribution
+> set.seed(1090)
+> y <- rt(1000, 4)
+> 
+> ## incorrect normal fit (tails too light) and correct t fit
+> par(mfrow = c(1, 2))
+> rootogram(y, fitted = "normal", breaks = 40, xlim = c(-6, 6), ylim = c(-2, 14))
+> rootogram(y, fitted = "t",      breaks = 40, xlim = c(-6, 6), ylim = c(-2, 14))
+> par(mfrow = c(1, 1))
+> 
+> #-------------------------------------------------------------------------------
+> 
+> ## linear regression with normal/Gaussian response: anorexia data
+> an <- glm(Postwt ~ Prewt + Treat + offset(Prewt), family = gaussian, data = anorexia)
+> rootogram(an, ylim = c(-1, 4))
+> abline(h = c(-1, 1), col = "#1E55CE", lty = 2, lwd = 2)
+> 
+> #-------------------------------------------------------------------------------
+> 
+> ## count data regression models: crab satellites
+> data("CrabSatellites", package = "countreg")
+> cs_p   <-    glm(satellites ~     width + color, data = CrabSatellites, family = poisson)
+> cs_nb  <- glm.nb(satellites ~     width + color, data = CrabSatellites)
+> cs_hp  <- hurdle(satellites ~ 1 | width + color, data = CrabSatellites, dist = "poisson")
+> cs_hnb <- hurdle(satellites ~ 1 | width + color, data = CrabSatellites, dist = "negbin")
+> 
+> ## rootograms
+> par(mfrow = c(2, 2))
+> rootogram(cs_p, max = 15, main = "Poisson")
+> rootogram(cs_nb, max = 15, main = "Negative Binomial")
+> rootogram(cs_hp, max = 15, main = "Hurdle Poisson")
+> rootogram(cs_hnb, max = 15, main = "Hurdle Negative Binomial")
+> par(mfrow = c(1, 1))
+> 
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+
+detaching 'package:ggplot2'
+
+> nameEx("zeroinfl")
+> ### * zeroinfl
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: zeroinfl
+> ### Title: Zero-inflated Count Data Regression
+> ### Aliases: zeroinfl print.zeroinfl
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> ## data
+> data("CrabSatellites", package = "countreg")
+> cs <- CrabSatellites[, c("satellites", "width", "color")]
+> cs$color <- as.numeric(cs$color)
+> 
+> ## without inflation
+> ## ("satellites ~ ." is "satellites ~ width + color")
+> fm_pois <- glm(satellites ~ ., data = cs, family = poisson)
+> fm_qpois <- glm(satellites ~ ., data = cs, family = quasipoisson)
+> fm_nb <- glm.nb(satellites ~ ., data = cs)
+> 
+> ## with simple inflation (no regressors for zero component)
+> fm_zip <- zeroinfl(satellites ~ . | 1, data = cs)
+> fm_zinb <- zeroinfl(satellites ~ . | 1, data = cs, dist = "negbin")
+> 
+> ## inflation with regressors
+> ## ("satellites ~ . | ." is "satellites ~ width + color | width + color")
+> fm_zip2 <- zeroinfl(satellites ~ . | ., data = cs)
+> fm_zinb2 <- zeroinfl(satellites ~ . | ., data = cs, dist = "negbin")
+> 
+> 
+> 
+> cleanEx()
+> nameEx("zeroinfl.control")
+> ### * zeroinfl.control
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: zeroinfl.control
+> ### Title: Control Parameters for Zero-inflated Count Data Regression
+> ### Aliases: zeroinfl.control
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> data("CrabSatellites", package = "countreg")
+> 
+> ## default start values
+> fm1 <- zeroinfl(satellites ~ width + as.numeric(color), data = CrabSatellites)
+> 
+> ## use EM algorithm for start values
+> fm2 <- zeroinfl(satellites ~ width + as.numeric(color), data = CrabSatellites, EM = TRUE)
+> 
+> ## user-supplied start values
+> fm3 <- zeroinfl(satellites ~ width + as.numeric(color), data = CrabSatellites,
++   start = list(count = c(0.5, 0, 0), zero = c(10, -0.5, 0.5)))
+> 
+> 
+> 
+> cleanEx()
+> nameEx("zerotrunc")
+> ### * zerotrunc
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: zerotrunc
+> ### Title: Zero-Truncated Count Data Regression
+> ### Aliases: zerotrunc print.zerotrunc
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> ## data
+> data("CrabSatellites", package = "countreg")
+> cs <- CrabSatellites[, c("satellites", "width", "color")]
+> cs$color <- as.numeric(cs$color)
+> cs <- subset(cs, subset = satellites > 0)
+> 
+> ## poisson
+> zt_p <- zerotrunc(satellites ~ ., data = cs)
+> ## or equivalently
+> zt_p <- zerotrunc(satellites ~ ., data = cs, theta = Inf)
+> summary(zt_p)
+
+Call:
+zerotrunc(formula = satellites ~ ., data = cs, theta = Inf)
+
+Deviance residuals:
+    Min      1Q  Median      3Q     Max 
+-2.5409 -0.9350 -0.2051  0.6278  3.7722 
+
+Coefficients (truncated poisson with log link):
+            Estimate Std. Error z value Pr(>|z|)
+(Intercept) 0.562699   0.645439   0.872    0.383
+width       0.034238   0.022227   1.540    0.123
+color       0.007166   0.066627   0.108    0.914
+
+Number of iterations in BFGS optimization: 6 
+Log-likelihood: -267.5 on 3 Df
+> 
+> ## negbin
+> zt_nb <- zerotrunc(satellites ~ ., data = cs, dist = "negbin")
+> ## or equivalently
+> zt_nb <- zerotrunc(satellites ~ ., data = cs, theta = NULL)
+> summary(zt_nb)
+
+Call:
+zerotrunc(formula = satellites ~ ., data = cs, theta = NULL)
+
+Deviance residuals:
+    Min      1Q  Median      3Q     Max 
+-2.1636 -0.7158 -0.1520  0.4498  2.4215 
+
+Coefficients (truncated negbin with log link):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept) 0.427224   0.941131   0.454    0.650    
+width       0.037890   0.032751   1.157    0.247    
+color       0.006985   0.091081   0.077    0.939    
+Log(theta)  1.527243   0.352937   4.327 1.51e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Theta = 4.6055
+Number of iterations in BFGS optimization: 10 
+Log-likelihood: -255.8 on 4 Df
+> 
+> 
+> 
+> cleanEx()
+> nameEx("zerotrunc.control")
+> ### * zerotrunc.control
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: zerotrunc.control
+> ### Title: Control Parameters for Zero-Truncated Count Data Regression
+> ### Aliases: zerotrunc.control
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> data("CrabSatellites", package = "countreg")
+> 
+> ## default start values
+> zt_nb <- zerotrunc(satellites ~ width + as.numeric(color), data = CrabSatellites,
++   subset = satellites > 0, dist = "negbin")
+> 
+> ## user-supplied start values and other options
+> zt_nb2 <- zerotrunc(satellites ~ width + as.numeric(color), data = CrabSatellites,
++   subset = satellites > 0, dist = "negbin", start = c(0.5, 0, 0))
+> 
+> 
+> 
+> cleanEx()
+> nameEx("zitest")
+> ### * zitest
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: zitest
+> ### Title: Zero Inflation Tests
+> ### Aliases: zitest
+> ### Keywords: htest
+> 
+> ### ** Examples
+> 
+> data("CrabSatellites", package = "countreg")
+> CrabSatellites <- transform(CrabSatellites,
++   color = as.numeric(color),
++   spine = as.numeric(spine),
++   cwidth = cut(width, c(-Inf, seq(23.25, 29.25), Inf))
++ )
+> 
+> cs_p <- glm(satellites ~ width + color, data = CrabSatellites, family = poisson)
+> zitest(cs_p)
+
+	Zero inflation test
+
+data:  cs_p
+S = 42.608, p-value = 3.345e-11
+
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("ztpoisson")
+> ### * ztpoisson
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: ztpoisson
+> ### Title: Family Object for the Zero-Truncated Poisson Distribution
+> ### Aliases: ztpoisson
+> ### Keywords: models
+> 
+> ### ** Examples
+> 
+> ## data
+> data("CrabSatellites", package = "countreg")
+> cs <- subset(CrabSatellites, subset = satellites > 0)
+> cs$color <- as.numeric(cs$color)
+> 
+> ## model
+> ztp1 <- glm(satellites ~ width + color, data = cs, family = ztpoisson)
+> ztp2 <- zerotrunc(satellites ~ width + color, data = cs)
+> summary(ztp1)
+
+Call:
+glm(formula = satellites ~ width + color, family = ztpoisson, 
+    data = cs)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-2.5409  -0.9350  -0.2051   0.6278   3.7722  
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept) 0.562699   0.879781   0.640    0.524
+width       0.034238   0.030300   1.130    0.261
+color       0.007166   0.090811   0.079    0.937
+
+(Dispersion parameter for ztpoisson family taken to be 1.85767)
+
+    Null deviance: 220.54  on 110  degrees of freedom
+Residual deviance: 218.16  on 108  degrees of freedom
+AIC: 541.09
+
+Number of Fisher Scoring iterations: 5
+
+> summary(ztp2)
+
+Call:
+zerotrunc(formula = satellites ~ width + color, data = cs)
+
+Deviance residuals:
+    Min      1Q  Median      3Q     Max 
+-2.5409 -0.9350 -0.2051  0.6278  3.7722 
+
+Coefficients (truncated poisson with log link):
+            Estimate Std. Error z value Pr(>|z|)
+(Intercept) 0.562699   0.645439   0.872    0.383
+width       0.034238   0.022227   1.540    0.123
+color       0.007166   0.066627   0.108    0.914
+
+Number of iterations in BFGS optimization: 6 
+Log-likelihood: -267.5 on 3 Df
+> 
+> 
+> 
+> ### * <FOOTER>
+> ###
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  19.148 0.144 19.295 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')
