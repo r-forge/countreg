@@ -38,18 +38,9 @@ zerotrunc(formula, data, subset, na.action, weights, offset,
 }
 
 \details{
-  Hurdle count models are two-component models with a truncated count
-  component for positive counts and a zerotrunc component that models the
-  zero counts. Thus, unlike zero-inflation models, there are \emph{not} two
-  sources of zeros: the count model is only employed if the zerotrunc for
-  modeling the occurence of zeros is exceeded. The count model is typically
-  a truncated Poisson or negative binomial regression (with log link).
-  The geometric distribution is a special case of the negative binomial with
-  size parameter equal to 1. For modeling the zerotrunc (occurence of positive
-  counts) either a binomial model can be employed or a censored count distribution.
-  Binomial logit and censored geometric models as the zerotrunc part both lead to 
-  the same likelihood function and thus to the same coefficient estimates.
-  
+  All zero-truncated count data models in \code{zerotrunc} are obtained
+  from the corresponding untruncated distribution using a log-link
+  between the untruncated mean and the linear predictor.
   All parameters are estimated by maximum likelihood using \code{\link[stats]{optim}},
   with control options set in \code{\link{zerotrunc.control}}.
   Starting values can be supplied, otherwise they are estimated by \code{\link[stats]{glm.fit}}
@@ -111,7 +102,7 @@ Cameron AC, Trivedi PK (2005). \emph{Microeconometrics: Methods and Applications
 Zeileis A, Kleiber C, Jackman S (2008).
   \dQuote{Regression Models for Count Data in R.} 
   \emph{Journal of Statistical Software}, \bold{27}(8), 1--25.
-  URL \url{http://www.jstatsoft.org/v27/i08/}.
+  \doi{10.18637/jss.v027.i08}.
 }
 
 \seealso{\code{\link{zerotrunc.control}}, \code{\link[stats]{glm}},

@@ -17,8 +17,6 @@
 \alias{rootogram.zeroinfl}
 \alias{rootogram.zerotrunc}
 
-\encoding{latin1}
-
 \title{Rootograms for Assessing Goodness of Fit of Likelihood Models}
 
 \description{
@@ -130,10 +128,10 @@ is much more limited in scope, hence a function has been created here.
 \references{
 Friendly M (2000), \emph{Visualizing Categorical Data}. SAS Institute, Cary.
 
-Kleiber C, Zeileis A (2014). \dQuote{Visualizing Count Data Regressions Using Rootograms}.
-Working Paper 2014-20. Working Papers in Economics and Statistics,
-Research Platform Empirical and Experimental Economics, Universität Innsbruck.
-\url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2014-20}
+Zeileis A, Kleiber C (2016).
+  \dQuote{Visualizing Count Data Regressions Using Rootograms.} 
+  \emph{The American Statistician}, \bold{70}(3), 296--303.
+  \doi{10.1080/00031305.2016.1173590}.
 
 Tukey JW (1977). \emph{Exploratory Data Analysis}. Addison-Wesley, Reading.
 }

@@ -1,4 +1,6 @@
 import("stats")
+importFrom("graphics", "abline", "axis", "box", "hist", "lines", "par", "plot", "points", "polygon", "rect")
+importFrom("grDevices", "n2mfrow")
 importFrom("utils", "head", "tail")
 importFrom("MASS", "fitdistr", "glm.nb", "negative.binomial")
 

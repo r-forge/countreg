@@ -153,7 +153,7 @@ Mullahy J (1986). \dQuote{Specification and Testing of Some Modified Count Data 
 Zeileis A, Kleiber C, Jackman S (2008).
   \dQuote{Regression Models for Count Data in R.} 
   \emph{Journal of Statistical Software}, \bold{27}(8), 1--25.
-  URL \url{http://www.jstatsoft.org/v27/i08/}.
+  \doi{10.18637/jss.v027.i08}.
 }
 
 \seealso{\code{\link{hurdle.control}}, \code{\link[stats]{glm}},

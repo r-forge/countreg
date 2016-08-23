@@ -14,7 +14,7 @@ FLXMRnegbin <- function(formula = . ~ ., theta = NULL, offset = NULL,
     fit
   }
 	      
-  z <- new("FLXMRglm", weighted = TRUE, formula = formula,
+  z <- methods::new("FLXMRglm", weighted = TRUE, formula = formula,
 	   name = "FLXMRglm: negative.binomial", offset = offset,
 	   family = "negative.binomial", refit = nbrefit)
 
@@ -38,7 +38,7 @@ FLXMRnegbin <- function(formula = . ~ ., theta = NULL, offset = NULL,
       logLik <- function(x, y, ...)
         suppressWarnings(dnbinom(y, mu = predict(x, ...), size = theta, log = TRUE))
     
-      new("FLXcomponent",
+      methods::new("FLXcomponent",
         parameters = list(coef = coef, theta = theta),
         logLik = logLik,
 	predict = predict,
@@ -59,7 +59,7 @@ FLXMRnegbin <- function(formula = . ~ ., theta = NULL, offset = NULL,
       logLik <- function(x, y, ...)
         suppressWarnings(dnbinom(y, mu = predict(x, ...), size = theta, log = TRUE))
     
-      new("FLXcomponent",
+      methods::new("FLXcomponent",
         parameters = list(coef = coef),
         logLik = logLik,
 	predict = predict,

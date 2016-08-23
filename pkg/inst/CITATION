@@ -21,7 +21,7 @@ citEntry(entry = "Manual",
                "URL http://R-Forge.R-project.org/projects/countreg/")
 )
 
-citEntry(entry="Article",
+citEntry(entry = "Article",
          title = "Regression Models for Count Data in {R}",
          author = personList(as.person("Achim Zeileis"), 
 	                     as.person("Christian Kleiber"),
@@ -30,33 +30,32 @@ citEntry(entry="Article",
          year         = "2008",
          volume       = "27",
          number       = "8",
-         url          = "http://www.jstatsoft.org/v27/i08/",
+	 pages        = "1--25",
+         doi          = "10.18637/jss.v027.i08",
          
          textVersion = 
          paste("Achim Zeileis, Christian Kleiber, Simon Jackman (2008).", 
                "Regression Models for Count Data in R.",
-               "Journal of Statistical Software 27(8).",
-               "URL http://www.jstatsoft.org/v27/i08/."),
+               "Journal of Statistical Software, 27(8), 1-25.",
+               "doi:10.18637/jss.v027.i08"),
 	 header = "If count data regression models zeroinfl()/hurdle() are used, please cite:"
 )
 
-citEntry(entry = "TechReport",
+citEntry(entry = "Article",
   title        = "Visualizing Count Data Regressions Using Rootograms",
   author       = personList(as.person("Christian Kleiber"), 
 		   as.person("Achim Zeileis")),
-  institution  = "Working Papers in Economics and Statistics, Research Platform Empirical
-  		  and Experimental Economics, Universit\\\"at Innsbruck",
-  year         = "2014",
-  type         = "Working Paper",
-  number       = "2014-20",
-  month        = "July",
-  url	       = "http://EconPapers.RePEc.org/RePEc:inn:wpaper:2014-20",
+  journal      = "The American Statistician",
+  year         = "2016",
+  volume       = "70",
+  number       = "3",
+  pages        = "296--303",
+  doi	       = "10.1080/00031305.2016.1173590",
   
   textVersion  = 
-  paste("Christian Kleiber, Achim Zeileis (2014).",
+  paste("Christian Kleiber, Achim Zeileis (2016).",
 	"Visualizing Count Data Regressions Using Rootograms.",
- 	"Working Paper 2014-20.",
- 	"Working Papers in Economics and Statistics, Research Platform Empirical and Experimental Economics, Universitaet Innsbruck.",
-	"URL http://EconPapers.RePEc.org/RePEc:inn:wpaper:2014-20"),
+ 	"The American Statistician, 70(3), 296--303.",
+	"doi:10.1080/00031305.2016.1173590"),
   header = "If rootogram() is used, please cite:"
 )
