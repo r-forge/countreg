@@ -57,7 +57,8 @@ sztpois <- function(x, lambda, mean, parameter = "lambda", drop = TRUE) {
   parameter <- match.arg(parameter, c("lambda", "mean"))
   s <- x/lambda - 1 - exp(-lambda)/(1 - exp(-lambda))
   if(parameter == "mean") s * lambda / (mean * (lambda + 1 - mean))
-  if(drop) s else matrix(s, dimnames = list(names(x), parameter))
+  s[(x < 1) | (abs(x - round(x)) > sqrt(.Machine$double.eps))] <- 0
+  if(drop) s else matrix(s, dimnames = list(NULL, parameter))
 }
 
 ztpoisson <- function() {

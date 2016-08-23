@@ -44,11 +44,18 @@ rhnbinom <- function(n, mu, theta, size, pi) {
 shnbinom <- function(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi"), drop = TRUE) {
   if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
   if(!missing(size)) theta <- size
-  parameter <- sapply(parameter, function(x) match.arg(x, c("mu", "pi")))
-  s <- cbind(
-    if("mu" %in% parameter) x/mu - 1 - exp(-mu)/(1 - exp(-mu)) else NULL,
-    if("pi" %in% parameter) ifelse(x == 0L, -1, 0) else NULL
-  )
-  colnames(s) <- c("mu", "theta", "pi")[c("mu", "theta", "pi") %in% parameter]
-  if(drop) drop(s) else s
+  parameter <- sapply(parameter, function(x) match.arg(x, c("mu", "theta", "pi")))
+  n <- max(length(x), length(mu), length(theta), length(pi))
+  s <- if(any(parameter %in% c("mu", "theta"))) {
+    sztnbinom(rep(x, length.out = n), mu = mu, theta = theta, parameter = parameter[parameter != "pi"], drop = FALSE)
+  } else {
+    NULL
+  }
+  if("pi" %in% parameter) {
+    sp <- rep(1/pi, length.out = n)
+    sp[x == 0L] <- -1/(1 - pi)
+    sp[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps))] <- 0
+    s <- cbind(s, "pi" = sp)
+  }
+  if(drop & (NCOL(s) < 2L)) drop(s) else s
 }

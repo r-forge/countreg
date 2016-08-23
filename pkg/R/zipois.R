@@ -30,10 +30,22 @@ rzipois <- function(n, lambda, pi) {
 
 szipois <- function(x, lambda, pi, parameter = c("lambda", "pi"), drop = TRUE) {
   parameter <- sapply(parameter, function(x) match.arg(x, c("lambda", "pi")))
-  s <- 0
-
-  ## FIXME ##
-
-  if(drop) drop(s) else s
+  clp0 <- -lambda
+  p0 <- pi * (x < 1) + exp(log(1 - pi) + clp0)
+  if("lambda" %in% parameter) {
+    sl <- -exp(-log(p0) + log(1 - pi) + clp0)
+    sl[x > 0L] <- (x/lambda)[x > 0] - 1
+  }
+  if("pi" %in% parameter) {
+    sp <- (1 - exp(clp0))/p0
+    sp[x > 0L] <- -1/(1 - pi)
+  }
+  s <- cbind(
+    if("lambda" %in% parameter) sl else NULL,
+    if("pi" %in% parameter) sp else NULL
+  )
+  colnames(s) <- c("lambda", "pi")[c("lambda", "pi") %in% parameter]
+  s[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps)), ] <- 0
+  if(drop & NCOL(s) < 2L) drop(s) else s
 }
 

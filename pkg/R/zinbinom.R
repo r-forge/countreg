@@ -40,10 +40,27 @@ szinbinom <- function(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi")
   if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
   if(!missing(size)) theta <- size
   parameter <- sapply(parameter, function(x) match.arg(x, c("mu", "theta", "pi")))
-  s <- 0
-
-  ## FIXME ##
-
-  if(drop) drop(s) else s
+  clp0 <- dnbinom(0, size = theta, mu = mu, log = TRUE)
+  p0 <- pi * (x < 1) + exp(log(1 - pi) + clp0)
+  x1 <- x > 0L
+  if("mu" %in% parameter) {
+    sm <- -exp(-log(p0) + log(1 - pi) + clp0 + log(theta) - log(mu + theta))
+    sm[x1] <- (x/mu - (x + theta)/(mu + theta))[x1]
+  }
+  if("theta" %in% parameter) {
+    st <- exp(-log(p0) + log(1 - pi) + clp0) * (log(theta) - log(mu + theta) + 1 - theta/(mu + theta))
+    st[x1] <- (digamma(x + theta) - digamma(theta) + log(theta) - log(mu + theta) + 1 - (x + theta)/(mu + theta))[x1]
+  }
+  if("pi" %in% parameter) {
+    sp <- (1 - exp(clp0))/p0
+    sp[x1] <- -1/(1 - pi)
+  }
+  s <- cbind(
+    if("mu" %in% parameter) sm else NULL,
+    if("theta" %in% parameter) st else NULL,
+    if("pi" %in% parameter) sp else NULL
+  )
+  colnames(s) <- c("mu", "theta", "pi")[c("mu", "theta", "pi") %in% parameter]
+  s[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps)), ] <- 0
+  if(drop & NCOL(s) < 2L) drop(s) else s
 }
-

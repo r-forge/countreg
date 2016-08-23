@@ -1,6 +1,7 @@
 ## binom: Binomial
 sbinom <- function(x, prob, size, parameter = "prob", drop = TRUE) {
   s <- x/prob - (size - x)/(1 - prob)
+  s[(x < 0) | (x > size) | (abs(x - round(x)) > sqrt(.Machine$double.eps))] <- 0
   if(drop) s else cbind("prob" = s)
 }
 
@@ -13,11 +14,13 @@ snbinom <- function(x, mu, size, parameter = c("mu", "size"), drop = TRUE) {
       log(size) + 1 - log(mu + size) - (x + size) / (mu + size) else NULL
   )
   colnames(s) <- c("mu", "size")[c("mu", "size") %in% parameter]
-  if(drop) drop(s) else s
+  s[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps)), ] <- 0
+  if(drop & NCOL(s) < 2L) drop(s) else s
 }
 
 ## pois: Poisson
 spois <- function(x, lambda, parameter = "lambda", drop = TRUE) {
   s <- x/lambda - 1
+  s[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps))] <- 0
   if(drop) s else cbind("lambda" = s)
 }
