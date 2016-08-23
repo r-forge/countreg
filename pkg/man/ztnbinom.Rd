@@ -10,9 +10,9 @@
 \description{
   Density, distribution function, quantile function, random
   generation and score function for the zero-truncated negative binomial
-  distribution with parameter \code{lambda} (= mean of the
-  untruncated distribution) or \code{mean} (= of the truncated
-  distribution).
+  distribution with parameters \code{mu} (= mean of the
+  untruncated distribution) and dispersion parameter \code{theta}
+  (or equivalently \code{size}).
 }
 
 \usage{

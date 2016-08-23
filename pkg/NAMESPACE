@@ -40,6 +40,18 @@ export(
   "rztnbinom",
   "sztnbinom",
   
+  "dzipois",
+  "pzipois",
+  "qzipois",
+  "rzipois",
+  "szipois",
+  
+  "dzinbinom",
+  "pzinbinom",
+  "qzinbinom",
+  "rzinbinom",
+  "szinbinom",
+  
   "MBbinomial",
   "MBnegbin",
   "MBztpoisson",
