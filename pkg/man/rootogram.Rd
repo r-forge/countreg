@@ -17,11 +17,11 @@
 \alias{rootogram.zeroinfl}
 \alias{rootogram.zerotrunc}
 
-\title{Rootograms for Assessing Goodness of Fit of Likelihood Models}
+\title{Rootograms for Assessing Goodness of Fit of Probability Models}
 
 \description{
-  Rootograms graphically compare the square root of an empirical histogram
-  with fitted probabilities from a likelihood model.
+  Rootograms graphically compare (square roots) of empirical frequencies
+  with fitted frequencies from a probability model.
 }
 
 \usage{
@@ -69,10 +69,10 @@ rootogram(object, \dots)
 }
 
 \details{
-Rootograms compare graphically compare frequencies of observed empirical
-distributions and fitted likelihood models. For the observed distribution
+Rootograms compare graphically compare frequencies of empirical
+distributions and fitted probability models. For the observed distribution
 the histogram is drawn on a square root scale (hence the name) and superimposed
-with a line for the fitted frequences. The histogram can be \code{"standing"}
+with a line for the fitted frequencies. The histogram can be \code{"standing"}
 on the x-axis (as usual), or \code{"hanging"} from the fitted curve, or
 a \code{"suspended"} histogram of deviations can be drawn.
 
@@ -83,15 +83,15 @@ the breaks for the histogram intervals) and the associating \code{plot} method
 that carries out the actual drawing (using base graphics).
 
 There is a wide range of further \code{rootogram} methods that all take
-the following approach: based on a fitted likelihood model observed and
+the following approach: based on a fitted probability model observed and
 expected frequencies are computed and then the default method is called.
 Currently, there are methods for \code{\link[stats]{glm}}, 
 \code{\link[mgcv]{gam}}, \code{\link[gamlss]{gamlss}}, \code{\link{hurdle}}, 
 \code{\link{zeroinfl}}, and \code{\link{zerotrunc}} models.
 
 Furthermore, there is a \code{numeric} method that uses \code{link[MASS]{fitdistr}}
-to obtain a fitted maximum likelihood model for a univariate variable. For
-this method, \code{fitted} can either be a character string or a density function
+to obtain a fitted (by maximum likelihood) probability model for a univariate variable. 
+For this method, \code{fitted} can either be a character string or a density function
 that is passed to \code{fitdistr}. In the latter case, a \code{start} list also
 has to be supplied.
 
@@ -128,7 +128,7 @@ is much more limited in scope, hence a function has been created here.
 \references{
 Friendly M (2000), \emph{Visualizing Categorical Data}. SAS Institute, Cary.
 
-Zeileis A, Kleiber C (2016).
+Kleiber C, Zeileis A (2016).
   \dQuote{Visualizing Count Data Regressions Using Rootograms.} 
   \emph{The American Statistician}, \bold{70}(3), 296--303.
   \doi{10.1080/00031305.2016.1173590}.
