@@ -136,7 +136,7 @@ zeroinfl(formula, data, subset, na.action, weights, offset,
 }
 
 \references{
-Cameron AC, Trivedi PK (1998). \emph{Regression Analysis of Count Data}.
+Cameron AC, Trivedi PK (2013). \emph{Regression Analysis of Count Data}, 2nd ed.
   New York: Cambridge University Press.
 
 Cameron AC, Trivedi PK (2005). \emph{Microeconometrics: Methods and Applications}.
@@ -144,7 +144,7 @@ Cameron AC, Trivedi PK (2005). \emph{Microeconometrics: Methods and Applications
 
 Lambert D (1992).
   \dQuote{Zero-Inflated Poisson Regression, with an Application to Defects in Manufacturing}.
-  \emph{Technometrics}. \bold{34}(1), 1--14
+  \emph{Technometrics}. \bold{34}(1), 1--14.
 
 Zeileis A, Kleiber C, Jackman S (2008).
   \dQuote{Regression Models for Count Data in R.} 

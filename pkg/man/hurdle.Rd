@@ -141,7 +141,7 @@ hurdle(formula, data, subset, na.action, weights, offset,
 }
 
 \references{
-Cameron AC, Trivedi PK (1998). \emph{Regression Analysis of Count Data}.
+Cameron AC, Trivedi PK (2013). \emph{Regression Analysis of Count Data}, 2nd ed.
   New York: Cambridge University Press.
 
 Cameron AC, Trivedi PK (2005). \emph{Microeconometrics: Methods and Applications}.

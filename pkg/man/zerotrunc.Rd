@@ -40,7 +40,7 @@ zerotrunc(formula, data, subset, na.action, weights, offset,
 \details{
   All zero-truncated count data models in \code{zerotrunc} are obtained
   from the corresponding untruncated distribution using a log-link
-  between the untruncated mean and the linear predictor.
+  between the mean of the untruncated distribution and the linear predictor.
   All parameters are estimated by maximum likelihood using \code{\link[stats]{optim}},
   with control options set in \code{\link{zerotrunc.control}}.
   Starting values can be supplied, otherwise they are estimated by \code{\link[stats]{glm.fit}}
@@ -93,11 +93,8 @@ zerotrunc(formula, data, subset, na.action, weights, offset,
 }
 
 \references{
-Cameron AC, Trivedi PK (1998). \emph{Regression Analysis of Count Data}.
+Cameron AC, Trivedi PK (2013). \emph{Regression Analysis of Count Data}, 2nd ed.
   New York: Cambridge University Press.
-
-Cameron AC, Trivedi PK (2005). \emph{Microeconometrics: Methods and Applications}.
-  Cambridge: Cambridge University Press.
 
 Zeileis A, Kleiber C, Jackman S (2008).
   \dQuote{Regression Models for Count Data in R.} 
