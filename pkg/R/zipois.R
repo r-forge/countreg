@@ -1,24 +1,24 @@
 ## zipois: Zero-inflated Poisson
 dzipois <- function(x, lambda, pi, log = FALSE) {
+  if(any(pi < 0) | any(pi > 1))  stop("'pi' must be in [0, 1]")
   rval <- log(1 - pi) + dpois(x, lambda = lambda, log = TRUE)
   if(any(x0 <- (x == 0L))) rval[x0] <- log(exp(rval) + pi)[x0]
-  rval[pi < 0 | pi > 1] <- NaN
   if(log) rval else exp(rval)
 }
 
 pzipois <- function(q, lambda, pi, lower.tail = TRUE, log.p = FALSE) {
+  if(any(pi < 0) | any(pi > 1))  stop("'pi' must be in [0, 1]")
   rval <- log(1 - pi) + ppois(q, lambda = lambda, lower.tail = lower.tail, log.p = TRUE)
   if(any(q0 <- (is.finite(rval) & (lower.tail | q < 0)))) rval[q0] <- log(exp(rval) + pi)[q0]
-  rval[pi < 0 | pi > 1] <- NaN
   if(log.p) rval else exp(rval)
 }
 
 qzipois <- function(p, lambda, pi, lower.tail = TRUE, log.p = FALSE) {
+  if(any(pi < 0) | any(pi > 1))  stop("'pi' must be in [0, 1]")
   if(log.p) p <- exp(p)
   if(!lower.tail) p <- 1 - p
   p <- pmax(0, (p - pi)/(1 - pi))
   rval <- qpois(p, lambda = lambda, lower.tail = TRUE, log.p = FALSE)
-  rval[pi < 0 | pi > 1] <- NaN
   rval
 }
 
@@ -29,6 +29,7 @@ rzipois <- function(n, lambda, pi) {
 }
 
 szipois <- function(x, lambda, pi, parameter = c("lambda", "pi"), drop = TRUE) {
+  if(any(pi < 0) | any(pi > 1))  stop("'pi' must be in [0, 1]")
   parameter <- sapply(parameter, function(x) match.arg(x, c("lambda", "pi")))
   clp0 <- -lambda
   p0 <- pi * (x < 1) + exp(log(1 - pi) + clp0)
