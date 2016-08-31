@@ -23,6 +23,7 @@ qzipois <- function(p, lambda, pi, lower.tail = TRUE, log.p = FALSE) {
 }
 
 rzipois <- function(n, lambda, pi) {
+  if(any(pi < 0) | any(pi > 1))  stop("'pi' must be in [0, 1]")
   rval <- rpois(n, lambda = lambda)
   rval[runif(n) < pi] <- 0
   rval
