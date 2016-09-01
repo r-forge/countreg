@@ -24,7 +24,7 @@ szipois(x, lambda, pi, parameter = c("lambda", "pi"), drop = TRUE)
 }
 
 \arguments{
-  \item{x}{vector of (positive integer) quantiles.}
+  \item{x}{vector of (non-negative integer) quantiles.}
   \item{q}{vector of quantiles.}
   \item{p}{vector of probabilities.}
   \item{n}{number of random values to return.}
