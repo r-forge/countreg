@@ -1,6 +1,6 @@
 ## zinbinom: Zero-inflated negative binomial
 dzinbinom <- function(x, mu, theta, size, pi, log = FALSE) {
-  if(any(pi < 0) | any(pi > 1))  stop("'pi' must be in [0, 1]")
+  if(any(pi < 0) | any(pi > 1))  warning("'pi' must be in [0, 1]")
   if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
   if(!missing(size)) theta <- size
   rval <- log(1 - pi) + dnbinom(x, mu = mu, size = theta, log = TRUE)
@@ -9,7 +9,7 @@ dzinbinom <- function(x, mu, theta, size, pi, log = FALSE) {
 }
 
 pzinbinom <- function(q, mu, theta, size, pi, lower.tail = TRUE, log.p = FALSE) {
-  if(any(pi < 0) | any(pi > 1))  stop("'pi' must be in [0, 1]")
+  if(any(pi < 0) | any(pi > 1))  warning("'pi' must be in [0, 1]")
   if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
   if(!missing(size)) theta <- size
   rval <- log(1 - pi) + pnbinom(q, mu = mu, size = theta, lower.tail = lower.tail, log.p = TRUE)
@@ -18,7 +18,7 @@ pzinbinom <- function(q, mu, theta, size, pi, lower.tail = TRUE, log.p = FALSE) 
 }
 
 qzinbinom <- function(p, mu, theta, size, pi, lower.tail = TRUE, log.p = FALSE) {
-  if(any(pi < 0) | any(pi > 1))  stop("'pi' must be in [0, 1]")
+  if(any(pi < 0) | any(pi > 1))  warning("'pi' must be in [0, 1]")
   if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
   if(!missing(size)) theta <- size
   if(log.p) p <- exp(p)
@@ -29,7 +29,7 @@ qzinbinom <- function(p, mu, theta, size, pi, lower.tail = TRUE, log.p = FALSE) 
 }
 
 rzinbinom <- function(n, mu, theta, size, pi) {
-  if(any(pi < 0) | any(pi > 1))  stop("'pi' must be in [0, 1]")
+  if(any(pi < 0) | any(pi > 1))  warning("'pi' must be in [0, 1]")
   if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
   if(!missing(size)) theta <- size
   rval <- rnbinom(n, mu = mu, size = theta)
@@ -38,7 +38,7 @@ rzinbinom <- function(n, mu, theta, size, pi) {
 }
 
 szinbinom <- function(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi"), drop = TRUE) {
-  if(any(pi < 0) | any(pi > 1))  stop("'pi' must be in [0, 1]")
+  if(any(pi < 0) | any(pi > 1))  warning("'pi' must be in [0, 1]")
   if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
   if(!missing(size)) theta <- size
   parameter <- sapply(parameter, function(x) match.arg(x, c("mu", "theta", "pi")))
