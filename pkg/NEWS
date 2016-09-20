@@ -7,6 +7,10 @@ Changes in Version 0.2-0
     inflation or hurdle crossing). The theta parameter may also be called
     size for consistency with base R's nbinom family.
 
+  o New data set "OralHealthNL" accompanying Hofstetter et al. (2016):
+    "Modeling Caries Experience: Advantages of the Use of the Hurdle Model",
+    Caries Research, 50(6), 517-526. doi:10.1159/000448197
+
 
 Changes in Version 0.1-5
 
