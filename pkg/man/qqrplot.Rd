@@ -12,8 +12,8 @@
 qqrplot(object, type = c("random", "quantile"),
   nsim = 1L, prob = 0.5, range = FALSE, diag = TRUE,
   col = "black", fill = "lightgray", xlim = NULL, ylim = NULL,
-  main = "Q-Q residuals plot", xlab = "Theoretical quantiles", ylab = "Quantile residuals",
-  \dots)
+  main = "Q-Q residuals plot", xlab = "Theoretical quantiles",
+  ylab = "Quantile residuals", \dots)
 }
 
 \arguments{
