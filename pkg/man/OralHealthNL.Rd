@@ -155,7 +155,7 @@ cor(cbind(dmfs = OralHealthNL$dmfs,
 
 ## Bias-reduced logistic regression (due to separation)
 if(require("brglm")) {
-br <- brglm(
+br <- brglm::brglm(
   factor(dmfs == 0, levels = c(TRUE, FALSE), labels = c("= 0", "> 0")) ~ .,
   data = OralHealthNL)
 print(coeftest(br), digits = 1)
