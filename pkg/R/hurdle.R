@@ -517,7 +517,7 @@ vcov.hurdle <- function(object, model = c("full", "count", "zero"), ...) {
   if(model == "full") return(rval)
 
   cf <- object$coefficients[[model]]
-  wi <- seq(along = object$coefficients$count)
+  wi <- seq_along(object$coefficients$count)
   rval <- if(model == "count") rval[wi, wi, drop = FALSE] else rval[-wi, -wi, drop = FALSE]
   colnames(rval) <- rownames(rval) <- names(cf)
   return(rval)
