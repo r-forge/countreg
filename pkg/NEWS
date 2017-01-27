@@ -7,6 +7,14 @@ Changes in Version 0.2-0
     inflation or hurdle crossing). The theta parameter may also be called
     size for consistency with base R's nbinom family.
 
+  o New generic function pit() for extracting the probability integral
+    transform F(y) where F is the predicted cumulative density function
+    and y the observed response.
+    
+  o Quantile residuals are now computed based on the pit() extractor.
+  
+  o New graphics function pithist() for PIT histograms based on pit().
+
   o New data set "OralHealthNL" accompanying Hofstetter et al. (2016):
     "Modeling Caries Experience: Advantages of the Use of the Hurdle Model",
     Caries Research, 50(6), 517-526. doi:10.1159/000448197

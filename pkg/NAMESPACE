@@ -23,6 +23,8 @@ export(
   "rootogram.default",
   "autoplot.rootogram", ## for the moment
 
+  "pit",
+  "pithist",
   "qresiduals",
   "qresiduals.default",
   "qqrplot",
@@ -123,10 +125,13 @@ S3method("extractAIC", "zerotrunc")
 
 ## methods for qresiduals
 S3method("qresiduals", "default")
-S3method("qresiduals", "zeroinfl")
-S3method("qresiduals", "zerotrunc")
-S3method("qresiduals", "hurdle")
-S3method("qresiduals", "glm")
+
+## methods for pit
+S3method("pit", "zeroinfl")
+S3method("pit", "zerotrunc")
+S3method("pit", "hurdle")
+S3method("pit", "lm")
+S3method("pit", "glm")
 
 ## methods for rootograms
 S3method("rootogram", "default")

@@ -1,5 +1,5 @@
 
-R version 3.3.1 (2016-06-21) -- "Bug in Your Hair"
+R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
 Copyright (C) 2016 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -534,8 +534,8 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 > ## Zero-inflation vs. hurdle
 > if(require("nonnest2")) vuongtest(zinb, hnb)
 Loading required package: nonnest2
-This is nonnest2 0.3
- nonnest2 has not been tested with all combinations of models.
+This is nonnest2 0.4
+ nonnest2 has not been tested with all combinations of model classes.
 
 Model 1 
  Class: zeroinfl 
@@ -1197,6 +1197,61 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 detaching 'package:car'
 
+> nameEx("pit")
+> ### * pit
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: pit
+> ### Title: Probability Integral Transform (PIT)
+> ### Aliases: pit pit.default pit.glm pit.hurdle pit.zeroinfl pit.zerotrunc
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> ## count data regression models: crab satellites
+> data("CrabSatellites", package = "countreg")
+> cs_p <- glm(satellites ~ width + color, data = CrabSatellites, family = poisson)
+> pit(cs_p)[1:5,]
+       [,1]       [,2]
+1 0.9511145 0.97975528
+2 0.8158450 0.92556681
+3 0.0000000 0.12378915
+4 0.0000000 0.35361066
+5 0.0122986 0.06639115
+> 
+> 
+> 
+> cleanEx()
+> nameEx("pithist")
+> ### * pithist
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: pithist
+> ### Title: PIT Histograms for Assessing Goodness of Fit of Probability
+> ###   Models
+> ### Aliases: pithist
+> ### Keywords: hplot
+> 
+> ### ** Examples
+> 
+> ## count data regression models: crab satellites
+> data("CrabSatellites", package = "countreg")
+> cs_p   <-    glm(satellites ~     width + color, data = CrabSatellites, family = poisson)
+> cs_hnb <- hurdle(satellites ~ 1 | width + color, data = CrabSatellites, dist = "negbin")
+> 
+> ## PIT histograms
+> par(mfrow = c(1, 2))
+> pithist(cs_p, ylim = c(0, 4.2))
+> pithist(cs_hnb, ylim = c(0, 4.2))
+> par(mfrow = c(1, 1))
+> 
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
 > nameEx("predict.hurdle")
 > ### * predict.hurdle
 > 
@@ -1419,8 +1474,7 @@ Log-likelihood: -261.9 on 5 Df
 > 
 > ### Name: qresiduals
 > ### Title: (Randomized) Quantile Residuals
-> ### Aliases: qresiduals qresiduals.default qresiduals.glm qresiduals.hurdle
-> ###   qresiduals.zeroinfl qresiduals.zerotrunc
+> ### Aliases: qresiduals qresiduals.default
 > ### Keywords: regression
 > 
 > ### ** Examples
@@ -1814,7 +1868,7 @@ Log-likelihood: -267.5 on 3 Df
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  19.692 0.216 19.912 0 0 
+Time elapsed:  8.036 0.06 8.096 0 0 
 > grDevices::dev.off()
 null device 
           1 

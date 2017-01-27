@@ -1,11 +1,6 @@
 \name{qresiduals}
 \alias{qresiduals}
-
 \alias{qresiduals.default}
-\alias{qresiduals.glm}
-\alias{qresiduals.hurdle}
-\alias{qresiduals.zeroinfl}
-\alias{qresiduals.zerotrunc}
 
 \title{(Randomized) Quantile Residuals}
 
@@ -21,9 +16,9 @@ qresiduals(object, \dots)
 
 \arguments{
   \item{object}{an object. For the \code{default} method this needs to
-    be a vector or 2-dimensional matrix of probabilities. Currently, there
-    are also methods for \code{lm}, \code{glm}, \code{hurdle}, \code{zeroinfl}, and
-    \code{zerotrunc} objects.}
+    be either a specification of probabilities (vector or 2-dimensional matrix of
+    probabilities) or an object from which the these can be obtained with
+    \code{\link{pit}}.}
   \item{type}{character specifying whether - in the case of discrete response distributions - 
     randomized quantile residuals or their corresponding quantiles should be computed.}
   \item{nsim}{numeric. The number of simulated randomized quantile residuals
@@ -36,19 +31,15 @@ qresiduals(object, \dots)
 \details{
 (Randomized) quantile residuals have been suggested by Dunn and Smyth (1996).
 For regression models with a continuous response distribution this simply computes
-theoretical standard normal quantile corresponding to the probabilities of the
+theoretical standard normal quantile corresponding to the probability integral transform of the
 fitted distribution. For discrete distributions, a random theoretical normal
 quantile is drawn from the range of probabilities corresponding to each observation.
 
 The default \code{qresiduals} method can compute randomized quantile residuals
-from a vector (which essentially just call \code{\link[stats]{qnorm}}) or
+from a vector (which essentially just calls \code{\link[stats]{qnorm}}) or
 a 2-column matrix of probabilities. The latter offers to either draw \code{"random"}
 samples from the distribution or compute corresponding \code{"quantile"}s such as
 the median etc.
-
-Currently, there are methods for \code{\link[stats]{lm}},  \code{\link[stats]{glm}}, 
-\code{\link{hurdle}}, \code{\link{zeroinfl}}, and \code{\link{zerotrunc}} models. All
-of these compute the empirical probabilities first and then call the default method.
 }
 
 \note{

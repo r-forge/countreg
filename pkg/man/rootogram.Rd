@@ -69,7 +69,7 @@ rootogram(object, \dots)
 }
 
 \details{
-Rootograms compare graphically compare frequencies of empirical
+Rootograms graphically compare frequencies of empirical
 distributions and fitted probability models. For the observed distribution
 the histogram is drawn on a square root scale (hence the name) and superimposed
 with a line for the fitted frequencies. The histogram can be \code{"standing"}
