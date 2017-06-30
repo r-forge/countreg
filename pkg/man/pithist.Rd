@@ -44,6 +44,11 @@ from the corresponding interval or distributed proportionally in the
 histogram.
 }
 
+\references{
+  Czado C, Gneiting T, Held L (2009). \dQuote{Predictive Model Assessment for Count Data.}
+  \emph{Biometrics}, \bold{65}(4), 1254--1261.
+}
+
 \seealso{\code{\link{pit}}, \code{\link[graphics]{hist}}}
 
 \examples{
