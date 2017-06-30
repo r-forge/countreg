@@ -71,7 +71,7 @@ par(mfrow = c(1, 1))
 par(mfrow = c(2, 2))
 qqrplot(cs_p, main = "One Random Sample")
 qqrplot(cs_p, main = "Median", type = "quantile")
-qqrplot(cs_p, main = "5 Random Samples and Range", nsim = 10, range = c(0.005, 0.995))
+qqrplot(cs_p, main = "10 Random Samples and Range", nsim = 10, range = c(0.005, 0.995))
 qqrplot(cs_p, main = "100 Random Samples", nsim = 100, pch = 19, col = gray(0, alpha = 0.01))
 par(mfrow = c(1, 1))
 
