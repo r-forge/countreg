@@ -423,7 +423,7 @@ autoplot.rootogram <- function(object,
   rval <- ggplot2::ggplot(object, ggplot2::aes(xmin = x - width/2, xmax = x + width/2, ymin = y, ymax = y + height, x = x, y = line)) +
     ggplot2::geom_rect(colour = colour[1L], fill = fill) + ggplot2::geom_line(colour = colour[2L], size = size[1L]) +
     ggplot2::geom_hline(yintercept = 0)
-  if(all(table(object$group) <= 15L)) rval <- rval + ggplot2::geom_point(colour = colour[2L], size = size[2L])
+  if(all(table(object$group) <= 20L)) rval <- rval + ggplot2::geom_point(colour = colour[2L], size = size[2L])
 
   ## grouping (if any)
   if(n > 1L) rval <- rval + ggplot2::facet_grid(group ~ .)
