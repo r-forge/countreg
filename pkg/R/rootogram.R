@@ -497,7 +497,14 @@ rootogram.gam <- function(object, newdata = NULL, breaks = NULL,
       for(i in at) p[, i + 1L] <- dpois(i, lambda = mu)
     } else {
       theta <- object$theta
-      if(is.null(theta)) theta <- get(".Theta", environment(family(object)$variance))
+      if(is.null(theta)) {
+          theta <- if (inherits(family(object), "extended.family")) { # family = nb
+              ## for nb, theta is on log scale; transform
+              family(object)$getTheta(trans = TRUE)
+          } else {                                                    # family = negbin
+              family(object)$getTheta()
+          }
+      }
       for(i in at) p[, i + 1L] <- dnbinom(i, mu = mu, size = theta)
     }
     expctd <- colSums(p)
