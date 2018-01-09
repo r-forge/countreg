@@ -5,7 +5,7 @@
 dlogseries <- function(x, prob = 0.5, log = FALSE) { 
   if(any(prob < 0) | any(prob > 1))  stop("'prob' must be in [0, 1]")
   rval <- x * log(prob) - log(abs(x)) - log(-log(1 - prob))
-  x <- rep(x, length.out = length(rval))
+  x <- rep_len(x, length(rval))
   rval[x < 1 | x != as.integer(x)] <- -Inf
   if(log) rval else exp(rval)
 }

@@ -36,13 +36,15 @@ rhpois <- function(n, lambda, pi) {
 shpois <- function(x, lambda, pi, parameter = c("lambda", "pi"), drop = TRUE) {
   parameter <- sapply(parameter, function(x) match.arg(x, c("lambda", "pi")))
   n <- max(length(x), length(lambda), length(pi))
+  x <- rep_len(x, n)
   if("pi" %in% parameter) {
-    sp <- rep(1/pi, length.out = n)
+    pi <- rep_len(pi, n)
+    sp <- 1/pi
     sp[x == 0L] <- -1/(1 - pi)[x == 0L]
     sp[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps))] <- 0
   }
   s <- cbind(
-    if("lambda" %in% parameter) sztpois(rep(x, length.out = n), lambda = lambda) else NULL,
+    if("lambda" %in% parameter) sztpois(x, lambda = lambda) else NULL,
     if("pi" %in% parameter) sp else NULL
   )
   colnames(s) <- c("lambda", "pi")[c("lambda", "pi") %in% parameter]

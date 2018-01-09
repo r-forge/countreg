@@ -46,13 +46,15 @@ shnbinom <- function(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi"),
   if(!missing(size)) theta <- size
   parameter <- sapply(parameter, function(x) match.arg(x, c("mu", "theta", "pi")))
   n <- max(length(x), length(mu), length(theta), length(pi))
+  x <- rep_len(x, n)
   s <- if(any(parameter %in% c("mu", "theta"))) {
-    sztnbinom(rep(x, length.out = n), mu = mu, theta = theta, parameter = parameter[parameter != "pi"], drop = FALSE)
+    sztnbinom(x, mu = mu, theta = theta, parameter = parameter[parameter != "pi"], drop = FALSE)
   } else {
     NULL
   }
   if("pi" %in% parameter) {
-    sp <- rep(1/pi, length.out = n)
+    pi <- rep_len(pi, n)
+    sp <- 1/pi
     sp[x == 0L] <- -1/(1 - pi)[x == 0L]
     sp[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps))] <- 0
     s <- cbind(s, "pi" = sp)
