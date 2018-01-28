@@ -51,3 +51,41 @@ sztnbinom <- function(x, mu, theta, size, parameter = c("mu", "theta"), drop = T
   if(drop & NCOL(s) < 2L) drop(s) else s
 }
 
+hztnbinom <- function(x, mu, theta, size, parameter = c("mu", "theta"), drop = TRUE) {
+  if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
+  if(!missing(size)) theta <- size
+
+  parameter <- unique(ifelse(parameter == "theta.mu", "mu.theta", parameter))
+  parameter <- sapply(parameter, function(x) match.arg(x, c("mu", "theta", "mu.theta")))
+
+  para2 <- ifelse(parameter == "theta", "size", parameter)
+  para2 <- ifelse(para2 == "mu.theta", "mu.size", para2)
+  h <- hnbinom(x, mu = mu, size = theta, parameter = para2, drop = FALSE)
+  colnames(h) <- parameter
+
+  logratio <- pnbinom(0, mu = mu, size = theta, log.p = TRUE) -
+    pnbinom(0, mu = mu, size = theta, lower.tail = FALSE, log.p = TRUE)
+
+  if("mu" %in% parameter) h[, "mu"] <- h[, "mu"] +
+    exp(logratio - 2*log(mu + theta) + log(theta) + log(1 + theta)) +
+    exp(2*logratio + 2*log(theta) - 2*log(mu + theta))
+
+  if("theta" %in% parameter) {
+    term <- (log(theta) - log(mu + theta) + 1 - theta/(mu + theta))^2
+    h[, "theta"] <- h[, "theta"] +
+      exp(logratio) * ( 1/theta - 2/(mu + theta) + theta/(mu + theta)^2 + term) +
+      exp(2*logratio) * term
+  }
+
+  if("mu.theta" %in% parameter) {
+    ratio <- theta/(mu + theta)
+    term  <- ratio*log(ratio)
+    h[, "mu.theta"] <- h[, "mu.theta"] -
+      exp(logratio) * (term + mu * (theta + 1)/(mu + theta)^2) -
+      exp(2*logratio) * (term + mu * theta / (mu + theta)^2)
+  }
+
+  h[(x < 1) | (abs(x - round(x)) > sqrt(.Machine$double.eps)), ] <- 0
+  if(drop & NCOL(h) < 2L) drop(h) else h
+}
+

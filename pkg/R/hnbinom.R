@@ -61,3 +61,34 @@ shnbinom <- function(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi"),
   }
   if(drop & (NCOL(s) < 2L)) drop(s) else s
 }
+
+hhnbinom <- function(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi"), drop = TRUE) {
+  if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
+  if(!missing(size)) theta <- size
+
+  parameter <- ifelse(parameter == "theta.mu", "mu.theta", parameter)
+  parameter <- ifelse(parameter == "theta.pi", "pi.theta", parameter)
+  parameter <- ifelse(parameter == "mu.pi", "pi.mu", parameter)
+  parameter <- sapply(unique(parameter), function(x) match.arg(x, c("mu",
+                      "theta", "pi", "mu.theta", "pi.theta", "pi.mu")))
+
+  n <- max(length(x), length(mu), length(theta), length(pi))
+  x <- rep_len(x, n)
+  h <- if(any(parameter %in% c("mu", "theta", "mu.theta"))) {
+    hztnbinom(x, mu = mu, theta = theta, parameter = parameter[!grepl("pi", parameter)],
+              drop = FALSE)
+  } else {
+    NULL
+  }
+  if("pi" %in% parameter) {
+    pi <- rep_len(pi, n)
+    hp <- -1/pi^2
+    hp[x == 0L] <- -1/((1 - pi)^2)[x == 0L]
+    hp[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps))] <- 0
+    h <- cbind(h, "pi" = hp)
+  }
+  if("pi.theta" %in% parameter) h <- cbind(h, "pi.theta" = rep_len(0, n))
+  if("pi.mu" %in% parameter) h <- cbind(h, "pi.mu" = rep_len(0, n))
+  if(drop & (NCOL(h) < 2L)) drop(h) else h
+}
+
