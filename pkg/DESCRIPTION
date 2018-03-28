@@ -4,7 +4,8 @@ Date: 2018-03-23
 Title: Count Data Regression
 Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org",
              comment = c(ORCID = "0000-0003-0918-3766")),
-             person(given = "Christian", family = "Kleiber", role = "aut", email = "Christian.Kleiber@unibas.ch"))
+             person(given = "Christian", family = "Kleiber", role = "aut", email = "Christian.Kleiber@unibas.ch", 
+             comment = c(ORCID = "0000-0002-6781-4733")))
 Description: Regression models for count data, including zero-inflated, zero-truncated, and
              hurdle models as well as generalized count data regression. Drivers for combination
 	     with flexmix and mboost are also provided. For (graphically) assessing the goodness
