@@ -4,6 +4,7 @@
 \alias{qztnbinom}
 \alias{rztnbinom}
 \alias{sztnbinom}
+\alias{hztnbinom}
 
 \title{The Zero-Truncated Negative Binomial Distribution}
 
@@ -21,6 +22,7 @@ pztnbinom(q, mu, theta, size, lower.tail = TRUE, log.p = FALSE)
 qztnbinom(p, mu, theta, size, lower.tail = TRUE, log.p = FALSE)
 rztnbinom(n, mu, theta, size)
 sztnbinom(x, mu, theta, size, parameter = c("mu", "theta"), drop = TRUE)
+hztnbinom(x, mu, theta, size, parameter = c("mu", "theta"), drop = TRUE)
 }
 
 \arguments{

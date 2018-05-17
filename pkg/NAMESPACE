@@ -4,31 +4,49 @@ importFrom("grDevices", "n2mfrow")
 importFrom("utils", "head", "tail")
 importFrom("MASS", "fitdistr", "glm.nb", "negative.binomial")
 
-export(  
+export(
+  ## hurdle count regression  
   "hurdle",
   "hurdle.control",
   "hurdletest",
   "getSummary.hurdle",
 
+  ## zero-inflated count regression
   "zeroinfl",
   "zeroinfl.control",
   "getSummary.zeroinfl",
   
+  ## zero-truncated count regression
   "zerotrunc",
   "zerotrunc.control",
   "estfun.zerotrunc",
   "getSummary.zerotrunc",
   
+  ## visualization: rootogram
   "rootogram",
   "rootogram.default",
   "autoplot.rootogram", ## for the moment
 
+  ## visualization: PIT histogram
   "pit",
   "pithist",
   "qresiduals",
   "qresiduals.default",
   "qqrplot",
 
+  ## TODO: export when documented
+  ## ## binomial
+  ## "sbinom",
+  ## 
+  ## ## Poisson
+  ## "spois",
+  ## "hpois",
+  ## 
+  ## ## negative binomial
+  ## "snbinom",
+  ## "hnbinom",
+
+  ## zero-truncated Poisson
   "ztpoisson",
   "dztpois",
   "pztpois",
@@ -36,43 +54,53 @@ export(
   "rztpois",
   "sztpois",
   
+  ## zero-truncated negative binomial
   "dztnbinom",
   "pztnbinom",
   "qztnbinom",
   "rztnbinom",
   "sztnbinom",
+  "hztnbinom",
   
+  ## zero-inflated Poisson
   "dzipois",
   "pzipois",
   "qzipois",
   "rzipois",
   "szipois",
   
+  ## zero-inflated negative binomial
   "dzinbinom",
   "pzinbinom",
   "qzinbinom",
   "rzinbinom",
   "szinbinom",
   
+  ## hurdle Poisson
   "dhpois",
   "phpois",
   "qhpois",
   "rhpois",
   "shpois",
   
+  ## hurdle negative binomial
   "dhnbinom",
   "phnbinom",
   "qhnbinom",
   "rhnbinom",
   "shnbinom",
+  "hhnbinom",
   
+  ## mboost families
   "MBbinomial",
   "MBnegbin",
   "MBztpoisson",
   "MBztnegbin",
   
+  ## flexmix family
   "FLXMRnegbin",
   
+  ## diagnostic tests
   "disptest",
   "zitest"
 )

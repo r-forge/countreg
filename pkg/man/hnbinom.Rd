@@ -4,6 +4,7 @@
 \alias{qhnbinom}
 \alias{rhnbinom}
 \alias{shnbinom}
+\alias{hhnbinom}
 
 \title{The Hurdle Negative Binomial Distribution}
 
@@ -22,6 +23,7 @@ phnbinom(q, mu, theta, size, pi, lower.tail = TRUE, log.p = FALSE)
 qhnbinom(p, mu, theta, size, pi, lower.tail = TRUE, log.p = FALSE)
 rhnbinom(n, mu, theta, size, pi)
 shnbinom(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi"), drop = TRUE)
+hhnbinom(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi"), drop = TRUE)
 }
 
 \arguments{
