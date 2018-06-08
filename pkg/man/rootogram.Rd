@@ -35,7 +35,7 @@ rootogram(object, \dots)
 \method{plot}{rootogram}(x,
   xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL, main = NULL,
   border = "black", fill = "lightgray", col = "#B61A51",
-  lwd = 2, pch = 19, lty = 1, type = NULL, axes = TRUE, \dots)
+  lwd = 2, pch = 19, lty = 1, max = NULL, type = NULL, axes = TRUE, \dots)
 
 \method{autoplot}{rootogram}(object, colour = c("black", "#B61A51"),
   fill = "darkgray", size = c(1.2, 4), \dots)
@@ -62,6 +62,7 @@ rootogram(object, \dots)
   \item{xlim, ylim, border, fill, col, lwd, pch, lty, type, axes}{graphical
     parameters. These may pertain either to the whole plot or just the
     histogram or just the fitted line.}
+  \item{max}{maximum count displayed.}
   \item{colour, size}{graphical parameters passed to \code{geom_line}
     and \code{geom_point}, respectively.}
   \item{\dots}{further graphical parameters passed to the plotting
