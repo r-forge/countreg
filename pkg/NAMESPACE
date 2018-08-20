@@ -34,17 +34,23 @@ export(
   "qresiduals.default",
   "qqrplot",
 
-  ## TODO: export when documented
-  ## ## binomial
-  ## "sbinom",
-  ## 
-  ## ## Poisson
-  ## "spois",
-  ## "hpois",
-  ## 
-  ## ## negative binomial
-  ## "snbinom",
-  ## "hnbinom",
+  ## binomial
+  "sbinom",
+  "hbinom",
+  "mean_binom",
+  "var_binom",
+  
+  ## Poisson
+  "spois",
+  "hpois",
+  "mean_pois",
+  "var_pois",
+  
+  ## negative binomial
+  "snbinom",
+  "hnbinom",
+  "mean_pois",
+  "var_pois",
 
   ## zero-truncated Poisson
   "ztpoisson",

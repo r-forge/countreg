@@ -5,7 +5,11 @@ sbinom <- function(x, prob, size, parameter = "prob", drop = TRUE) {
   if(drop) s else cbind("prob" = s)
 }
 
-## hbinom?
+hbinom <- function(x, prob, size, parameter = "prob", drop = TRUE) {
+  h <- - x/prob^2 - (size - x)/(1 - prob)^2
+  h[(x < 0) | (x > size) | (abs(x - round(x)) > sqrt(.Machine$double.eps))] <- 0
+  if(drop) h else cbind("prob" = h)
+}
 
 
 
