@@ -1,16 +1,19 @@
-\name{ztnbinom}
+\name{Zero-Truncated-NegBinomial}
 \alias{dztnbinom}
 \alias{pztnbinom}
 \alias{qztnbinom}
 \alias{rztnbinom}
 \alias{sztnbinom}
 \alias{hztnbinom}
+\alias{mean_ztnbinom}
+\alias{var_ztnbinom}
 
 \title{The Zero-Truncated Negative Binomial Distribution}
 
 \description{
   Density, distribution function, quantile function, random
-  generation and score function for the zero-truncated negative binomial
+  generation, score function, hessian, mean, and variance
+  for the zero-truncated negative binomial
   distribution with parameters \code{mu} (= mean of the
   untruncated distribution) and dispersion parameter \code{theta}
   (or equivalently \code{size}).
@@ -23,6 +26,8 @@ qztnbinom(p, mu, theta, size, lower.tail = TRUE, log.p = FALSE)
 rztnbinom(n, mu, theta, size)
 sztnbinom(x, mu, theta, size, parameter = c("mu", "theta"), drop = TRUE)
 hztnbinom(x, mu, theta, size, parameter = c("mu", "theta"), drop = TRUE)
+mean_ztnbinom(mu, theta, size, drop = TRUE)
+var_ztnbinom(mu, theta, size, drop = TRUE)
 }
 
 \arguments{
@@ -61,6 +66,10 @@ for \eqn{x = 1, 2, \ldots}.
   \code{rztnbinom} generates random deviates, and
   \code{sztnbinom} gives the score function (= derivative of
   the log-density with respect to mu and/or theta).
+  \code{hztnbinom} gives the hessian (= 2nd derivative of
+  the log-density with respect to mu and/or theta).
+  \code{mean_ztnbinom} and \code{var_ztnbinom} give the
+  mean and the variance, respectively.
 }
 
 

@@ -89,3 +89,26 @@ hztnbinom <- function(x, mu, theta, size, parameter = c("mu", "theta"), drop = T
   if(drop & NCOL(h) < 2L) drop(h) else h
 }
 
+mean_ztnbinom <- function(mu, theta, size, drop = TRUE) {
+  if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
+  if(!missing(size)) theta <- size
+
+  if(drop) {
+    mu / pnbinom(0, mu = mu, size = theta, lower.tail = FALSE)
+  } else {
+    cbind("mean" = mu / pnbinom(0, mu = mu, size = theta, lower.tail = FALSE))
+  }
+}
+
+var_ztnbinom <- function(mu, theta, size, drop = TRUE) {
+  if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
+  if(!missing(size)) theta <- size
+
+  mean <- mu / pnbinom(0, mu = mu, size = theta, lower.tail = FALSE)
+  if(drop) {
+    mean * (1 + mu/theta + mu - mean)
+  } else {
+    cbind("var" = mean * (1 + mu/theta + mu - mean))
+  }
+}
+

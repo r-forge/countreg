@@ -70,6 +70,8 @@ export(
   "rztnbinom",
   "sztnbinom",
   "hztnbinom",
+  "mean_ztnbinom",
+  "var_ztnbinom",
   
   ## zero-inflated Poisson
   "dzipois",
