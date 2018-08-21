@@ -1,15 +1,19 @@
-\name{ztpois}
+\name{Zero-Truncated-Poisson}
 \alias{dztpois}
 \alias{pztpois}
 \alias{qztpois}
 \alias{rztpois}
 \alias{sztpois}
+\alias{hztpois}
+\alias{mean_ztpois}
+\alias{var_ztpois}
 
 \title{The Zero-Truncated Poisson Distribution}
 
 \description{
   Density, distribution function, quantile function, random
-  generation and score function for the zero-truncated Poisson
+  generation, score function, hessian, mean, and variance
+  for the zero-truncated Poisson
   distribution with parameter \code{lambda} (= mean of the
   untruncated distribution) or \code{mean} (= of the truncated
   distribution).
@@ -21,6 +25,9 @@ pztpois(q, lambda, mean, lower.tail = TRUE, log.p = FALSE)
 qztpois(p, lambda, mean, lower.tail = TRUE, log.p = FALSE)
 rztpois(n, lambda, mean)
 sztpois(x, lambda, mean, parameter = "lambda", drop = TRUE)
+hztpois(x, lambda, mean, parameter = "lambda", drop = TRUE)
+mean_ztpois(lambda, mean, drop = TRUE)
+var_ztpois(lambda, mean, drop = TRUE)
 }
 
 \arguments{
@@ -68,6 +75,10 @@ numerically if needed.
   \code{rztpois} generates random deviates, and
   \code{sztpois} gives the score function (= derivative of
   the log-density with respect to lambda or mean).
+  \code{hztpois} gives the hessian (= 2nd derivative of
+  the log-density with respect to lambda or mean).
+  \code{mean_ztpois} and \code{var_ztpois} give the mean
+  and the variance, respectively.
 }
 
 

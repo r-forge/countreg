@@ -59,6 +59,9 @@ export(
   "qztpois",
   "rztpois",
   "sztpois",
+  "hztpois",
+  "mean_ztpois",
+  "var_ztpois",
   
   ## zero-truncated negative binomial
   "dztnbinom",

@@ -56,9 +56,45 @@ sztpois <- function(x, lambda, mean, parameter = "lambda", drop = TRUE) {
   }
   parameter <- match.arg(parameter, c("lambda", "mean"))
   s <- x/lambda - 1 - exp(-lambda)/(1 - exp(-lambda))
-  if(parameter == "mean") s * lambda / (mean * (lambda + 1 - mean))
+  if(parameter == "mean") s <- s * lambda / (mean * (lambda + 1 - mean))
   s[(x < 1) | (abs(x - round(x)) > sqrt(.Machine$double.eps))] <- 0
   if(drop) s else matrix(s, dimnames = list(NULL, parameter))
+}
+
+hztpois <- function(x, lambda, mean, parameter = "lambda", drop = TRUE) {
+  if(!missing(lambda) & !missing(mean)) stop("only 'lambda' or 'mean' may be specified")
+  if(!missing(mean)) {
+    lambda <- .ztpois_mean_to_lambda(mean)
+  } else if(parameter == "mean") {
+    mean <- .ztpois_lambda_to_mean(lambda)
+  }
+  parameter <- match.arg(parameter, c("lambda", "mean"))
+  h <- - x/lambda^2 + exp(-lambda)/(1 - exp(-lambda))^2
+  if(parameter == "mean") {
+    dldm <- lambda / (mean * (lambda + 1 - mean))
+    h <- h * dldm^2 + sztpois(x, lambda = lambda, parameter = "lambda") *
+         dldm / (mean * (lambda + 1 - mean)) * (- lambda - mean * (dldm - 2))
+  }
+  h[(x < 1) | (abs(x - round(x)) > sqrt(.Machine$double.eps))] <- 0
+  if(drop) h else matrix(h, dimnames = list(NULL, parameter))
+}
+
+mean_ztpois <- function(lambda, mean, drop = TRUE) {
+  if(!missing(lambda) & !missing(mean)) stop("only 'lambda' or 'mean' may be specified")
+  if(!missing(lambda)) {
+    mean <- .ztpois_lambda_to_mean(lambda)
+  }
+  if(drop) mean else cbind("mean" = mean)
+}
+
+var_ztpois <- function(lambda, mean, drop = TRUE) {
+  if(!missing(lambda) & !missing(mean)) stop("only 'lambda' or 'mean' may be specified")
+  if(!missing(mean)) {
+    lambda <- .ztpois_mean_to_lambda(mean)
+  } else {
+    mean <- .ztpois_lambda_to_mean(lambda)
+  }
+  if(drop) mean * (1 + lambda - mean) else cbind("var" = mean * (1 + lambda - mean))
 }
 
 ztpoisson <- function() {
