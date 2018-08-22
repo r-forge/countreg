@@ -50,3 +50,45 @@ shpois <- function(x, lambda, pi, parameter = c("lambda", "pi"), drop = TRUE) {
   colnames(s) <- c("lambda", "pi")[c("lambda", "pi") %in% parameter]
   if(drop) drop(s) else s
 }
+
+hhpois <- function(x, lambda, pi, parameter = c("lambda", "pi"), drop = TRUE) {
+  parameter <- ifelse(parameter == "lambda.pi", "pi.lambda", parameter)
+  parameter <- sapply(unique(parameter), function(x) match.arg(x, c("lambda",
+                      "pi", "pi.lambda")))
+
+  n <- max(length(x), length(lambda), length(pi))
+  x <- rep_len(x, n)
+  h <- if("lambda" %in% parameter) {
+    hztpois(x, lambda = lambda, parameter = "lambda", drop = FALSE)
+  } else {
+    NULL
+  }
+  if("pi" %in% parameter) {
+    pi <- rep_len(pi, n)
+    hp <- -1/pi^2
+    hp[x == 0L] <- -1/((1 - pi)^2)[x == 0L]
+    hp[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps))] <- 0
+    h <- cbind(h, "pi" = hp)
+  }
+  if("pi.lambda" %in% parameter) h <- cbind(h, "pi.theta" = rep_len(0, n))
+  if(drop & (NCOL(h) < 2L)) drop(h) else h
+}
+
+mean_hpois <- function(lambda, pi, drop = TRUE) {
+  if(drop) {
+    lambda * pi / (1 - exp(-lambda))
+  } else {
+    cbind("mean" = lambda * pi / (1 - exp(-lambda)))
+  }
+}
+
+var_hpois <- function(lambda, pi, drop = TRUE) {
+  mean <- lambda * pi / (1 - exp(-lambda))
+  if(drop) {
+    mean * (lambda + 1 - mean)
+  } else {
+    cbind("var" = mean * (lambda + 1 - mean))
+  }
+}
+
+

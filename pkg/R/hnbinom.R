@@ -92,3 +92,26 @@ hhnbinom <- function(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi"),
   if(drop & (NCOL(h) < 2L)) drop(h) else h
 }
 
+mean_hnbinom <- function(mu, theta, size, pi, drop = TRUE) {
+  if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
+  if(!missing(size)) theta <- size
+
+  if(drop) {
+    mu * pi / pnbinom(0, size = theta, mu = mu, lower.tail = FALSE)
+  } else {
+    cbind("mean" = mu * pi / pnbinom(0, size = theta, mu = mu, lower.tail = FALSE))
+  }
+}
+
+var_hnbinom <- function(mu, theta, size, pi, drop = TRUE) {
+  if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
+  if(!missing(size)) theta <- size
+
+  mean <- mu * pi / pnbinom(0, size = theta, mu = mu, lower.tail = FALSE)
+  if(drop) {
+    mean * (1 + mu/theta + mu - mean)
+  } else {
+    cbind("var" = mean * (1 + mu/theta + mu - mean))
+  }
+}
+

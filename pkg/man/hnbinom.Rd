@@ -5,12 +5,15 @@
 \alias{rhnbinom}
 \alias{shnbinom}
 \alias{hhnbinom}
+\alias{mean_hnbinom}
+\alias{var_hnbinom}
 
 \title{The Hurdle Negative Binomial Distribution}
 
 \description{
   Density, distribution function, quantile function, random
-  generation and score function for the (zero-)hurdle negative binomial
+  generation, score function, hessian, mean, and, variance
+  for the (zero-)hurdle negative binomial
   distribution with parameters \code{mu} (= mean of the
   underlying negative binomial distribution), dispersion parameter \code{theta}
   (or equivalently \code{size}), and hurdle crossing probability
@@ -24,6 +27,8 @@ qhnbinom(p, mu, theta, size, pi, lower.tail = TRUE, log.p = FALSE)
 rhnbinom(n, mu, theta, size, pi)
 shnbinom(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi"), drop = TRUE)
 hhnbinom(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi"), drop = TRUE)
+mean_hnbinom(mu, theta, size, pi, drop = TRUE)
+var_hnbinom(mu, theta, size, pi, drop = TRUE)
 }
 
 \arguments{
@@ -64,6 +69,10 @@ for \eqn{x = 1, 2, \ldots} and \eqn{g(0) = 1 - \pi}, respectively.
   \code{rhnbinom} generates random deviates, and
   \code{shnbinom} gives the score function (= derivative of
   the log-density with respect to mu and/or theta and/or pi).
+  \code{hhnbinom} gives the hessian (= 2nd derivative of
+  the log-density with respect to mu and/or theta and/or pi).
+  \code{mean_hnbinom} and \code{var_hnbinom} give the mean
+  and the variance, respectively.
 }
 
 

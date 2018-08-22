@@ -93,6 +93,9 @@ export(
   "qhpois",
   "rhpois",
   "shpois",
+  "hhpois",
+  "mean_hpois",
+  "var_hpois",
   
   ## hurdle negative binomial
   "dhnbinom",
@@ -101,7 +104,9 @@ export(
   "rhnbinom",
   "shnbinom",
   "hhnbinom",
-  
+  "mean_hnbinom",
+  "var_hnbinom", 
+ 
   ## mboost families
   "MBbinomial",
   "MBnegbin",

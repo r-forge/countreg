@@ -4,14 +4,18 @@
 \alias{qhpois}
 \alias{rhpois}
 \alias{shpois}
+\alias{hhpois}
+\alias{mean_hpois}
+\alias{var_hpois}
 
 \title{The Hurdle Poisson Distribution}
 
 \description{
   Density, distribution function, quantile function, random
-  generation and score function for the (zero-)hurdle Poisson
+  generation, score function, hessian, mean, and, variance
+  for the (zero-)hurdle Poisson
   distribution with parameters \code{mu} (= mean of the
-  underlying Poisson distribution)and hurdle crossing probability
+  underlying Poisson distribution) and hurdle crossing probability
   \code{pi} (i.e., \code{1 - pi} is the probability for observed zeros).
 }
 
@@ -21,6 +25,9 @@ phpois(q, lambda, pi, lower.tail = TRUE, log.p = FALSE)
 qhpois(p, lambda, pi, lower.tail = TRUE, log.p = FALSE)
 rhpois(n, lambda, pi)
 shpois(x, lambda, pi, parameter = c("lambda", "pi"), drop = TRUE)
+hhpois(x, lambda, pi, parameter = c("lambda", "pi"), drop = TRUE)
+mean_hpois(lambda, pi, drop = TRUE)
+var_hpois(lambda, pi, drop = TRUE)
 }
 
 \arguments{
@@ -55,7 +62,11 @@ for \eqn{x = 1, 2, \ldots} and \eqn{g(0) = 1 - \pi}, respectively.
   \code{qhpois} gives the quantile function,
   \code{rhpois} generates random deviates, and
   \code{shpois} gives the score function (= derivative of
-  the log-density with respect to mu and/or theta and/or pi).
+  the log-density with respect to lambda and/or pi).
+  \code{hhpois} gives the hessian (= 2nd derivative of
+  the log-density with respect to lambda and/or pi).
+  \code{mean_hpois} and \code{var_hpois} give the mean and
+  the variance, respectively.
 }
 
 
