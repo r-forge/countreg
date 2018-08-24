@@ -107,7 +107,7 @@ c.rootogram <- rbind.rootogram <- function(...)
 plot.rootogram <- function(x,
   xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL, main = NULL,
   border = "black", fill = "lightgray", col = "#B61A51",
-  lwd = 2, pch = 19, lty = 1, type = NULL, axes = TRUE, ...)
+  lwd = 2, pch = 19, lty = 1, max = NULL, type = NULL, axes = TRUE, ...)
 {
   ## handling of groups
   if(is.null(x$group)) x$group <- 1L
