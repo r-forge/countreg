@@ -1,0 +1,360 @@
+---
+title: "Countreg: Distributions"
+author: "Thorsten Simon"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+    number_sections: TRUE
+vignette: >
+  %\VignetteIndexEntry{countreg distributions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This document gives an overview of the parametric count data distributions
+implemented within **countreg**.
+
+# Introduction
+
+A distribution is commonly determined by its density function
+$f(y\,|\,\theta)$, where $y$ is a realization of a random variable $\mathrm{Y}$
+and $\theta$ is a vector of parameters allowing the location, scale, and,
+shape of the distribution to vary.
+
+The main motivation for the use of parametric distribtions within
+**countreg** is to solve regression problems. For maximum likelihood
+estimation the objective function is the log-likelihood,
+
+\begin{equation}
+  \ell(\theta\,|\,y) = \sum_{i=1}^{n} \log\, f(y_i\,|\,\theta).
+\end{equation}
+
+To solve this optimizaiton problem numerically algorithms of
+the Newton-Raphson type are employed, which require the
+first and second derivative of the objective funciton,
+i.e., the score function $s$ and the hessian $h$, respectively,
+
+\begin{equation}
+  s_\theta = \frac{\partial \ell}{\partial \theta}
+  \quad \text{and} \quad
+  h_{\theta\theta} = \frac{\partial^2 \ell}{\partial \theta^2}.
+\end{equation}
+
+Note, that in many cases it is numerically less burdensome to
+compute the second derivative numerically instead of applying an
+analytical solution.
+
+For prediction purposes it is convenient to have functions on hand that
+allow the computation of the expected value and the variance given
+a set of parameters.
+
+These two points, numerical optimization and prediction, motivate
+to extend the infrastucture of the distributions implemented
+in **countreg**.
+
+# Implementation
+
+The standard infrastructure within **stats**
+provides 4 functions for each distibution. The prefixes `'d'`, `'p'`, `'q'`, and
+`'r'` indicate the density, cumulative distribution function (CDF), the
+quantile function, and a simulator for random deviates, respectively. 
+The implementation in **countreg** aims at extending this infrastructure by
+the score function `sxxx`, the hessian `hxxx`, the mean `mean_xxx`, and
+the variance `var_xxx`.
+
+The interface of the score function look as follows,
+
+`sxxx(x, theta1, theta2, parameter = c("theta1" ,"theta2"), drop = TRUE)`
+
+The first argument `x` is a vector of quantiles, `theta1` and `theta2` are
+vectors of the parameters specifying the distribution (names and amount
+of parameters are choosen as an example), the argument `parameter` gets
+a character string (or a vector of charater strings) indicating wrt
+which parameter the score should be computed, the logical `drop` indicates
+whether the result should be a matrix or if the dimension should be dropped.
+The interface of the hessian `hxxx` is analogously.
+
+The interface of `mean_xxx` and `var_xxx` is
+
+`mean_xxx(theta1, theta2, drop = TRUE)`
+
+# Distributions
+
+## Poisson (`"xpois"`) {#xpois}
+
+The Poisson distribution has the density
+\begin{equation}
+  f_{Pois}(y\,|\,\lambda) = \frac{\lambda^y e^{-\lambda}}{y!}, \quad \text{with} \quad y = 0, 1, 2, \ldots,
+\end{equation}
+with expected value $\mathsf{E}(\mathrm{Y}) = \lambda$ and variance
+$\mathsf{VAR}(\mathrm{Y}) = \lambda$.
+
+The score function is
+\begin{equation}
+  s(\lambda\,|\,y) = \frac{y}{\lambda} - 1.
+\end{equation}
+The hessian is
+\begin{equation}
+  h(\lambda\,|\,y) = - \frac{y}{\lambda^2}.
+\end{equation}
+
+## Binomial (`"xbinom"`)
+
+The binomial distribution with `size` $= n$ and
+`prob` $= \pi$ has the density
+\begin{equation}
+  f_{Binom}(y\,|\,\pi,n) = {n \choose y} {\pi}^{y} {(1-\pi)}^{n-y}, \quad \text{for} \quad y = 0, \ldots, n,
+\end{equation}
+with expected value $\mathsf{E}(\mathrm{Y}) = n \cdot \pi$ and variance
+$\mathsf{VAR}(\mathrm{Y}) = n \cdot \pi \cdot (1 - \pi)$.
+
+The score function is
+\begin{equation}
+  s(\pi\,|\,y,n) = \frac{y}{\pi} - \frac{n-y}{1-\pi}
+\end{equation}
+
+The hessian is
+\begin{equation}
+  h(\pi\,|\,y,n) = - \frac{y}{\pi^2} - \frac{n-y}{(1-\pi)^2}
+\end{equation}
+
+## Negative Binomial (`"xnbinom"`) {#xnbinom}
+
+The negative binomial (type 2) has the density,
+\begin{equation}
+f_{NB}(y\,|\,\mu,\theta) = \frac{\Gamma(\theta + y)}{\Gamma({\theta}) \cdot y!} \cdot
+ \frac{\mu^y \cdot \theta^\theta}{(\mu + \theta)^{\theta + y}}, \quad y = 0, 1, 2, \dots
+\end{equation}
+with expected value $\mathsf{E}(\mathrm{Y}) = \mu$ and variance
+$\mathsf{VAR}(\mathrm{Y}) = \mu + \mu^2 / \theta$.
+
+The score functions are:
+\begin{equation}
+ s_{\mu}(\mu,\theta\,|\,y) = \frac{y}{\mu} - \frac{y + \theta}{\mu + \theta}
+\end{equation}
+\begin{equation}
+ s_{\theta}(\mu,\theta\,|\,y) = \psi_0(y + \theta) - \psi_0(\theta)
+ + \log(\theta) + 1 - \log(\mu + \theta) - \frac{y + \theta}{\mu + \theta}
+\end{equation}
+where $\psi_0$ is the digamma function.
+
+The elements of the hessian are
+\begin{equation}
+ h_{\mu\mu}(\mu,\theta\,|\,y) = - \frac{y}{\mu^2}
+ + \frac{y + \theta}{(\mu + \theta)^2}
+\end{equation}
+\begin{equation}
+ h_{\theta\theta}(\mu,\theta\,|\,y) = \psi_1(y + \theta) - \psi_1(\theta)
+ + \frac{1}{\theta} - \frac{2}{\mu + \theta} + \frac{y + \theta}{(\mu + \theta)^2}
+\end{equation}
+where $\psi_1$ is the trigamma function.
+\begin{equation}
+ h_{\mu\theta}(\mu,\theta\,|\,y) = \frac{y - \mu}{(\mu + \theta)^2}.
+\end{equation}
+
+## Zero-Truncated Poisson (`"xztpois"`) {#xztpois}
+
+The zero truncated Poisson has the density
+\begin{equation}
+  f_{ZTP}(x\,|\,\lambda) = \frac{f_{Pois}(x\,|\,\lambda)}{1 - f_{Pois}(0\,|\,\lambda)} \quad \text{for} \quad x = 1, 2, \ldots
+\end{equation}
+where $f_{Pois}$ is the density of the [Poisson distribution](#xpois).
+The zero-truncated distribution has expectation
+$\mathsf{E}(x) = \mu = \lambda / (1 - \exp(-\lambda))$ and variance
+$\mathsf{VAR}(x) = \mu \cdot (\lambda + 1 - \mu)$, where $\lambda$
+is the expectation of the [untruncated Poisson distribution](#xpois).
+Within **countreg** both parameterizations, either with $\lambda$
+(`"lambda"`) or $\mu$ (`"mean"`), are implemented.
+Thus, the score functions can be calculated either wrt $\lambda$
+(`"lambda"`) or $\mu$ (`"mean"`):
+\begin{equation}
+  s_{\lambda}(\lambda\,|\,x) = \frac{x}{\lambda} - 1 - \frac{e^{-\lambda}}{1 - e^{-\lambda}}
+\end{equation}
+\begin{equation}
+  s_{\mu}(\lambda\,|\,x) = s_{\lambda} \cdot \frac{\lambda}{\mu \cdot (\lambda + 1 - \mu)}
+\end{equation}
+The hessian is
+\begin{equation}
+  h_{\lambda\lambda}(\lambda\,|\,x) = - \frac{x}{\lambda^2} + \frac{e^{-\lambda}}{(1 - e^{-\lambda})^2}.
+\end{equation}
+
+## Zero-Truncated Negative Binomial (`"xztnbinom"`) {#xztnbinom}
+
+The zero-truncated negative binomial has density
+\begin{equation}
+f_{ZTNB}(y\,|\,\mu,\theta) = \frac{f_{NB}(y\,|\,\mu, \theta)}{1 - f_{NB}(0\,|\,\mu, \theta)}, \quad y = 1, 2, \dots
+\end{equation}
+with expectation
+\begin{equation}
+\mathsf{E}(\mathrm{Y}) = \frac{\mu}{1 - f_{NB}(0\,|\,\mu,\theta)}
+= \frac{\mu}{1 - \left( \frac{\theta}{\mu + \theta} \right)^\theta},
+\end{equation}
+where $f_{NB}$ is the density of the [negative binomial distribution](#xnbinom), and variance
+\begin{align}
+\mathsf{VAR}(\mathrm{Y}) & = \frac{\mu}{1 - f_{NB}(0\,|\,\mu,\theta)} \cdot
+\left( 1 + \frac{\mu}{\theta} + \mu - \frac{\mu}{1 - f_{NB}(0\,|\,\mu,\theta)} \right) \\
+& = \frac{\mu}{1 - \left( \frac{\theta}{\mu + \theta} \right)^\theta} \cdot
+\left( 1 + \frac{\mu}{\theta} + \mu - \frac{\mu}{1 - \left( \frac{\theta}{\mu + \theta} \right)^\theta} \right)
+\end{align}
+
+The score functions are:
+\begin{equation}
+  s_{\mu}(\mu,\theta\,|\,y) =
+  \frac{y}{\mu} - \frac{y + \theta}{\mu + \theta} -
+  \frac{\left( \frac{\theta}{\mu + \theta} \right)^{\theta+1}}{1 - \left( \frac{\theta}{\mu + \theta} \right)^\theta}
+\end{equation}
+
+\begin{equation}
+  s_{\theta}(\mu,\theta\,|\,y) =
+  \psi_0(y + \theta) - \psi_0(\theta) + \log(\theta) + 1 - \log(\mu + \theta) -
+  \frac{y + \theta}{\mu + \theta} + 
+  \frac{\left( \frac{\theta}{\mu + \theta} \right)^\theta}{1 - \left( \frac{\theta}{\mu + \theta} \right)^\theta} \cdot
+  \left( \log\frac{\theta}{\mu + \theta} + 1 - \frac{\theta}{\mu + \theta} \right)
+\end{equation}
+
+The elements of the hessian are:
+\begin{align}
+ h_{\mu\mu}(\mu,\theta\,|\,y) & =
+ \frac{\partial^2 \ell}{\partial \mu^2}
+ + \frac{f(0)}{1 - f(0)} \cdot \frac{\theta \cdot (1 + \theta)}{(\mu + \theta)^2}
+ + \left( \frac{f(0)}{1 - f(0)} \cdot \frac{\theta}{\mu + \theta} \right)^2 \\
+ & = - \frac{y}{\mu^2} + \frac{y + \theta}{(\mu + \theta)^2}
+ + \frac{\left( \frac{\theta}{\mu + \theta} \right)^{\theta+1}}{1 - \left( \frac{\theta}{\mu + \theta} \right)^\theta}
+     \cdot \frac{1 + \theta}{\mu + \theta}
+ + \left( \frac{\left( \frac{\theta}{\mu + \theta} \right)^{\theta+1}}{ 1 - \left( \frac{\theta}{\mu + \theta} \right)^\theta} \right)^2,
+\end{align}
+\begin{align}
+ h_{\theta\theta}(\mu,\theta\,|\,y)  =
+   \psi_1(y + \theta) - \psi_1(\theta)
+   + \frac{1}{\theta} - \frac{2}{\mu + \theta} + \frac{y + \theta}{(\mu + \theta)^2}
+ +  \frac{\left( \frac{\theta}{\mu + \theta} \right)^\theta}{1 - \left( \frac{\theta}{\mu + \theta} \right)^\theta}  \cdot 
+ \left\{
+ \frac{1}{\theta} - \frac{2}{\mu + \theta} + \frac{\theta}{(\mu + \theta)^2} +
+ \left( \log\frac{\theta}{\mu + \theta} + 1 - \frac{\theta}{\mu + \theta} \right)^2
+ \right\} 
+ + \left( \frac{\left( \frac{\theta}{\mu + \theta} \right)^\theta}{1 - \left( \frac{\theta}{\mu + \theta} \right)^\theta} \cdot \left( \log\frac{\theta}{\mu + \theta} +
+ 1 - \frac{\theta}{\mu + \theta} \right)  \right)^2,
+\end{align}
+and
+\begin{align}
+ h_{\mu\theta}(\mu,\theta\,|\,y) = \frac{y - \mu}{(\mu + \theta)^2}
+ - \frac{\left( \frac{\theta}{\mu + \theta} \right)^\theta}{1 - \left( \frac{\theta}{\mu + \theta} \right)^\theta} \cdot
+ \left(
+  \frac{\theta}{\mu+\theta}\log\frac{\theta}{\mu+\theta}
+  + \frac{\mu\cdot(\theta+1)}{(\mu+\theta)^2}
+ \right)
+ &- \left( \frac{\left( \frac{\theta}{\mu + \theta} \right)^\theta}{1 - \left( \frac{\theta}{\mu + \theta} \right)^\theta} \right)^2 \cdot
+ \left(
+  \frac{\theta}{\mu+\theta}\log\frac{\theta}{\mu+\theta}
+  + \frac{\mu\cdot\theta}{(\mu+\theta)^2}
+ \right)
+\end{align}
+
+## Hurdle Poisson (`"xhpois"`)
+
+The hurdle poisson has density
+\begin{equation}
+f(y\,|\,\pi,\lambda) = 
+  \begin{cases}
+    1-\pi & y = 0 \\
+    \pi \cdot \frac{f_{Pois}(y\,|\,\lambda)}{1 - f_{Pois}(0\,|\,\lambda)} & y > 0
+  \end{cases}
+\end{equation}
+with expectation
+\begin{equation}
+\mathsf{E}(\pi,\lambda) = \frac{\pi}{1-e^{-\lambda}} \cdot \lambda
+\end{equation}
+and variance
+\begin{equation}
+\mathsf{VAR}(\pi,\lambda) = \frac{\pi\cdot\lambda}{1-e^{-\lambda}} \cdot
+\left(\lambda + 1 - \frac{\pi\cdot\lambda}{1-e^{-\lambda}}\right).
+\end{equation}
+The score functions are
+\begin{equation}
+s_\pi(\pi, \lambda\,|\,y) = (1-\mathbf{I}_{\{0\}}(y)) \cdot \frac{1}{\pi} -
+  \mathbf{I}_{\{0\}}(y) \cdot \frac{1}{1 - \pi}
+\end{equation}
+and
+\begin{equation}
+s_\lambda(\pi, \lambda\,|\,y) = (1-\mathbf{I}_{\{0\}}(y)) \cdot \left(
+  \frac{x}{\lambda} - 1 - \frac{e^{-\lambda}}{1 - e^{-\lambda}} \right)
+\end{equation}
+where $\mathbf{I}_{\{0\}}(y)$ is an indicator function which takes the value
+one if $y$ equals zero, and zero otherwise.
+
+The elements of the Hessian are,
+\begin{equation}
+h_{\pi\pi}(\pi, \lambda \,|\, y) = (\mathbf{I}_{\{0\}}(y) - 1) \cdot \frac{1}{\pi^2} -
+  \mathbf{I}_{\{0\}}(y) \cdot \frac{1}{(1 - \pi)^2},
+\end{equation}
+\begin{equation}
+h_{\lambda\lambda}(\pi, \lambda \,|\, y) = (1-\mathbf{I}_{\{0\}}(y)) \cdot \left(
+  - \frac{x}{\lambda^2} + \frac{e^{-\lambda}}{(1 - e^{-\lambda})^2} \right)
+\end{equation}
+and
+\begin{equation}
+h_{\pi\lambda}(\pi, \lambda \,|\, y) = 0.
+\end{equation}
+
+
+
+## Hurdle Negative Binomial (`"xhnbinom"`)
+
+The hurdle negative binomial has density
+\begin{equation}
+f(y\,|\,\pi, \mu, \theta) =
+  \begin{cases}
+    1-\pi & y = 0 \\
+    \pi \cdot \frac{f_{NB}(y\,|\,\mu,\theta)}{1-f_{NB}(0\,|\,\mu,\theta)} & y > 0
+  \end{cases}
+\end{equation}
+with expectation
+\begin{equation}
+\mathsf{E}(\pi,\mu,\lambda) = \frac{\pi}{1-f_{NB}(0\,|\,\mu,\theta)} \cdot \mu
+\end{equation}
+and variance
+\begin{equation}
+\mathsf{VAR}(\pi,\mu,\lambda) = \frac{\pi\cdot\mu}{1-f_{NB}(0\,|\,\mu,\theta)} \cdot
+\left(1+\frac{\mu}{\theta}+\mu-\frac{\pi\cdot\mu}{1-f_{NB}(0\,|\,\mu,\theta)}\right)
+ 
+\end{equation}
+The score functions are,
+\begin{equation}
+s_\pi(\pi, \mu, \theta\,|\,y) = (1-\mathbf{I}_{\{0\}}(y)) \cdot \frac{1}{\pi} -
+  \mathbf{I}_{\{0\}}(y) \cdot \frac{1}{1 - \pi},
+\end{equation}
+\begin{equation}
+s_\mu(\pi, \mu, \theta\,|\,y) = (1-\mathbf{I}_{\{0\}}(y)) \cdot s_{\mu,\,NB}(\mu,\theta\,|\,y)
+\end{equation}
+and
+\begin{equation}
+s_\theta(\pi, \mu, \theta\,|\,y) = (1-\mathbf{I}_{\{0\}}(y)) \cdot s_{\theta,\,NB}(\mu,\theta\,|\,y),
+\end{equation}
+where $s_{\star,\,NB}(\cdot)$ are the score functions of the
+[zero-truncated negative binomial](#xztnbinom).
+
+The elements of the hessian
+\begin{equation}
+h_{\pi\pi}(\pi, \mu, \theta\,|\,y) = (\mathbf{I}_{\{0\}}(y) - 1) \cdot \frac{1}{\pi^2} -
+  \mathbf{I}_{\{0\}}(y) \cdot \frac{1}{(1 - \pi)^2},
+\end{equation}
+
+\begin{equation}
+h_{\mu\mu}(\pi, \mu, \theta\,|\,y) = (1-\mathbf{I}_{\{0\}}(y)) \cdot h_{\mu\mu,\,NB}(\mu,\theta\,|\,y)
+\end{equation}
+
+\begin{equation}
+h_{\theta\theta}(\pi, \mu, \theta\,|\,y) = (1-\mathbf{I}_{\{0\}}(y)) \cdot h_{\theta\theta,\,NB}(\mu,\theta\,|\,y)
+\end{equation}
+
+\begin{equation}
+h_{\mu\theta}(\pi, \mu, \theta\,|\,y) = (1-\mathbf{I}_{\{0\}}(y)) \cdot h_{\mu\theta,\,NB}(\mu,\theta\,|\,y)
+\end{equation}
+
+\begin{equation}
+h_{\pi\mu}(\pi, \mu, \theta\,|\,y) = h_{\pi\theta}(\pi, \mu, \theta\,|\,y) = 0.
+\end{equation}
+
+

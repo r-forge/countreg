@@ -1,17 +1,21 @@
 Package: countreg
-Version: 0.2-0
-Date: 2018-05-17
+Version: 0.2-1
+Date: 2018-08-22
 Title: Count Data Regression
 Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org",
              comment = c(ORCID = "0000-0003-0918-3766")),
              person(given = "Christian", family = "Kleiber", role = "aut", email = "Christian.Kleiber@unibas.ch", 
-             comment = c(ORCID = "0000-0002-6781-4733")))
+             comment = c(ORCID = "0000-0002-6781-4733")),
+             person(given = "Thorsten", family = "Simon", role = "ctb",
+                    email = "thorsten.simon@uibk.ac.at",
+                    comment = c(ORCID = "0000-0002-3778-7738")))
 Description: Regression models for count data, including zero-inflated, zero-truncated, and
              hurdle models as well as generalized count data regression. Drivers for combination
 	     with flexmix and mboost are also provided. For (graphically) assessing the goodness
 	     of fit for (regression) models, rootograms and quantile residuals are available.
 LazyLoad: yes
-Depends: R (>= 2.14.0), MASS
-Suggests: AER, brglm, car, flexmix (>= 2.3-11), gamlss, gamlss.dist, ggplot2, lmtest, mboost, methods, nonnest2, sandwich
+Depends: R (>= 3.0.0), MASS
+Suggests: AER, brglm, car, flexmix (>= 2.3-11), gamlss, gamlss.dist, ggplot2, lmtest, mboost, methods, nonnest2, sandwich, knitr, rmarkdown
 Imports: graphics, grDevices, stats, utils
+VignetteBuilder: knitr
 License: GPL-2 | GPL-3
