@@ -35,10 +35,10 @@ rztnbinom <- function(n, mu, theta, size) {
   qztnbinom(runif(n), mu = mu, theta = theta)
 }
 
-sztnbinom <- function(x, mu, theta, size, parameter = c("mu", "theta"), drop = TRUE) {
+sztnbinom <- function(x, mu, theta, size, parameter = c("mu", "theta", "size"), drop = TRUE) {
   if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
   if(!missing(size)) theta <- size
-  parameter <- sapply(parameter, function(x) match.arg(x, c("mu", "theta")))
+  parameter <- sapply(parameter, function(x) match.arg(x, c("mu", "theta", "size")))
   s <- snbinom(x, mu = mu, size = theta, parameter = ifelse(parameter == "theta", "size", parameter), drop = FALSE)
   colnames(s) <- parameter
   logratio <- pnbinom(0, mu = mu, size = theta, log.p = TRUE) -
