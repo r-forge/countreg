@@ -1,5 +1,11 @@
 Changes in Version 0.2-0
 
+  o Bug fix in dhpois() and dhnbinom() when 'x' is a vector and 'pi' is a
+    scalar (reported by Andrea Gilardi).
+
+
+Changes in Version 0.2-0
+
   o New d/p/q/r/s functions for all combinations of Poisson vs. negative
     binomial (NB) and zero-truncated vs. zero-inflated vs. hurdle. The parameter
     names are all greek letters: lambda for Poisson mean, mu for NB mean,

@@ -5,7 +5,7 @@ dhnbinom <- function(x, mu, theta, size, pi, log = FALSE) {
   rval <- dnbinom(x, mu = mu, size = theta, log = TRUE) -
     pnbinom(0, mu = mu, size = theta, lower.tail = FALSE, log.p = TRUE) + 
     log(pi)
-  rval[x == 0L] <- log(1 - pi)[x == 0L]
+  rval[x == 0L] <- log(1 - rep_len(pi, length(rval)))[x == 0L]
   if(log) rval else exp(rval)
 }
 
