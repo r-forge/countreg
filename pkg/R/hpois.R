@@ -3,7 +3,7 @@ dhpois <- function(x, lambda, pi, log = FALSE) {
   rval <- dpois(x, lambda = lambda, log = TRUE) -
     ppois(0, lambda = lambda, lower.tail = FALSE, log.p = TRUE) + 
     log(pi)
-  rval[x == 0L] <- log(1 - pi)[x == 0L]
+  rval[x == 0L] <- log(1 - rep_len(pi, length(rval)))[x == 0L]
   if(log) rval else exp(rval)
 }
 
