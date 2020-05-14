@@ -89,7 +89,7 @@ OralHealthNL <- na.omit(subset(OralHealthNL, dmfs < 40))
 ## Visualization: Is dmfs > 0?
 par(mfrow = c(2, 4))
 plot(factor(dmfs > 0, levels = c(TRUE, FALSE), labels = c("> 0", "= 0")) ~ .,
-  data = OralHealthNL, ylevels = 2:1, ylab = "dmfs")
+  data = OralHealthNL, ylab = "dmfs")
 
 ## Count: How large is log(dmfs) given dmfs > 0?
 par(mfrow = c(2, 4))
