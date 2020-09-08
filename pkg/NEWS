@@ -6,6 +6,8 @@ Changes in Version 0.2-1
   o Catch errors when inverting the Hessian from optim, returning an NA
     matrix of correct dimension instead.
 
+  o Conditionally register autoplot.rootogram() method.
+
 
 Changes in Version 0.2-0
 
