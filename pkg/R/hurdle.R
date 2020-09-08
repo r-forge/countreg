@@ -365,12 +365,20 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
                zero = if(zero.dist == "negbin") as.vector(exp(fit_zero$par[kz+1])) else NULL)
     ## covariances
     vc_count <- if(hessian) {
-      -solve(as.matrix(fit_count$hessian))
+      tryCatch(-solve(as.matrix(fit_count$hessian)),
+        error = function(e) {
+	  warning(e$message, call = FALSE)
+	  matrix(NA_real_, nrow = kx + (dist == "negbin"), ncol = kx + (dist == "negbin"))
+	})
     } else {
       matrix(NA_real_, nrow = kx + (dist == "negbin"), ncol = kx + (dist == "negbin"))
     }
     vc_zero <- if(hessian) {
-      -solve(as.matrix(fit_zero$hessian))
+      tryCatch(-solve(as.matrix(fit_zero$hessian)),
+        error = function(e) {
+	  warning(e$message, call = FALSE)
+	  matrix(NA_real_, nrow = kz + (zero.dist == "negbin"), ncol = kz + (zero.dist == "negbin"))
+	})
     } else {
       matrix(NA_real_, nrow = kz + (zero.dist == "negbin"), ncol = kz + (zero.dist == "negbin"))
     }
@@ -400,7 +408,12 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
     coefz <- fit$par[(kx + (dist == "negbin") + 1):(kx + kz + (dist == "negbin"))]
     ## covariances
     vc <- if(hessian) {
-      -solve(as.matrix(fit$hessian))
+      tryCatch(-solve(as.matrix(fit$hessian)),
+        error = function(e) {
+	  warning(e$message, call = FALSE)
+          matrix(NA_real_, nrow = kx + kz + (dist == "negbin") + (thetaz),
+            ncol = kx + kz + (dist == "negbin") + (thetaz))
+	})
     } else {
       matrix(NA_real_, nrow = kx + kz + (dist == "negbin") + (thetaz),
         ncol = kx + kz + (dist == "negbin") + (thetaz))

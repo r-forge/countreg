@@ -369,7 +369,15 @@ zeroinfl <- function(formula, data, subset, na.action, weights, offset,
   names(coefz) <- names(start$zero) <- colnames(Z)
 
   np <- kx + kz + (dist == "negbin")
-  vc <- if(hessian) -solve(as.matrix(fit$hessian)) else matrix(NA_real_, nrow = np, ncol = np)
+  vc <- if(hessian) {
+    tryCatch(-solve(as.matrix(fit$hessian)),
+      error = function(e) {
+        warning(e$message, call = FALSE)
+        matrix(NA_real_, nrow = np, ncol = np)
+      })
+  } else {
+    matrix(NA_real_, nrow = np, ncol = np)
+  }
   if(dist == "negbin") {
     theta <- as.vector(exp(fit$par[np]))
     SE.logtheta <- as.vector(sqrt(diag(vc)[np]))
