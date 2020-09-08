@@ -1,7 +1,10 @@
-Changes in Version 0.2-0
+Changes in Version 0.2-1
 
   o Bug fix in dhpois() and dhnbinom() when 'x' is a vector and 'pi' is a
     scalar (reported by Andrea Gilardi).
+
+  o Catch errors when inverting the Hessian from optim, returning an NA
+    matrix of correct dimension instead.
 
 
 Changes in Version 0.2-0

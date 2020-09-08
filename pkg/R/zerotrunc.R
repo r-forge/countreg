@@ -183,7 +183,15 @@ zerotrunc <- function(formula, data, subset, na.action, weights, offset,
   names(cf) <- colnames(X)
 
   ## covariances
-  vc <- -solve(as.matrix(fit$hessian))
+  vc <- if(hessian) {
+    tryCatch(-solve(as.matrix(fit$hessian)),
+      error = function(e) {
+        warning(e$message, call = FALSE)
+        matrix(NA_real_, nrow = k + (dist == "negbin"), ncol = k + (dist == "negbin"))
+      })
+  } else {
+    matrix(NA_real_, nrow = k + (dist == "negbin"), ncol = k + (dist == "negbin"))
+  }
   if(dist == "negbin") {
     SE.logtheta <- as.vector(sqrt(diag(vc)[k + 1]))
     vc <- vc[-(k+1), -(k+1), drop = FALSE]

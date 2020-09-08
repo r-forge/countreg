@@ -99,7 +99,16 @@ nbreg <- function(formula, data, subset, na.action, weights, offset,
   names(cf) <- colnames(X)
 
   ## covariances
-  vc <- -solve(as.matrix(fit$hessian))
+  vc <- if(hessian) {
+    tryCatch(-solve(as.matrix(fit$hessian)),
+      error = function(e) {
+        warning(e$message, call = FALSE)
+        matrix(NA_real_, nrow = k + !fix, ncol = k + !fix)
+      })
+  } else {
+    matrix(NA_real_, nrow = k + !fix, ncol = k + !fix)
+  }
+
   if(fix) {
     SE.logtheta <- NULL
   } else {
