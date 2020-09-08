@@ -24,7 +24,7 @@ dztnbinom(x, mu, theta, size, log = FALSE)
 pztnbinom(q, mu, theta, size, lower.tail = TRUE, log.p = FALSE)
 qztnbinom(p, mu, theta, size, lower.tail = TRUE, log.p = FALSE)
 rztnbinom(n, mu, theta, size)
-sztnbinom(x, mu, theta, size, parameter = c("mu", "theta"), drop = TRUE)
+sztnbinom(x, mu, theta, size, parameter = c("mu", "theta", "size"), drop = TRUE)
 hztnbinom(x, mu, theta, size, parameter = c("mu", "theta"), drop = TRUE)
 mean_ztnbinom(mu, theta, size, drop = TRUE)
 var_ztnbinom(mu, theta, size, drop = TRUE)
@@ -44,7 +44,7 @@ var_ztnbinom(mu, theta, size, drop = TRUE)
   \item{lower.tail}{logical. If \code{TRUE} (default), probabilities are
     \eqn{P[X \le x]}, otherwise, \eqn{P[X > x]}.}
   \item{parameter}{character. Should the derivative with respect to
-    \code{"mu"} and/or \code{"size"} be computed?}
+    \code{"mu"} and/or \code{"theta"}/\code{"size"} be computed?}
   \item{drop}{logical. Should the result be a matrix (\code{drop = FALSE})
     or should the dimension be dropped (\code{drop = TRUE}, the default)?}
 }
