@@ -192,3 +192,5 @@ S3method("plot", "rootogram")
 S3method("c", "rootogram")
 S3method("rbind", "rootogram")
 S3method("+", "rootogram")
+
+S3method(ggplot2::autoplot, "rootogram")
