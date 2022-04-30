@@ -77,22 +77,22 @@ rootogram.gamlss <- function (object, newdata = NULL, breaks = NULL, max = NULL,
          p <- matrix(NA, length(mu), length(at))
          
     if (family == "GEOM") {
-           for (i in at) p[, i + 1L] <- dGEOM(i, mu = mu)
+           for (i in at) p[, i + 1L] <- gamlss.dist::dGEOM(i, mu = mu)
           }
     if (family == "GEOMo") {
-           for (i in at) p[, i + 1L] <- dGEOMo(i, mu = mu)
+           for (i in at) p[, i + 1L] <- gamlss.dist::dGEOMo(i, mu = mu)
          } 
     if (family == "LG") {
-           for (i in at) p[, i + 1L] <- dLG(i, mu = mu)
+           for (i in at) p[, i + 1L] <- gamlss.dist::dLG(i, mu = mu)
          } 
     if (family == "PO") {
       for (i in at) p[, i + 1L] <- dpois(i, lambda = mu)
     }
     if (family == "YULE") {
-           for (i in at) p[, i + 1L] <- dYULE(i, mu = mu)
+           for (i in at) p[, i + 1L] <- gamlss.dist::dYULE(i, mu = mu)
          }     
     if (family == "ZIPF") {
-           for (i in at) p[, i + 1L] <- dZIPF(i, mu = mu)
+           for (i in at) p[, i + 1L] <- gamlss.dist::dZIPF(i, mu = mu)
          }       
     if (family == "NBI") {
       for (i in at) p[, i + 1L] <- gamlss.dist::dNBI(i, mu = mu, sigma = sigma)
@@ -150,10 +150,11 @@ rootogram.gamlss <- function (object, newdata = NULL, breaks = NULL, max = NULL,
          } 
       if (family == "ZIPIG") {
            for (i in at) p[, i + 1L] <- gamlss.dist::dZIPIG(i, mu = mu, sigma = sigma, nu = nu)
-         }      
-      if (family == "ZANBF") {
-           for (i in at) p[, i + 1L] <- gamlss.dist::dZANBF(i, mu = mu, sigma = sigma, nu = nu, tau=tau)
-         }    
+         }
+      ## FIXME: not available in gamlss.dist
+      ## if (family == "ZANBF") {
+      ##      for (i in at) p[, i + 1L] <- gamlss.dist::dZANBF(i, mu = mu, sigma = sigma, nu = nu, tau=tau)
+      ##    }    
       if (family == "ZABNB") {
            for (i in at) p[, i + 1L] <- gamlss.dist::dZABNB(i, mu = mu, sigma = sigma, nu = nu, tau=tau)
          }    
@@ -161,7 +162,7 @@ rootogram.gamlss <- function (object, newdata = NULL, breaks = NULL, max = NULL,
            for (i in at) p[, i + 1L] <- gamlss.dist::dZASICHEL(i, mu = mu, sigma = sigma, nu = nu, tau=tau)
          }    
       if (family == "ZINBF") {
-           for (i in at) p[, i + 1L] <- gamlss.dist::dZINBFL(i, mu = mu, sigma = sigma, nu = nu, tau=tau)
+           for (i in at) p[, i + 1L] <- gamlss.dist::dZINBF(i, mu = mu, sigma = sigma, nu = nu, tau=tau)
          } 
       if (family == "ZIBNB") {
            for (i in at) p[, i + 1L] <- gamlss.dist::dZIBNB(i, mu = mu, sigma = sigma, nu = nu, tau=tau)
