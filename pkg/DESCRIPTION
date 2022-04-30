@@ -15,7 +15,7 @@ Description: Regression models for count data, including zero-inflated, zero-tru
 	     of fit for (regression) models, rootograms and quantile residuals are available.
 LazyLoad: yes
 Depends: R (>= 3.6.0), MASS
-Suggests: AER, brglm, car, flexmix (>= 2.3-11), gamlss, gamlss.dist, ggplot2, lmtest, mboost, methods, nonnest2, sandwich, knitr, rmarkdown
+Suggests: AER, brglm2, car, flexmix (>= 2.3-11), gamlss, gamlss.dist, ggplot2, lmtest, mboost, methods, nonnest2, sandwich, knitr, rmarkdown
 Imports: graphics, grDevices, stats, utils
 VignetteBuilder: knitr
 License: GPL-2 | GPL-3

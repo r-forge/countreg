@@ -154,10 +154,10 @@ cor(cbind(dmfs = OralHealthNL$dmfs,
   ZINB = fitted(zinb), HNB = fitted(hnb)))
 
 ## Bias-reduced logistic regression (due to separation)
-if(require("brglm")) {
-br <- brglm(
+if(require("brglm2")) {
+br <- glm(
   factor(dmfs == 0, levels = c(TRUE, FALSE), labels = c("= 0", "> 0")) ~ .,
-  data = OralHealthNL)
+  data = OralHealthNL, family = binomial, method = "brglmFit")
 print(coeftest(br), digits = 1)
 }
 
