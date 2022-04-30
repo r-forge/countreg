@@ -95,14 +95,14 @@ g <- hurdle(satellites ~ width + color, data = CrabSatellites, dist = "negbin")
 summary(g)
 
 ## boosting of zero hurdle
-g0 <- gamboost(factor(satellites > 0) ~ bbs(width) + bbs(color),
+g0 <- gamboost(factor(satellites > 0) ~ bbs(width) + bbs(color, knots = 3),
   data = CrabSatellites, family = MBbinomial())
 set.seed(0)
 g0cv <- cvrisk(g0)
 g0[mstop(g0cv)]
 
 ## boosting of count regression
-g1 <- gamboost(satellites ~ bbs(width) + bbs(color),
+g1 <- gamboost(satellites ~ bbs(width) + bbs(color, knots = 3),
   data = subset(CrabSatellites, satellites > 0), family = MBztnegbin())
 set.seed(1)
 g1cv <- cvrisk(g1)
@@ -118,7 +118,7 @@ plot(g1cv)
 ## partial effects in zero hurdle
 plot(g0)
 ## -> large effect of width, moderate effect of color with
-## both effects almost linear
+## width effect almost linear
 }
 }
 
@@ -171,7 +171,7 @@ c1[mstop(c1cv)]
 ## compare coefficients
 cbind(c(coef(c0), "theta" = c0$theta),
   c(coef(c1, off2int = TRUE, which = ""), nuisance(c1)))
-## -> not much difference
+## -> similar
 }
 }
 
