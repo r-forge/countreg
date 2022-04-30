@@ -704,16 +704,13 @@ ZINB 0.3486790 1.000000 0.9997870
 HNB  0.3490063 0.999787 1.0000000
 > 
 > ## Bias-reduced logistic regression (due to separation)
-> if(require("brglm")) {
-+ br <- brglm(
+> if(require("brglm2")) {
++ br <- glm(
 +   factor(dmfs == 0, levels = c(TRUE, FALSE), labels = c("= 0", "> 0")) ~ .,
-+   data = OralHealthNL)
++   data = OralHealthNL, family = binomial, method = "brglmFit")
 + print(coeftest(br), digits = 1)
 + }
-Loading required package: brglm
-Loading required package: profileModel
-'brglm' will gradually be superseded by the 'brglm2' R package (https://cran.r-project.org/package=brglm2), which provides utilities for mean and median bias reduction for all GLMs.
- Methods for the detection of separation and infinite estimates in binomial-response models are provided by the 'detectseparation' R package (https://cran.r-project.org/package=detectseparation).
+Loading required package: brglm2
 
 z test of coefficients:
 
@@ -736,8 +733,8 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 > graphics::par(get("par.postscript", pos = 'CheckExEnv'))
 > cleanEx()
 
-detaching ‘package:brglm’, ‘package:profileModel’, ‘package:nonnest2’,
-  ‘package:lmtest’, ‘package:zoo’
+detaching ‘package:brglm2’, ‘package:nonnest2’, ‘package:lmtest’,
+  ‘package:zoo’
 
 > nameEx("SerumPotassium")
 > ### * SerumPotassium
@@ -1934,7 +1931,7 @@ S = 42.608, p-value = 3.345e-11
 > ## model
 > ztp1 <- glm(satellites ~ width + color, data = cs, family = ztpoisson)
 > ztp2 <- zerotrunc(satellites ~ width + color, data = cs)
-> summary(ztp1)
+> summary(ztp1, dispersion = 1) ## to get fixed dispersion as for poisson
 
 Call:
 glm(formula = satellites ~ width + color, family = ztpoisson, 
@@ -1945,12 +1942,12 @@ Deviance Residuals:
 -2.5409  -0.9350  -0.2051   0.6278   3.7722  
 
 Coefficients:
-            Estimate Std. Error t value Pr(>|t|)
-(Intercept) 0.562699   0.879781   0.640    0.524
-width       0.034238   0.030300   1.130    0.261
-color       0.007166   0.090811   0.079    0.937
+            Estimate Std. Error z value Pr(>|z|)
+(Intercept) 0.562699   0.645491   0.872    0.383
+width       0.034238   0.022231   1.540    0.124
+color       0.007166   0.066627   0.108    0.914
 
-(Dispersion parameter for ztpoisson family taken to be 1.85767)
+(Dispersion parameter for ztpoisson family taken to be 1)
 
     Null deviance: 220.54  on 110  degrees of freedom
 Residual deviance: 218.16  on 108  degrees of freedom
@@ -1983,7 +1980,7 @@ Log-likelihood: -267.5 on 3 Df
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  7.602 0.104 7.727 0 0 
+Time elapsed:  8.081 0.152 8.257 0 0 
 > grDevices::dev.off()
 null device 
           1 
