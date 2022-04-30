@@ -1,11 +1,13 @@
 
-R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
-Copyright (C) 2016 The R Foundation for Statistical Computing
+R version 4.2.0 (2022-04-22) -- "Vigorous Calisthenics"
+Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -22,6 +24,7 @@ Type 'q()' to quit R.
 Loading required package: MASS
 > 
 > base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
 > cleanEx()
 > nameEx("CodParasites")
 > ### * CodParasites
@@ -272,28 +275,28 @@ $Comp.1
 (Intercept) 1.027477   0.117141  8.7713   <2e-16 ***
 x           0.048125   0.214572  0.2243   0.8225    
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 $Comp.2
             Estimate Std. Error z value  Pr(>|z|)    
 (Intercept) -0.86166    0.35676 -2.4153   0.01572 *  
 x            2.95928    0.50637  5.8441 5.093e-09 ***
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 $Comp.1
             Estimate Std. Error z value  Pr(>|z|)    
-(Intercept) 1.107731   0.208688  5.3081 1.108e-07 ***
-x           0.027095   0.220164  0.1231    0.9021    
+(Intercept) 1.107734   0.208690  5.3080 1.108e-07 ***
+x           0.027094   0.220164  0.1231    0.9021    
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 $Comp.2
             Estimate Std. Error z value  Pr(>|z|)    
-(Intercept) -0.79527    0.40674 -1.9552   0.05055 .  
-x            2.79622    0.63995  4.3694 1.246e-05 ***
+(Intercept) -0.79527    0.40674 -1.9552   0.05056 .  
+x            2.79622    0.63996  4.3694 1.246e-05 ***
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 > 
 > ## Not run: 
@@ -335,7 +338,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 > graphics::par(get("par.postscript", pos = 'CheckExEnv'))
 > cleanEx()
 
-detaching 'package:flexmix', 'package:lattice'
+detaching ‘package:flexmix’, ‘package:lattice’
 
 > nameEx("MBnegbin")
 > ### * MBnegbin
@@ -377,9 +380,6 @@ detaching 'package:flexmix', 'package:lattice'
 Loading required package: mboost
 Loading required package: parallel
 Loading required package: stabs
-This is mboost 2.6-0. See 'package?mboost' and 'news(package  = "mboost")'
-for a complete list of changes.
-
                   [,1]       [,2]       [,3]
 (Intercept) -3.2409842 -3.2409580 -3.2409580
 width        0.1776543  0.1776532  0.1776532
@@ -445,7 +445,7 @@ theta        0.9290420  0.9290599  0.9290599
 > 
 > cleanEx()
 
-detaching 'package:mboost', 'package:stabs', 'package:parallel'
+detaching ‘package:mboost’, ‘package:stabs’, ‘package:parallel’
 
 > nameEx("OralHealthNL")
 > ### * OralHealthNL
@@ -474,7 +474,7 @@ detaching 'package:mboost', 'package:stabs', 'package:parallel'
 > ## Visualization: Is dmfs > 0?
 > par(mfrow = c(2, 4))
 > plot(factor(dmfs > 0, levels = c(TRUE, FALSE), labels = c("> 0", "= 0")) ~ .,
-+   data = OralHealthNL, ylevels = 2:1, ylab = "dmfs")
++   data = OralHealthNL, ylab = "dmfs")
 > 
 > ## Count: How large is log(dmfs) given dmfs > 0?
 > par(mfrow = c(2, 4))
@@ -506,9 +506,9 @@ zip  16 1969.571 2033.274
 Loading required package: lmtest
 Loading required package: zoo
 
-Attaching package: 'zoo'
+Attaching package: ‘zoo’
 
-The following objects are masked from 'package:base':
+The following objects are masked from ‘package:base’:
 
     as.Date, as.Date.numeric
 
@@ -520,7 +520,7 @@ Model 2: dmfs ~ .
 1  17 -838.24                         
 2  16 -968.76 -1 261.05  < 2.2e-16 ***
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 > if(require("lmtest")) lrtest(zinb, zip)
 Likelihood ratio test
 
@@ -530,12 +530,12 @@ Model 2: dmfs ~ .
 1  17 -839.48                         
 2  16 -968.79 -1 258.62  < 2.2e-16 ***
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 > ## Zero-inflation vs. hurdle
 > if(require("nonnest2")) vuongtest(zinb, hnb)
 Loading required package: nonnest2
-This is nonnest2 0.4
- nonnest2 has not been tested with all combinations of model classes.
+This is nonnest2 0.5-5.
+nonnest2 has not been tested with all combinations of model classes.
 
 Model 1 
  Class: zeroinfl 
@@ -712,6 +712,8 @@ HNB  0.3490063 0.999787 1.0000000
 + }
 Loading required package: brglm
 Loading required package: profileModel
+'brglm' will gradually be superseded by the 'brglm2' R package (https://cran.r-project.org/package=brglm2), which provides utilities for mean and median bias reduction for all GLMs.
+ Methods for the detection of separation and infinite estimates in binomial-response models are provided by the 'detectseparation' R package (https://cran.r-project.org/package=detectseparation).
 
 z test of coefficients:
 
@@ -725,7 +727,7 @@ breakfast< 7           1.19       0.46     2.6     0.01 *
 fooddrink> 7           0.93       0.45     2.1     0.04 *
 corah>= 13             3.33       1.48     2.3     0.02 *
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 > 
 > 
@@ -734,8 +736,8 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 > graphics::par(get("par.postscript", pos = 'CheckExEnv'))
 > cleanEx()
 
-detaching 'package:brglm', 'package:profileModel', 'package:nonnest2',
-  'package:lmtest', 'package:zoo'
+detaching ‘package:brglm’, ‘package:profileModel’, ‘package:nonnest2’,
+  ‘package:lmtest’, ‘package:zoo’
 
 > nameEx("SerumPotassium")
 > ### * SerumPotassium
@@ -805,7 +807,7 @@ size            0.178503   0.060022   2.974  0.00294 **
 regulationyes  -0.029439   0.160568  -0.183  0.85453   
 I(size^2)      -0.007569   0.003122  -2.425  0.01532 * 
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 (Dispersion parameter for poisson family taken to be 1)
 
@@ -850,13 +852,13 @@ sample estimates:
 > ## Parts of Cameron and Trivedi (2013), Table 5.4
 > summary(residuals(tb_p, type = "response"))
     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
--3.22500 -0.71960 -0.07505  0.00000  0.37180  5.57200 
+-3.22537 -0.71963 -0.07505  0.00000  0.37182  5.57238 
 > summary(residuals(tb_p, type = "pearson"))
      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
--1.606000 -0.521400 -0.068440  0.001562  0.297000  3.027000 
+-1.606458 -0.521439 -0.068443  0.001563  0.297046  3.026831 
 > summary(residuals(tb_p, type = "deviance"))
     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
--2.27200 -0.55500 -0.06922 -0.08986  0.28720  2.39800 
+-2.27187 -0.55501 -0.06922 -0.08986  0.28720  2.39771 
 > 
 > ## hurdle Poisson model mitigates underdispersion
 > tb_hp <- hurdle(bids ~ . + I(size^2), data = TakeoverBids, dist = "poisson")
@@ -906,6 +908,43 @@ tb_hp 20 358.9549
 > 
 > 
 > 
+> cleanEx()
+> nameEx("binom")
+> ### * binom
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: Binomial-extensions
+> ### Title: Extension of the Binomial Distribution
+> ### Aliases: sbinom hbinom mean_binom var_binom
+> ### Keywords: distribution
+> 
+> ### ** Examples
+> 
+> ## Simulate some data
+> set.seed(123)
+> y <- rbinom(50, size = 1, prob = 0.3)
+> 
+> ## Plot log-likelihood function
+> par(mfrow = c(1,3))
+> ll <- function(x) {sum(dbinom(y, size = 1, prob = x, log = TRUE))}
+> curve(sapply(x, ll), xlab = expression(pi), ylab = "", main = "Log-likelihood")
+> abline(v = 0.3, lty = 3)
+> 
+> ## Plot score function
+> curve(sapply(x, function(x) sum(sbinom(y, size = 1, x))),
++       xlab = expression(pi), ylab = "", main = "Score")
+> abline(h = 0, lty = 3)
+> abline(v = 0.3, lty = 3)
+> 
+> ## Plot hessian
+> curve(sapply(x, function(x) sum(hbinom(y, size = 1, x))),
++       xlab = expression(pi), ylab = "", main = "Hessian")
+> abline(v = 0.3, lty = 3)
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
 > cleanEx()
 > nameEx("disptest")
 > ### * disptest
@@ -1045,8 +1084,8 @@ Log-likelihood: -362.1 on 6 Df
 > 
 > ## logit and geometric model are equivalent
 > coef(fm_hp1, model = "zero") - coef(fm_hp2, model = "zero")
- (Intercept)        width        color 
-3.594458e-11 1.073255e-09 6.707657e-11 
+(Intercept)       width       color 
+          0           0           0 
 > 
 > ## logit-negbin
 > fm_hnb1 <- hurdle(satellites ~ ., data = cs, dist = "negbin")
@@ -1142,10 +1181,8 @@ Hurdle Count Model
 count model: negbin with log link
 zero hurdle model: negbin with log link
 dependent variable:
-   0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15 
-  62   16    9   19   19   15   13    4    6    3    3    1    1    0    1    1 
-<NA> 
-   0 
+ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 
+62 16  9 19 19 15 13  4  6  3  3  1  1  0  1  1 
 calling optim() for joint count and zero hurlde estimation:
 initial  value 408.872181 
 iter  10 value 350.643112
@@ -1175,6 +1212,7 @@ done
 > fm <- hurdle(satellites ~ ., data = cs, dist = "negbin", zero = "negbin")
 > if(require("car")) hurdletest(fm)
 Loading required package: car
+Loading required package: carData
 Wald test for hurdle models
 
 Restrictions:
@@ -1189,14 +1227,52 @@ Model 2: satellites ~ .
 1    168                         
 2    165  3 50.362  6.689e-11 ***
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 > 
 > 
 > 
 > cleanEx()
 
-detaching 'package:car'
+detaching ‘package:car’, ‘package:carData’
 
+> nameEx("nbinom")
+> ### * nbinom
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: NegBinomial-extensions
+> ### Title: Extension of the Negative Binomial Distribution
+> ### Aliases: snbinom hnbinom mean_nbinom var_nbinom
+> ### Keywords: distribution
+> 
+> ### ** Examples
+> 
+> ## Simulate some data
+> set.seed(123)
+> y <- rnbinom(1000, size = 2, mu = 2)
+> 
+> ## Plot log-likelihood function
+> par(mfrow = c(1, 3))
+> ll <- function(x) {sum(dnbinom(y, size = x, mu = 2, log = TRUE))}
+> curve(sapply(x, ll), 1, 4, xlab = expression(theta), ylab = "",
++       main = "Log-likelihood")
+> abline(v = 2, lty = 3)
+> 
+> ## Plot score function
+> curve(sapply(x, function(x) sum(snbinom(y, size = x, mu = 2, parameter = "size"))),
++       1, 4, xlab = expression(theta), ylab = "", main = "Score")
+> abline(h = 0, lty = 3)
+> abline(v = 2, lty = 3)
+> 
+> ## Plot hessian
+> curve(sapply(x, function(x) sum(hnbinom(y, size = x, mu = 2, parameter = "size"))),
++       1, 4, xlab = expression(theta), ylab = "", main = "Hessian")
+> abline(v = 2, lty = 3)
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
 > nameEx("pit")
 > ### * pit
 > 
@@ -1247,6 +1323,44 @@ detaching 'package:car'
 > pithist(cs_hnb, ylim = c(0, 4.2))
 > par(mfrow = c(1, 1))
 > 
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+> nameEx("pois")
+> ### * pois
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: Poisson-extensions
+> ### Title: Extension of the Poisson Distribution
+> ### Aliases: spois hpois mean_pois var_pois
+> ### Keywords: distribution
+> 
+> ### ** Examples
+> 
+> ## Simulate some data
+> set.seed(123)
+> y <- rpois(50, lambda = 3)
+> 
+> ## Plot log-likelihood function
+> par(mfrow = c(1,3))
+> ll <- function(x) {sum(dpois(y, x, log = TRUE))}
+> curve(sapply(x, ll), 1, 5, xlab = expression(lambda), ylab = "",
++       main = "Log-likelihood")
+> abline(v = 3, lty = 3)
+> 
+> ## Plot score function
+> curve(sapply(x, function(x) sum(spois(y, x))), 1, 5,
++       xlab = expression(lambda), ylab = "", main = "Score")
+> abline(h = 0, lty = 3)
+> abline(v = 3, lty = 3)
+> 
+> ## Plot hessian
+> curve( sapply(x, function(x) sum(hpois(y, x))), 1, 5,
++       xlab = expression(lambda), ylab = "", main = "Hessian")
+> abline(v = 3, lty = 3)
 > 
 > 
 > 
@@ -1415,7 +1529,7 @@ color.L      0.10778    0.14402   0.748  0.45425
 color.Q      0.39488    0.12110   3.261  0.00111 **
 color.C      0.16937    0.09365   1.808  0.07054 . 
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Number of iterations in BFGS optimization: 8 
 Log-likelihood: -261.9 on 5 Df
@@ -1458,7 +1572,7 @@ Log-likelihood: -261.9 on 5 Df
 > par(mfrow = c(2, 2))
 > qqrplot(cs_p, main = "One Random Sample")
 > qqrplot(cs_p, main = "Median", type = "quantile")
-> qqrplot(cs_p, main = "5 Random Samples and Range", nsim = 10, range = c(0.005, 0.995))
+> qqrplot(cs_p, main = "10 Random Samples and Range", nsim = 10, range = c(0.005, 0.995))
 > qqrplot(cs_p, main = "100 Random Samples", nsim = 100, pch = 19, col = gray(0, alpha = 0.01))
 > par(mfrow = c(1, 1))
 > 
@@ -1610,7 +1724,7 @@ Loading required package: ggplot2
 > graphics::par(get("par.postscript", pos = 'CheckExEnv'))
 > cleanEx()
 
-detaching 'package:ggplot2'
+detaching ‘package:ggplot2’
 
 > nameEx("zeroinfl")
 > ### * zeroinfl
@@ -1734,7 +1848,7 @@ width       0.037890   0.032751   1.157    0.247
 color       0.006985   0.091081   0.077    0.939    
 Log(theta)  1.527243   0.352937   4.327 1.51e-05 ***
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Theta = 4.6055
 Number of iterations in BFGS optimization: 10 
@@ -1866,9 +1980,10 @@ Log-likelihood: -267.5 on 3 Df
 > 
 > ### * <FOOTER>
 > ###
+> cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  8.036 0.06 8.096 0 0 
+Time elapsed:  7.602 0.104 7.727 0 0 
 > grDevices::dev.off()
 null device 
           1 
