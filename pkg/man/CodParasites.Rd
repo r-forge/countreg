@@ -51,7 +51,7 @@ in Chapters 10.2.2, 11.3.2, 11.4.2, 11.5.2.
 
 \source{
 The data are taken from the online supplements of Zuur et al. (2009).
-\url{http://www.highstat.com/book2.htm}
+\url{http://highstat.com/index.php/mixed-effects-models-and-extensions-in-ecology-with-r}
 }
 
 \references{
