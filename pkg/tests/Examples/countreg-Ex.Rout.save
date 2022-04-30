@@ -438,7 +438,7 @@ theta        0.9290420  0.9290599  0.9290599
 > ##D ## compare coefficients
 > ##D cbind(c(coef(c0), "theta" = c0$theta),
 > ##D   c(coef(c1, off2int = TRUE, which = ""), nuisance(c1)))
-> ##D ## -> not much difference
+> ##D ## -> similar
 > ## End(Not run)
 > 
 > 
@@ -1980,7 +1980,7 @@ Log-likelihood: -267.5 on 3 Df
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  8.081 0.152 8.257 0 0 
+Time elapsed:  5.892 0.116 6.038 0 0 
 > grDevices::dev.off()
 null device 
           1 
