@@ -3,6 +3,10 @@ Changes in Version 0.2-1
   o Bug fix in dhpois() and dhnbinom() when 'x' is a vector and 'pi' is a
     scalar (reported by Andrea Gilardi).
 
+  o Try to auto-detect columns in regressor matrices that are aliased, i.e.,
+    whose coefficients cannot be estimated. This is based on pivot and rank
+    from qr() and can detect, e.g., constant or linearly dependent columns.
+
   o Catch errors when inverting the Hessian from optim, returning an NA
     matrix of correct dimension instead.
 

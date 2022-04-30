@@ -260,6 +260,22 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
   Y0 <- Y <= 0
   Y1 <- Y > 0
 
+  ## check for aliased columns
+  aliasx <- qralias(X[Y1, , drop = FALSE])
+  if(any(aliasx)) {
+    warning(paste("some count model coefficients are aliased, regressors dropped:",
+      paste(colnames(X)[aliasx], collapse = ", ")))
+    X <- X[, !aliasx, drop = FALSE]
+    kx <- NCOL(X)
+  }
+  aliasz <- qralias(Z)
+  if(any(aliasz)) {
+    warning(paste("some zero hurdle model coefficients are aliased, regressors dropped:",
+      paste(colnames(Z)[aliasz], collapse = ", ")))
+    Z <- Z[, !aliasx, drop = FALSE]
+    kz <- NCOL(Z)
+  }
+
   ## size of binomial experiments
   if(dist == "binomial") {
     if(is.null(size)) size <- max(Y)
@@ -490,7 +506,8 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
     formula = ff,
     levels = .getXlevels(mt, mf),
     contrasts = list(count = attr(X, "contrasts"), zero = attr(Z, "contrasts")),
-    size = if(dist == "binomial") size else NULL
+    size = if(dist == "binomial") size else NULL,
+    alias = list(count = aliasx, zero = aliasz)
   )
   if(model) rval$model <- mf
   if(y) rval$y <- Y
@@ -664,7 +681,9 @@ predict.hurdle <- function(object, newdata, type = c("response", "prob", "count"
 	  Z <- object$x$zero
 	} else if(!is.null(object$model)) {
           X <- model.matrix(object$terms$count, object$model, contrasts = object$contrasts$count)
-          Z <- model.matrix(object$terms$zero,  object$model, contrasts = object$contrasts$zero)	
+          Z <- model.matrix(object$terms$zero,  object$model, contrasts = object$contrasts$zero)
+          if(any(object$alias$count)) X <- X[, !object$alias$count, drop = FALSE]
+          if(any(object$alias$zero))  Z <- Z[, !object$alias$zero,  drop = FALSE]
 	} else {
 	  stop("predicted probabilities cannot be computed with missing newdata")
 	}
@@ -677,6 +696,8 @@ predict.hurdle <- function(object, newdata, type = c("response", "prob", "count"
       mf <- model.frame(delete.response(object$terms$full), newdata, na.action = na.action, xlev = object$levels)
       X <- model.matrix(delete.response(object$terms$count), mf, contrasts = object$contrasts$count)
       Z <- model.matrix(delete.response(object$terms$zero),  mf, contrasts = object$contrasts$zero)
+      if(any(object$alias$count)) X <- X[, !object$alias$count, drop = FALSE]
+      if(any(object$alias$zero))  Z <- Z[, !object$alias$zero,  drop = FALSE]
       offsetx <- model_offset_2(mf, terms = object$terms$count, offset = FALSE)
       offsetz <- model_offset_2(mf, terms = object$terms$zero,  offset = FALSE)
       if(is.null(offsetx)) offsetx <- rep.int(0, NROW(X))
@@ -832,4 +853,13 @@ model_offset_2 <- function(x, terms = NULL, offset = TRUE)
   }
   if(!is.null(ans) && !is.numeric(ans)) stop("'offset' must be numeric")
   ans
+}
+
+## detect which columns of a regressor matrix are not of full rank
+## based on the corresponding QR decomposition
+qralias <- function(x) {
+  a <- logical(ncol(x))
+  names(a) <- colnames(x)
+  a[with(qr(x), pivot[seq_along(pivot) > rank])] <- TRUE
+  return(a)
 }
