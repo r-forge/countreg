@@ -44,6 +44,43 @@ hnbinom <- function(x, mu, size, parameter = c("mu", "size"), drop = TRUE) {
 
 
 
+## nbinom1: Negative binomial type 1
+snbinom1 <- function(x, mu, size, parameter = c("mu", "size"), drop = TRUE) {
+  parameter <- sapply(parameter, function(x) match.arg(x, c("mu", "size")))
+  sizemu <- size*mu
+  digammaDiff <- digamma(sizemu + x) - digamma(sizemu)
+  s <- cbind(
+    if("mu" %in% parameter)size * (digammaDiff - log1p(size) +  log(size))else NULL,
+    if("size" %in% parameter) (mu - x)/(1 + size) - mu * (log1p(size) - log(size) -
+                                                            digammaDiff) else NULL
+  )
+  colnames(s) <- c("mu", "size")[c("mu", "size") %in% parameter]
+  s[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps)), ] <- 0
+  if(drop & NCOL(s) < 2L) drop(s) else s
+}
+
+hnbinom1 <- function(x, mu, size, parameter = c("mu", "size", "mu.size"), drop = TRUE) {
+  parameter <- sapply(parameter, function(x) match.arg(x, c("mu", "size",
+                                                            "mu.size", "size.mu")))
+  sizemu <- size*mu
+  digammaDiff <- digamma(sizemu + x) - digamma(sizemu)
+  trigammaDiff <- trigamma(sizemu + x) - trigamma(sizemu)
+  h <- cbind(
+    if("mu" %in% parameter) (size^2) * trigammaDiff else NULL,
+    if("size" %in% parameter) mu/(size*(1 + size)) - (mu - x)/((1 + size)^2) +
+      (mu^2) * trigammaDiff else NULL,
+    if(any(c("mu.size", "size.mu") %in% parameter)) sizemu * trigammaDiff +
+      digammaDiff + 1/(1 + size) - log1p(size) + log(size) else NULL
+  )
+  colnames(h) <- c(if("mu" %in% parameter) "mu",
+                   if("size" %in% parameter) "size",
+                   if(any(c("mu.size", "size.mu") %in% parameter)) "mu.size")
+  h[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps)), ] <- 0
+  if(drop & NCOL(h) < 2L) drop(h) else h
+}
+
+
+
 ## pois: Poisson
 spois <- function(x, lambda, parameter = "lambda", drop = TRUE) {
   s <- x/lambda - 1

@@ -1,4 +1,5 @@
 import("stats")
+import("Formula")
 importFrom("graphics", "abline", "axis", "box", "hist", "lines", "par", "plot", "points", "polygon", "rect")
 importFrom("grDevices", "n2mfrow")
 importFrom("utils", "head", "tail")
@@ -10,7 +11,12 @@ export(
   "hurdle.control",
   "hurdletest",
   "getSummary.hurdle",
-
+  
+  ## negative binomial count regression
+  "nbreg",
+  "nbreg.control",
+  "getSummary.nbreg",
+  
   ## zero-inflated count regression
   "zeroinfl",
   "zeroinfl.control",
@@ -150,6 +156,21 @@ S3method("fitted", "hurdle")
 S3method("terms", "hurdle")
 S3method("model.matrix", "hurdle")
 S3method("extractAIC", "hurdle")
+
+## methods for nbreg
+S3method("print", "nbreg")
+S3method("print", "summary.nbreg")
+S3method("summary", "nbreg")
+S3method("coef", "nbreg")
+S3method("vcov", "nbreg")
+S3method("logLik", "nbreg")
+S3method("nobs", "nbreg")
+S3method("predict", "nbreg")
+S3method("residuals", "nbreg")
+S3method("fitted", "nbreg")
+S3method("terms", "nbreg")
+S3method("model.matrix", "nbreg")
+S3method("extractAIC", "nbreg")
 
 ## methods for class zerotrunc
 S3method("print", "zerotrunc")

@@ -26,3 +26,7 @@ var_nbinom <- function(mu, size, drop = TRUE) {
     if(drop) mu + mu^2 / size else cbind("var" = mu + mu^2 / size)
 }
 
+## nbinom1: Negative binomial type 1
+var_nbinom1 <- function(mu, size, drop = TRUE){
+  if(drop) mu + mu / size else cbind("var" = mu + mu / size)
+}
