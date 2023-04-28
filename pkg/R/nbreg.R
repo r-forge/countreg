@@ -501,7 +501,7 @@ residuals.nbreg <- function(object, type = c("pearson","deviance", "response"), 
            y <- yhat + object$residuals / sqrt(wts) # recover y from residuals and fitted values
            mu <- predict(object, type = "response")
            theta <- predict(object, type = "theta")
-           return(pmax(object$dev.resids(y = y, mu = mu, theta = theta, wt = wts), 0))
+           return(sign(y - yhat) * sqrt(pmax(object$dev.resids(y = y, mu = mu, theta = theta, wt = wts), 0)))
            # why pmax(devresids, 0)? Can get dev >= 0 by mu = muhat if dev < 0.
          })
 }
