@@ -214,4 +214,8 @@ S3method("c", "rootogram")
 S3method("rbind", "rootogram")
 S3method("+", "rootogram")
 
+## ggplot2 support
 S3method(ggplot2::autoplot, "rootogram")
+
+## distributions3 support
+S3method(distributions3::prodist, "nbreg")

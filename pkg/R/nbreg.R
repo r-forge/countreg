@@ -397,7 +397,7 @@ model.matrix.nbreg <- function(object, model = c("mu", "theta"), ...) {
 }
 
 # inspired by predict.zeroinfl
-predict.nbreg <- function(object, newdata, type = c("response", "prob", "theta"),
+predict.nbreg <- function(object, newdata, type = c("response", "prob", "theta", "parameters"),
                           na.action = na.pass, ...)
 {
   type <- match.arg(type)
@@ -456,6 +456,7 @@ predict.nbreg <- function(object, newdata, type = c("response", "prob", "theta")
   
   if(type == "response") rval <- mu
   if(type == "theta") rval <- theta
+  if(type == "parameters") rval <- data.frame(mu = mu, theta = theta)
   
   ## predicted probabilities
   if(type == "prob") {
@@ -504,6 +505,13 @@ residuals.nbreg <- function(object, type = c("pearson","deviance", "response"), 
            return(sign(y - yhat) * sqrt(pmax(object$dev.resids(y = y, mu = mu, theta = theta, wt = wts), 0)))
            # why pmax(devresids, 0)? Can get dev >= 0 by mu = muhat if dev < 0.
          })
+}
+
+prodist.nbreg <- function(object, ...) {
+  stopifnot(requireNamespace("distributions3"))
+  p <- predict(object, type = "parameters", ...)
+  if(object$dist == "NB1") p$theta <- p$theta * p$mu
+  distributions3::NegativeBinomial(mu = p$mu, size = p$theta)
 }
 
 predprob.nbreg <- function(obj, ...){

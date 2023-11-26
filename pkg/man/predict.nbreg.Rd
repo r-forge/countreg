@@ -23,7 +23,7 @@
 
 \usage{
 \method{predict}{nbreg}(object, newdata,
-  type = c("response", "prob", "theta"), na.action = na.pass, \dots)
+  type = c("response", "prob", "theta", "parameters"), na.action = na.pass, \dots)
 \method{residuals}{nbreg}(object, type = c("pearson", "deviance", "response"), \dots)
 
 \method{coef}{nbreg}(object, model = c("full", "mu", "theta"), \dots)
