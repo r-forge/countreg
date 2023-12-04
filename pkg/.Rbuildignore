@@ -1,2 +1,15 @@
-data/GSOEP.rda
-man/GSOEP.Rd
+^data/GSOEP\.rda$
+^man/GSOEP\.Rd$
+
+^R/pithist\.R$
+^R/qresiduals\.R$
+^man/pithist\.Rd$
+^man/pit\.Rd$
+^man/qresiduals\.Rd$
+
+^R/rootogram\.R$
+^R/rootogram\.gamlss\.R$
+^man/rootogram\.Rd$
+
+^R/qqrplot\.R$
+^man/qqrplot\.Rd$

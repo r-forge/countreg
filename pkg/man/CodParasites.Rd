@@ -96,11 +96,13 @@ AIC(cp_p, cp_nb, cp_hp, cp_hnb)
 BIC(cp_p, cp_nb, cp_hp, cp_hnb)
 
 ## rootograms
+if(require("topmodels")) {
 par(mfrow = c(2, 2))
 rootogram(cp_p, max = 50, main = "Poisson")
 rootogram(cp_nb, max = 50, main = "Negative Binomial")
 rootogram(cp_hp, max = 50, main = "Hurdle Poisson")
 rootogram(cp_hnb, max = 50, main = "Hurdle Negative Binomial")
+}
 }
 
 \keyword{datasets}

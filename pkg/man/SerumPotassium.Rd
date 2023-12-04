@@ -34,18 +34,24 @@ Martin HF, Gudzinowicz BJ, Fanger H (1975).
 }
 
 \examples{
+\dontshow{ if(!requireNamespace("topmodels")) {
+  if(interactive() || is.na(Sys.getenv("_R_CHECK_PACKAGE_NAME_", NA))) {
+    stop("the topmodels package is required for this example but is not installed")
+  } else q() }
+}
+library("topmodels")
 data("SerumPotassium", package = "countreg")
 
 ## Figure 9.3a-c from Rice (2007), and actual hanging rootogram
 ## (note that Rice erroneously refers to suspended rootograms as hanging)
 br <- 32:54/10 - 0.05
-rootogram(SerumPotassium, "normal", scale = "raw", style = "standing",
+rootogram(lm(SerumPotassium ~ 1), scale = "raw", style = "standing",
   breaks = br, col = "transparent")
-rootogram(SerumPotassium, "normal", scale = "raw", style = "suspended",
+rootogram(lm(SerumPotassium ~ 1), scale = "raw", style = "suspended",
   breaks = br, col = "transparent", ylim = c(2.8, -4))
-rootogram(SerumPotassium, "normal", scale = "sqrt", style = "suspended",
+rootogram(lm(SerumPotassium ~ 1), scale = "sqrt", style = "suspended",
   breaks = br, col = "transparent", ylim = c(1, -1.5))
-rootogram(SerumPotassium, "normal", breaks = br)
+rootogram(lm(SerumPotassium ~ 1), breaks = br)
 }
 
 \keyword{datasets}

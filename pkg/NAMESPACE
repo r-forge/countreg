@@ -4,6 +4,7 @@ importFrom("graphics", "abline", "axis", "box", "hist", "lines", "par", "plot", 
 importFrom("grDevices", "n2mfrow")
 importFrom("utils", "head", "tail")
 importFrom("MASS", "fitdistr", "glm.nb", "negative.binomial")
+importFrom("distributions3", "dztpois", "rztpois", "dztnbinom", "dzipois", "dzinbinom", "dhpois", "dhnbinom", "prodist")
 
 export(
   ## hurdle count regression  
@@ -28,17 +29,17 @@ export(
   "estfun.zerotrunc",
   "getSummary.zerotrunc",
   
-  ## visualization: rootogram
-  "rootogram",
-  "rootogram.default",
-  "autoplot.rootogram", ## for the moment
+  ## ## visualization: rootogram
+  ## "rootogram",
+  ## "rootogram.default",
+  ## "autoplot.rootogram", ## for the moment
 
-  ## visualization: PIT histogram
-  "pit",
-  "pithist",
-  "qresiduals",
-  "qresiduals.default",
-  "qqrplot",
+  ## ## visualization: PIT histogram
+  ## "pit",
+  ## "pithist",
+  ## "qresiduals",
+  ## "qresiduals.default",
+  ## "qqrplot",
 
   ## binomial
   "sbinom",
@@ -60,54 +61,30 @@ export(
 
   ## zero-truncated Poisson
   "ztpoisson",
-  "dztpois",
-  "pztpois",
-  "qztpois",
-  "rztpois",
   "sztpois",
   "hztpois",
   "mean_ztpois",
   "var_ztpois",
   
   ## zero-truncated negative binomial
-  "dztnbinom",
-  "pztnbinom",
-  "qztnbinom",
-  "rztnbinom",
   "sztnbinom",
   "hztnbinom",
   "mean_ztnbinom",
   "var_ztnbinom",
   
   ## zero-inflated Poisson
-  "dzipois",
-  "pzipois",
-  "qzipois",
-  "rzipois",
   "szipois",
   
   ## zero-inflated negative binomial
-  "dzinbinom",
-  "pzinbinom",
-  "qzinbinom",
-  "rzinbinom",
   "szinbinom",
   
   ## hurdle Poisson
-  "dhpois",
-  "phpois",
-  "qhpois",
-  "rhpois",
   "shpois",
   "hhpois",
   "mean_hpois",
   "var_hpois",
   
   ## hurdle negative binomial
-  "dhnbinom",
-  "phnbinom",
-  "qhnbinom",
-  "rhnbinom",
   "shnbinom",
   "hhnbinom",
   "mean_hnbinom",
@@ -188,34 +165,35 @@ S3method("model.frame", "zerotrunc")
 S3method("model.matrix", "zerotrunc")
 S3method("extractAIC", "zerotrunc")
 
-## methods for qresiduals
-S3method("qresiduals", "default")
-
-## methods for pit
-S3method("pit", "zeroinfl")
-S3method("pit", "zerotrunc")
-S3method("pit", "hurdle")
-S3method("pit", "lm")
-S3method("pit", "glm")
-
-## methods for rootograms
-S3method("rootogram", "default")
-S3method("rootogram", "numeric")
-S3method("rootogram", "zeroinfl")
-S3method("rootogram", "zerotrunc")
-S3method("rootogram", "hurdle")
-S3method("rootogram", "glm")
-S3method("rootogram", "gamlss")
-S3method("rootogram", "gam")
-
-## methods for class rootogram
-S3method("plot", "rootogram")
-S3method("c", "rootogram")
-S3method("rbind", "rootogram")
-S3method("+", "rootogram")
-
-## ggplot2 support
-S3method(ggplot2::autoplot, "rootogram")
+## ## methods for qresiduals
+## S3method("qresiduals", "default")
+## 
+## ## methods for pit
+## S3method("pit", "zeroinfl")
+## S3method("pit", "zerotrunc")
+## S3method("pit", "hurdle")
+## S3method("pit", "lm")
+## S3method("pit", "glm")
+## S3method("pit", "negbin")
+## 
+## ## methods for rootograms
+## S3method("rootogram", "default")
+## S3method("rootogram", "numeric")
+## S3method("rootogram", "zeroinfl")
+## S3method("rootogram", "zerotrunc")
+## S3method("rootogram", "hurdle")
+## S3method("rootogram", "glm")
+## S3method("rootogram", "gamlss")
+## S3method("rootogram", "gam")
+## 
+## ## methods for class rootogram
+## S3method("plot", "rootogram")
+## S3method("c", "rootogram")
+## S3method("rbind", "rootogram")
+## S3method("+", "rootogram")
+## 
+## ## ggplot2 support
+## S3method(ggplot2::autoplot, "rootogram")
 
 ## distributions3 support
-S3method(distributions3::prodist, "nbreg")
+S3method("prodist", "nbreg")

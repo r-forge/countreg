@@ -32,25 +32,31 @@ Tukey JW (1972). \dQuote{Some Graphic and Semigraphic Displays.}
 }
 
 \examples{
+\dontshow{ if(!requireNamespace("topmodels")) {
+  if(interactive() || is.na(Sys.getenv("_R_CHECK_PACKAGE_NAME_", NA))) {
+    stop("the topmodels package is required for this example but is not installed")
+  } else q() }
+}
 ## Rootograms from Tukey (1972)
 ## (some 'breaks' don't match exactly)
+library("topmodels")
 data("VolcanoHeights", package = "countreg")
 
 ## Figure 16
-rootogram(VolcanoHeights, "normal", style = "standing",
-  breaks = 0:20 - 0.01, col = "transparent")
+rootogram(lm(VolcanoHeights ~ 1), style = "standing",
+  breaks = 0:20 - 0.01, expected = FALSE, confint = FALSE)
 
 ## Figure 17
-rootogram(sqrt(1000 * VolcanoHeights), "normal", style = "standing",
-  breaks = 0:17 * 10 - 1.1, col = "transparent")
+rootogram(lm(sqrt(1000 * VolcanoHeights) ~ 1), style = "standing",
+  breaks = 0:17 * 10 - 1.1, expected = FALSE, confint = FALSE)
 
 ## Figure 18
-rootogram(sqrt(1000 * VolcanoHeights), "normal", style = "hanging",
-  breaks = -2:18 * 10 - 1.1)
+rootogram(lm(sqrt(1000 * VolcanoHeights) ~ 1), style = "hanging",
+  breaks = -2:18 * 10 - 1.1, confint = FALSE)
 
 ## Figure 19
-rootogram(sqrt(1000 * VolcanoHeights), "normal", style = "suspended",
-  breaks = -2:18 * 10 - 1.1, ylim = c(6, -2))
+rootogram(lm(sqrt(1000 * VolcanoHeights) ~ 1), style = "suspended",
+  breaks = -2:18 * 10 - 1.1, ylim = c(6, -2), confint = FALSE)
 abline(h = c(-1.5, -1, 1, 1.5), lty = c(2, 3, 3, 2))
 }
 

@@ -3,9 +3,7 @@
 \alias{hpois}
 \alias{mean_pois}
 \alias{var_pois}
-\title{
-Extension of the Poisson Distribution
-}
+\title{Extension of the Poisson Distribution}
 \description{
 Score function, hessian, mean, and variance
 for the Poisson distribution

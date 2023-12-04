@@ -126,8 +126,9 @@ summary(hnb)
 exp(confint(zinb))
 
 ## Rootograms (top left: Figure 1)
+if(require("topmodels")) {
 par(mfrow = c(2, 2))
-rootogram(OralHealthNL$dmfs, "normal",
+rootogram(lm(OralHealthNL$dmfs ~ 1),
   style = "standing", scale = "raw",
   breaks = 0:23 - 0.5, xlim = c(-0.5, 22.5),
   xlab = "dmfs", main = "Normal distribution")
@@ -135,7 +136,7 @@ rootogram(hnb,
   style = "standing", scale = "raw",
   width = 1, xlim = c(-0.5, 22.5),
   xlab = "dmfs", main = "Negative binomial hurdle model")
-rootogram(OralHealthNL$dmfs, "normal",
+rootogram(lm(OralHealthNL$dmfs ~ 1),
   breaks = 0:23 - 0.5, xlim = c(-0.5, 22.5),
   xlab = "dmfs", main = "Normal distribution")
 abline(h = c(-1, 1), lty = 2)
@@ -144,6 +145,7 @@ rootogram(hnb,
   xlab = "dmfs", main = "Negative binomial hurdle model")
 abline(h = c(-1, 1), lty = 2)
 par(mfrow = c(1, 1))
+}
 
 ## Number of zeros
 c(dmfs = sum(OralHealthNL$dmfs == 0),

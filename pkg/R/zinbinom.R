@@ -1,41 +1,42 @@
 ## zinbinom: Zero-inflated negative binomial
-dzinbinom <- function(x, mu, theta, size, pi, log = FALSE) {
-  if(any(pi < 0) | any(pi > 1))  warning("'pi' must be in [0, 1]")
-  if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
-  if(!missing(size)) theta <- size
-  rval <- log(1 - pi) + dnbinom(x, mu = mu, size = theta, log = TRUE)
-  if(any(x0 <- (x == 0L))) rval[x0] <- log(exp(rval) + pi)[x0]
-  if(log) rval else exp(rval)
-}
 
-pzinbinom <- function(q, mu, theta, size, pi, lower.tail = TRUE, log.p = FALSE) {
-  if(any(pi < 0) | any(pi > 1))  warning("'pi' must be in [0, 1]")
-  if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
-  if(!missing(size)) theta <- size
-  rval <- log(1 - pi) + pnbinom(q, mu = mu, size = theta, lower.tail = lower.tail, log.p = TRUE)
-  if(any(q0 <- (is.finite(rval) & (lower.tail | q < 0)))) rval[q0] <- log(exp(rval) + pi)[q0]
-  if(log.p) rval else exp(rval)
-}
-
-qzinbinom <- function(p, mu, theta, size, pi, lower.tail = TRUE, log.p = FALSE) {
-  if(any(pi < 0) | any(pi > 1))  warning("'pi' must be in [0, 1]")
-  if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
-  if(!missing(size)) theta <- size
-  if(log.p) p <- exp(p)
-  if(!lower.tail) p <- 1 - p
-  p <- pmax(0, (p - pi)/(1 - pi))
-  rval <- qnbinom(p, mu = mu, size = theta, lower.tail = TRUE, log.p = FALSE)
-  rval
-}
-
-rzinbinom <- function(n, mu, theta, size, pi) {
-  if(any(pi < 0) | any(pi > 1))  warning("'pi' must be in [0, 1]")
-  if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
-  if(!missing(size)) theta <- size
-  rval <- rnbinom(n, mu = mu, size = theta)
-  rval[runif(n) < pi] <- 0
-  rval
-}
+## dzinbinom <- function(x, mu, theta, size, pi, log = FALSE) {
+##   if(any(pi < 0) | any(pi > 1))  warning("'pi' must be in [0, 1]")
+##   if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
+##   if(!missing(size)) theta <- size
+##   rval <- log(1 - pi) + dnbinom(x, mu = mu, size = theta, log = TRUE)
+##   if(any(x0 <- (x == 0L))) rval[x0] <- log(exp(rval) + pi)[x0]
+##   if(log) rval else exp(rval)
+## }
+## 
+## pzinbinom <- function(q, mu, theta, size, pi, lower.tail = TRUE, log.p = FALSE) {
+##   if(any(pi < 0) | any(pi > 1))  warning("'pi' must be in [0, 1]")
+##   if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
+##   if(!missing(size)) theta <- size
+##   rval <- log(1 - pi) + pnbinom(q, mu = mu, size = theta, lower.tail = lower.tail, log.p = TRUE)
+##   if(any(q0 <- (is.finite(rval) & (lower.tail | q < 0)))) rval[q0] <- log(exp(rval) + pi)[q0]
+##   if(log.p) rval else exp(rval)
+## }
+## 
+## qzinbinom <- function(p, mu, theta, size, pi, lower.tail = TRUE, log.p = FALSE) {
+##   if(any(pi < 0) | any(pi > 1))  warning("'pi' must be in [0, 1]")
+##   if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
+##   if(!missing(size)) theta <- size
+##   if(log.p) p <- exp(p)
+##   if(!lower.tail) p <- 1 - p
+##   p <- pmax(0, (p - pi)/(1 - pi))
+##   rval <- qnbinom(p, mu = mu, size = theta, lower.tail = TRUE, log.p = FALSE)
+##   rval
+## }
+## 
+## rzinbinom <- function(n, mu, theta, size, pi) {
+##   if(any(pi < 0) | any(pi > 1))  warning("'pi' must be in [0, 1]")
+##   if(!missing(theta) & !missing(size)) stop("only 'theta' or 'size' may be specified")
+##   if(!missing(size)) theta <- size
+##   rval <- rnbinom(n, mu = mu, size = theta)
+##   rval[runif(n) < pi] <- 0
+##   rval
+## }
 
 szinbinom <- function(x, mu, theta, size, pi, parameter = c("mu", "theta", "pi"), drop = TRUE) {
   if(any(pi < 0) | any(pi > 1))  warning("'pi' must be in [0, 1]")

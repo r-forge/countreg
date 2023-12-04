@@ -70,11 +70,12 @@ summary(refit(fm0, gradient = NULL))
 
 ## refitting both components manually for rootograms
 rf1 <- lapply(1:2, function(i)
-  glm(y ~ x, data = d, family = negative.binomial(1), weights = posterior(fm1)[,i]))
+  nbreg(y ~ x, data = d, theta = 1, weights = posterior(fm1)[,i]))
 rf0 <- lapply(1:2, function(i)
-  glm.nb(y ~ x, data = d, weights = posterior(fm0)[,i]))
+  nbreg(y ~ x, data = d, weights = posterior(fm0)[,i]))
 
 ## Rootograms
+if(require("topmodels")) {
 par(mfrow = c(1, 2))
 
 r11 <- rootogram(rf1[[1]])
@@ -84,7 +85,9 @@ r01 <- rootogram(rf0[[1]])
 r02 <- rootogram(rf0[[2]])
 
 rootogram(glm.nb(y ~ x, data = d))
-plot(r01 + r02)
+plot(r01)
+plot(r02)
+}
 }
 
 \dontrun{
@@ -108,16 +111,14 @@ summary(refit(nmes_fnb, gradient = NULL))
 
 ## refit individual models manually for rootograms
 nmes_fnb_rf <- lapply(1:2, function(i)
-  glm.nb(visits ~ ., data = nmes, weights = posterior(nmes_fnb)[,i]))
+  nbreg(visits ~ ., data = nmes, weights = posterior(nmes_fnb)[,i]))
 
-r1 <- rootogram(nmes_fnb_rf[[1]], max = 50, plot = FALSE)
-r2 <- rootogram(nmes_fnb_rf[[2]], max = 50, plot = FALSE)
-
-par(mfrow = c(2, 2))
-rootogram(nmes_nb, max = 50, main = "Negative Binomial", ylim = c(-1, 25))
-plot(r1 + r2, xlab = "visits", main = "Mixture Negative Binomial", ylim = c(-1, 25))
-plot(r1, main = "Mixture Negative Binomial (Component 1)", ylim = c(-1, 25))
-plot(r2, main = "Mixture Negative Binomial (Component 2)", ylim = c(-1, 25))
+par(mfrow = c(1, 3))
+rootogram(nmes_nb, main = "Negative Binomial", xlim = c(0, 50), ylim = c(-1, 25))
+rootogram(nmes_fnb_rf[[1]], main = "Mixture Negative Binomial (Component 1)",
+  xlim = c(0, 50), ylim = c(-1, 25))
+rootogram(nmes_fnb_rf[[2]], main = "Mixture Negative Binomial (Component 2)",
+  xlim = c(0, 50), ylim = c(-1, 25))
 }
 }
 }

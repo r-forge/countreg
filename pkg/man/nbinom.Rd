@@ -3,9 +3,7 @@
 \alias{hnbinom}
 \alias{mean_nbinom}
 \alias{var_nbinom}
-\title{
-Extension of the Negative Binomial Distribution
-}
+\title{Extension of the Negative Binomial Distribution}
 \description{
 Score function, hessian, mean, and variance
 for the negative binomial distribution

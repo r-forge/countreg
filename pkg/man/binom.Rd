@@ -3,9 +3,7 @@
 \alias{hbinom}
 \alias{mean_binom}
 \alias{var_binom}
-\title{
-Extension of the Binomial Distribution
-}
+\title{Extension of the Binomial Distribution}
 \description{
 Score function, hessian, mean, and variance
 for the binomial distribution

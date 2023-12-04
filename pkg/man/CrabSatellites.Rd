@@ -90,11 +90,13 @@ AIC(cs_p, cs_nb, cs_hp, cs_hnb, cs_hnb2)
 BIC(cs_p, cs_nb, cs_hp, cs_hnb, cs_hnb2)
 
 ## rootograms
+if(require("topmodels")) {
 par(mfrow = c(2, 2))
-r_p   <- rootogram(cs_p,   max = 15, main = "Poisson")
-r_nb  <- rootogram(cs_nb,  max = 15, main = "Negative Binomial")
-r_hp  <- rootogram(cs_hp,  max = 15, main = "Hurdle Poisson")
-r_hnb <- rootogram(cs_hnb, max = 15, main = "Hurdle Negative Binomial")
+r_p   <- rootogram(cs_p,   xlim = c(0, 15), main = "Poisson")
+r_nb  <- rootogram(cs_nb,  xlim = c(0, 15), main = "Negative Binomial")
+r_hp  <- rootogram(cs_hp,  xlim = c(0, 15), main = "Hurdle Poisson")
+r_hnb <- rootogram(cs_hnb, xlim = c(0, 15), main = "Hurdle Negative Binomial")
+}
 
 ## fitted curves
 par(mfrow = c(1, 1))
@@ -111,10 +113,13 @@ legend("topleft", c("Hurdle NB", "Hurdle NB 2", "Poisson (id)", "Poisson (log)")
   col = c(4, 4, 2, 3), lty = c(1, 2, 1, 1), lwd = 1.5, bty = "n")
 
 ## alternative displays: Q-Q residuals plot, barplot, residuals vs. fitted
+if(require("topmodels")) {
 par(mfrow= c(3, 2))
-
 qqrplot(cs_p, range = c(0.05, 0.95), main = "Q-Q residuals plot: Poisson")
 qqrplot(cs_hnb, range = c(0.05, 0.95), main = "Q-Q residuals plot: Hurdle NB")
+} else {
+par(mfrow= c(2, 2))
+}
 
 barplot(t(matrix(c(r_p$observed, r_p$expected), ncol = 2,
   dimnames = list(r_p$x, c("Observed", "Expected")))),
