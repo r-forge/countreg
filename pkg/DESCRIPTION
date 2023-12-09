@@ -6,10 +6,10 @@ Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"),
              person(given = "Christian", family = "Kleiber", role = "aut", email = "Christian.Kleiber@unibas.ch", comment = c(ORCID = "0000-0002-6781-4733")),
              person(given = "Thorsten", family = "Simon", role = "ctb", comment = c(ORCID = "0000-0002-3778-7738")),
              person(given = "Kevin", family = "Huynh", role = "ctb", email = "Kevin.Huynh@unibas.ch"))
-Description: Regression models for count data, including zero-inflated, zero-truncated, and
-             hurdle models as well as generalized count data regression. Drivers for combination
-	     with flexmix and mboost are also provided. For (graphically) assessing the goodness
-	     of fit for (regression) models, rootograms and quantile residuals are available.
+Description: Regression models for count data, including negative binomial, zero-inflated, zero-truncated,
+             and hurdle models. Drivers for combination with flexmix and mboost are also provided.
+             Previously available functions for graphical goodness-of-fit assessment (rootograms etc.)
+             are now provided in the 'topmodels' package on R-Forge.
 LazyLoad: yes
 Depends: R (>= 3.6.0), MASS
 Imports: graphics, grDevices, stats, utils, distributions3 (>= 0.2.1), Formula
