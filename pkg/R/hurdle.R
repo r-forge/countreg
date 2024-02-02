@@ -645,7 +645,7 @@ print.summary.hurdle <- function(x, digits = max(3, getOption("digits") - 3), ..
     cat(paste("Zero hurdle model coefficients (", zero_dist, "):\n", sep = ""))
     printCoefmat(x$coefficients$zero, digits = digits, signif.legend = FALSE)
     
-    if(getOption("show.signif.stars") & isTRUE(any(rbind(x$coefficients$count, x$coefficients$zero)[,4] < 0.1)))
+    if(getOption("show.signif.stars") && isTRUE(any(rbind(x$coefficients$count, x$coefficients$zero)[,4] < 0.1, na.rm = TRUE)))
       cat("---\nSignif. codes: ", "0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1", "\n")
 
     if(!is.null(x$theta)) cat(paste("\nTheta:", paste(names(x$theta), round(x$theta, digits), sep = " = ", collapse = ", ")))
