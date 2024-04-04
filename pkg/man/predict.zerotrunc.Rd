@@ -12,7 +12,6 @@
 \alias{logLik.zerotrunc}
 \alias{nobs.zerotrunc}
 \alias{fitted.zerotrunc}
-\alias{predprob.zerotrunc}
 \alias{extractAIC.zerotrunc}
 \alias{getSummary.zerotrunc}
 

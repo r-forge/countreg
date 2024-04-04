@@ -145,8 +145,8 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
   }
 
   ## collect likelihood components
-  dist <- match.arg(dist)
-  zero.dist <- match.arg(zero.dist)
+  dist <- match.arg(dist[1L], c("poisson", "geometric", "negbin", "binomial"))
+  zero.dist <- match.arg(zero.dist[1L], c("binomial", "poisson", "negbin", "geometric"))
   countDist <- switch(dist,
                      "poisson" = countPoisson,
 		     "geometric" = countGeom,
@@ -184,7 +184,7 @@ hurdle <- function(formula, data, subset, na.action, weights, offset,
   }
 
   ## binary link processing
-  linkstr <- match.arg(link)
+  linkstr <- match.arg(link[1L], c("logit", "probit", "cloglog", "cauchit", "log"))
   linkobj <- make.link(linkstr)
   linkinv <- linkobj$linkinv
 
@@ -529,7 +529,7 @@ hurdle.control <- function(method = "BFGS", maxit = 10000, trace = FALSE,
 }
 
 coef.hurdle <- function(object, model = c("full", "count", "zero"), ...) {
-  model <- match.arg(model)
+  model <- match.arg(model[1L], c("full", "count", "zero"))
   rval <- object$coefficients
   rval <- switch(model,
                  "full" = structure(c(rval$count, rval$zero),
@@ -541,7 +541,7 @@ coef.hurdle <- function(object, model = c("full", "count", "zero"), ...) {
 }
 
 vcov.hurdle <- function(object, model = c("full", "count", "zero"), ...) {
-  model <- match.arg(model)
+  model <- match.arg(model[1L], c("full", "count", "zero"))
   rval <- object$vcov
   if(model == "full") return(rval)
 
@@ -655,107 +655,157 @@ print.summary.hurdle <- function(x, digits = max(3, getOption("digits") - 3), ..
   invisible(x)
 }
 
-terms.hurdle <- function(x, model = c("count", "zero"), ...) {
-  x$terms[[match.arg(model)]]
+terms.hurdle <- function(x, model = c("full", "count", "zero"), ...) {
+  x$terms[[match.arg(model[1L], c("full", "count", "zero"))]]
 }
 
 model.matrix.hurdle <- function(object, model = c("count", "zero"), ...) {
-  model <- match.arg(model)
+  model <- match.arg(model[1L], c("count", "zero"))
   if(!is.null(object$x)) rval <- object$x[[model]]
     else if(!is.null(object$model)) rval <- model.matrix(object$terms[[model]], object$model, contrasts = object$contrasts[[model]])
     else stop("not enough information in fitted model to return model.matrix")
   return(rval)
 }
 
-predict.hurdle <- function(object, newdata, type = c("response", "prob", "count", "zero"),
-  na.action = na.pass, at = NULL, ...)
+predict.hurdle <- function(object, newdata,
+  type = c("mean", "variance", "quantile", "probability", "density", "loglikelihood", "parameters", "distribution"),
+  model = c("full", "count", "zero", "truncated"),
+  na.action = na.pass, at = NULL, drop = TRUE, ...)
 {
-    type <- match.arg(type)
+  ## match type
+  type <- match.arg(tolower(type[1L]), c(
+    "mean", "response",
+    "variance",
+    "quantile",
+    "probability", "cdf",
+    "density", "pdf", "pmf",
+    "loglikelihood", "log_pdf",
+    "distribution", "parameters",
+    "count"))
+  if(type == "count") {
+    model <- "count"
+    type <- "mean"
+  }
+  if(type == "response") type <- "mean"
+  if(type == "cdf") type <- "probability"
+  if(type %in% c("pdf", "pmf")) type <- "density"
+  if(type == "log_pdf") type <- "loglikelihood"
 
-    ## if no new data supplied
-    if(missing(newdata)) {
-      if(type != "response") {
-        if(!is.null(object$x)) {
-	  X <- object$x$count
-	  Z <- object$x$zero
-	} else if(!is.null(object$model)) {
-          X <- model.matrix(object$terms$count, object$model, contrasts = object$contrasts$count)
-          Z <- model.matrix(object$terms$zero,  object$model, contrasts = object$contrasts$zero)
-          if(any(object$alias$count)) X <- X[, !object$alias$count, drop = FALSE]
-          if(any(object$alias$zero))  Z <- Z[, !object$alias$zero,  drop = FALSE]
-	} else {
-	  stop("predicted probabilities cannot be computed with missing newdata")
-	}
-	offsetx <- if(is.null(object$offset$count)) rep.int(0, NROW(X)) else object$offset$count
-	offsetz <- if(is.null(object$offset$zero))  rep.int(0, NROW(Z)) else object$offset$zero
-      } else {
-        return(object$fitted.values)
-      }
+  ## match model
+  model <- match.arg(tolower(model[1L]), c("full", "count", "zero", "truncated"))
+
+  ## default: in-sample fitted means are already pre-computed
+  if(missing(newdata) && model == "full" && type == "mean") return(object$fitted.values)
+
+  ## set up model matrices
+  modelx <- model %in% c("full", "count", "truncated")
+  modelz <- model %in% c("full", "zero")
+  
+  if(missing(newdata)) {
+    if(!is.null(object$x)) {
+      X <- if(modelx) object$x$count else NULL
+      Z <- if(modelz) object$x$zero  else NULL
+    } else if(!is.null(object$model)) {
+      X <- if(modelx) model.matrix(object$terms$count, object$model, contrasts = object$contrasts$count) else NULL
+      Z <- if(modelz) model.matrix(object$terms$zero,  object$model, contrasts = object$contrasts$zero)  else NULL
+      if(modelx && any(object$alias$count)) X <- X[, !object$alias$count, drop = FALSE]
+      if(modelz && any(object$alias$zero))  Z <- Z[, !object$alias$zero,  drop = FALSE]
     } else {
-      mf <- model.frame(delete.response(object$terms$full), newdata, na.action = na.action, xlev = object$levels)
-      X <- model.matrix(delete.response(object$terms$count), mf, contrasts = object$contrasts$count)
-      Z <- model.matrix(delete.response(object$terms$zero),  mf, contrasts = object$contrasts$zero)
-      if(any(object$alias$count)) X <- X[, !object$alias$count, drop = FALSE]
-      if(any(object$alias$zero))  Z <- Z[, !object$alias$zero,  drop = FALSE]
-      offsetx <- model_offset_2(mf, terms = object$terms$count, offset = FALSE)
-      offsetz <- model_offset_2(mf, terms = object$terms$zero,  offset = FALSE)
-      if(is.null(offsetx)) offsetx <- rep.int(0, NROW(X))
-      if(is.null(offsetz)) offsetz <- rep.int(0, NROW(Z))
-      if(!is.null(object$call$offset)) offsetx <- offsetx + eval(object$call$offset, newdata)
+      stop("predicted probabilities cannot be computed with missing newdata")
     }
+    offsetx <- object$offset$count
+    offsetz <- object$offset$zero
+    if(modelx && is.null(object$offset$count)) offsetx <- rep.int(0, NROW(X))
+    if(modelz && is.null(object$offset$zero))  offsetz <- rep.int(0, NROW(Z))
+  } else {
+    mf <- model
+    if(mf == "truncated") mf <- "count"
+    mf <- model.frame(delete.response(object$terms[[mf]]), newdata, na.action = na.action, xlev = object$levels)
+    X <- if(modelx) model.matrix(delete.response(object$terms$count), mf, contrasts = object$contrasts$count) else NULL
+    Z <- if(modelz) model.matrix(delete.response(object$terms$zero),  mf, contrasts = object$contrasts$zero)  else NULL
+    if(modelx && any(object$alias$count)) X <- X[, !object$alias$count, drop = FALSE]
+    if(modelz && any(object$alias$zero))  Z <- Z[, !object$alias$zero,  drop = FALSE]
+    offsetx <- if(modelx) model_offset_2(mf, terms = object$terms$count, offset = FALSE) else NULL
+    offsetz <- if(modelz) model_offset_2(mf, terms = object$terms$zero,  offset = FALSE) else NULL
+    if(modelx && is.null(offsetx)) offsetx <- rep.int(0, NROW(X))
+    if(modelz && is.null(offsetz)) offsetz <- rep.int(0, NROW(Z))
+    if(modelx && !is.null(object$call$offset)) offsetx <- offsetx + eval(object$call$offset, newdata)
+  }
 
-    phi <- if(object$dist$zero == "binomial") object$linkinv(Z %*% object$coefficients$zero + offsetz)[,1]
-      else exp(Z %*% object$coefficients$zero + offsetz)[,1]
-    p0_zero <- switch(object$dist$zero,
-                      "binomial" = log(phi),
-		      "poisson" = ppois(0, lambda = phi, lower.tail = FALSE, log.p = TRUE),
-		      "negbin" = pnbinom(0, size = object$theta["zero"], mu = phi, lower.tail = FALSE, log.p = TRUE),
-		      "geometric" = pnbinom(0, size = 1, mu = phi, lower.tail = FALSE, log.p = TRUE))
-
+  ## predict distribution parameters
+  if(modelx) {
     mu <- drop(X %*% object$coefficients$count + offsetx)
-    mu <- if(object$dist$count == "binomial") object$size * object$linkinv(mu) else exp(mu)
-    p0_count <- switch(object$dist$count,
-		      "poisson" = ppois(0, lambda = mu, lower.tail = FALSE, log.p = TRUE),
-		      "negbin" = pnbinom(0, size = object$theta["count"], mu = mu, lower.tail = FALSE, log.p = TRUE),
-		      "geometric" = pnbinom(0, size = 1, mu = mu, lower.tail = FALSE, log.p = TRUE),
-		      "binomial" = pnbinom(0, prob = mu/object$size, size = object$size, lower.tail = FALSE, log.p = TRUE))
-    logphi <- p0_zero - p0_count
-    
-    if(type == "response") rval <- exp(logphi + log(mu))
-    if(type == "count") rval <- mu
-    if(type == "zero") rval <- exp(logphi)
-
-    ## predicted probabilities
-    if(type == "prob") {
-      if(!is.null(object$y)) y <- object$y
-        else if(!is.null(object$model)) y <- model.response(object$model)
-	else stop("predicted probabilities cannot be computed for fits with y = FALSE and model = FALSE")
-
-      yUnique <- if(is.null(at)) 0:max(y) else at
-      nUnique <- length(yUnique)
-      rval <- matrix(NA, nrow = length(mu), ncol = nUnique)
-      dimnames(rval) <- list(rownames(X), yUnique)
-      
-      switch(object$dist$count,
-             "poisson" = {
-               for(i in 1:nUnique) rval[,i] <- if(yUnique[i] == 0) 1 - exp(p0_zero) else exp(logphi +
-	         dpois(yUnique[i], lambda = mu, log = TRUE))
-	     },
-	     "negbin" = {
-               for(i in 1:nUnique) rval[,i] <- if(yUnique[i] == 0) 1 - exp(p0_zero) else exp(logphi +
-	         dnbinom(yUnique[i], mu = mu, size = object$theta["count"], log = TRUE))
-	     },
-	     "geometric" = {
-               for(i in 1:nUnique) rval[,i] <- if(yUnique[i] == 0) 1 - exp(p0_zero) else exp(logphi +
-	         dnbinom(yUnique[i], mu = mu, size = 1, log = TRUE))
-	     },
-	     "binomial" = {
-               for(i in 1:nUnique) rval[,i] <- if(yUnique[i] == 0) 1 - exp(p0_zero) else exp(logphi +
-	         dbinom(yUnique[i], prob = mu/object$size, size = object$size, log = TRUE))
-	     })
+    mu <- if(object$dist$count == "binomial") object$linkinv(mu) else exp(mu)
+  } else {
+    mu <- NULL
+  }
+  if(modelz) {
+    pi <- if(object$dist$zero == "binomial") {
+      object$linkinv(Z %*% object$coefficients$zero + offsetz)[, 1L]
+    } else {
+      exp(Z %*% object$coefficients$zero + offsetz)[, 1L]
     }
-   
-    return(rval)
+    pi <- switch(object$dist$zero,
+      "binomial" = pi,
+      "poisson" = ppois(0, lambda = pi, lower.tail = FALSE),
+      "negbin" = pnbinom(0, size = object$theta["zero"], mu = pi, lower.tail = FALSE),
+      "geometric" = pnbinom(0, size = 1, mu = pi, lower.tail = FALSE))
+  } else {
+    pi <- NULL
+  }
+  theta <- if(object$dist$count == "negbin") object$theta["count"] else NULL
+
+  ## set up distributions3 object
+  pd <- if(model == "full") {
+    switch(object$dist$count,
+           "poisson"   = HurdlePoisson(lambda = mu, pi = pi),
+           "negbin"    = HurdleNegativeBinomial(mu = mu, theta = theta, pi = pi),
+           "geometric" = HurdleNegativeBinomial(mu = mu, theta = 1, pi = pi),
+           "binomial"  = HurdleBinomial(size = object$size, p = mu, pi = pi)) ## FIXME
+  } else if(model == "count") {
+    switch(object$dist$count,
+           "poisson"   = Poisson(lambda = mu),
+           "negbin"    = NegativeBinomial(mu = mu, size = theta),
+           "geometric" = NegativeBinomial(mu = mu, size = 1),
+           "binomial"  = Binomial(size = object$size, p = mu))
+  } else if(model == "truncated") {
+    switch(object$dist$count,
+           "poisson"   = ZTPoisson(lambda = mu),
+           "negbin"    = ZTNegativeBinomial(mu = mu, theta = theta),
+           "geometric" = ZTNegativeBinomial(mu = mu, theta = 1),
+           "binomial"  = ZTBinomial(size = object$size, p = mu)) ## FIXME
+  } else if(model == "zero") {
+    Binomial(size = 1, p = pi)
+  }
+
+  ## evaluate type of procast
+  pc <- switch(type,
+    "distribution"  = pd,
+    "quantile"      = quantile(pd, at, ...),
+    "mean"          = mean(pd),
+    "variance"      = variance(pd),
+    "probability"   = cdf(pd, at, ...),
+    "density"       = pdf(pd, at, ...),
+    "loglikelihood" = log_pdf(pd, at, ...),
+    "parameters"    = as.matrix(pd)
+  )
+  
+  ## convert to data frame if drop = FALSE
+  if(drop) {
+    if(!is.null(dim(pc)) && NCOL(pc) == 1L) pc <- drop(pc)
+  } else {
+    if(inherits(pc, "distribution")) {
+      pc <- as.data.frame(pc)
+      colnames(pc) <- type
+    }
+    if(is.null(dim(pc))) {
+      pc <- as.matrix(pc)
+      if(ncol(pc) == 1L) colnames(pc) <- type
+    }
+    if(!inherits(pc, "data.frame")) pc <- as.data.frame(pc)
+  }
+  
+  return(pc)
 }
 
 fitted.hurdle <- function(object, ...) {
@@ -763,31 +813,10 @@ fitted.hurdle <- function(object, ...) {
 }
 
 residuals.hurdle <- function(object, type = c("pearson", "response"), ...) {
-
-  type <- match.arg(type)
+  type <- match.arg(type[1L], c("pearson", "response"))
   res <- object$residuals
-
-  switch(type,
-  
-  "response" = {
-    return(res)
-  },
-  
-  "pearson" = {
-    mu <- predict(object, type = "count")
-    phi <- predict(object, type = "zero")
-    theta1 <- switch(object$dist$count,
-      "poisson" = 0,
-      "geometric" = 1,
-      "negbin" = 1/object$theta["count"],
-      "binomial" = 0) ## FIXME!
-    vv <- object$fitted.values * (1 + ((1-phi) + theta1) * mu)
-    return(res/sqrt(vv))
-  })
-}
-
-predprob.hurdle <- function(obj, ...){
-    predict(obj, type = "prob", ...)
+  if(type == "pearson") res <- res/sqrt(predict(object, type = "variance"))
+  return(res)
 }
 
 extractAIC.hurdle <- function(fit, scale = NULL, k = 2, ...) {

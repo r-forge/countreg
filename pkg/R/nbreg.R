@@ -514,10 +514,6 @@ prodist.nbreg <- function(object, ...) {
   distributions3::NegativeBinomial(mu = p$mu, size = p$theta)
 }
 
-predprob.nbreg <- function(obj, ...){
-    predict(obj, type = "prob", ...)
-}
-
 extractAIC.nbreg <- function(fit, scale = NULL, k = 2, ...) {
   c(attr(logLik(fit), "df"), AIC(fit, k = k))
 }

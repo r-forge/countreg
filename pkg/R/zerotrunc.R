@@ -486,10 +486,6 @@ residuals.zerotrunc <- function(object, type = c("deviance", "pearson", "respons
   })
 }
 
-predprob.zerotrunc <- function(obj, ...){
-    predict(obj, type = "prob", ...)
-}
-
 extractAIC.zerotrunc <- function(fit, scale = NULL, k = 2, ...) {
   c(attr(logLik(fit), "df"), AIC(fit, k = k))
 }

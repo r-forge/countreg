@@ -11,7 +11,6 @@
 \alias{logLik.hurdle}
 \alias{nobs.hurdle}
 \alias{fitted.hurdle}
-\alias{predprob.hurdle}
 \alias{extractAIC.hurdle}
 
 \title{Methods for hurdle Objects}
@@ -22,14 +21,15 @@
 
 \usage{
 \method{predict}{hurdle}(object, newdata,
-  type = c("response", "prob", "count", "zero"), na.action = na.pass,
-  at = NULL, \dots)
+  type = c("mean", "variance", "quantile", "probability", "density", "loglikelihood", "parameters", "distribution"),
+  model = c("full", "count", "zero", "truncated"),
+  na.action = na.pass, at = NULL, drop = TRUE, \dots)
 \method{residuals}{hurdle}(object, type = c("pearson", "response"), \dots)
 
 \method{coef}{hurdle}(object, model = c("full", "count", "zero"), \dots)
 \method{vcov}{hurdle}(object, model = c("full", "count", "zero"), \dots)
 
-\method{terms}{hurdle}(x, model = c("count", "zero"), \dots)
+\method{terms}{hurdle}(x, model = c("full", "count", "zero"), \dots)
 \method{model.matrix}{hurdle}(object, model = c("count", "zero"), \dots)
 }
 
@@ -40,13 +40,15 @@
     which to predict. If omitted, the original observations are used.}
   \item{type}{character specifying the type of predictions or residuals,
     respectively. For details see below.}
+  \item{model}{character specifying for which component of the model the
+    terms or model matrix should be extracted.}
   \item{na.action}{function determining what should be done with missing values
     in \code{newdata}. The default is to predict \code{NA}.}
   \item{at}{optionally, if \code{type = "prob"}, a numeric vector at which
     the probabilities are evaluated. By default \code{0:max(y)} is used
     where \code{y} is the original observed response.}
-  \item{model}{character specifying for which component of the model the
-    terms or model matrix should be extracted.}
+  \item{drop}{logical. Should predictions be returned in a data frame
+    or (if possible) dropped to a vector (default).}
   \item{\dots}{currently not used.}
 }
 

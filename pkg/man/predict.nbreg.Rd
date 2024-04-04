@@ -12,7 +12,6 @@
 \alias{logLik.nbreg}
 \alias{nobs.nbreg}
 \alias{fitted.nbreg}
-\alias{predprob.nbreg}
 \alias{extractAIC.nbreg}
 
 \title{Methods for nbreg Objects}
