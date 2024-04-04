@@ -4,7 +4,11 @@ importFrom("graphics", "abline", "axis", "box", "hist", "lines", "par", "plot", 
 importFrom("grDevices", "n2mfrow")
 importFrom("utils", "head", "tail")
 importFrom("MASS", "fitdistr", "glm.nb", "negative.binomial")
-importFrom("distributions3", "dztpois", "rztpois", "dztnbinom", "dzipois", "dzinbinom", "dhpois", "dhnbinom", "prodist")
+importFrom("distributions3",
+  "dztpois", "rztpois", "dztnbinom", "dzipois", "dzinbinom", "dhpois", "dhnbinom",
+  "prodist",
+  "variance", "cdf", "pdf", "log_pdf",
+  "HurdlePoisson", "HurdleNegativeBinomial", "ZTPoisson", "ZTNegativeBinomial", "ZIPoisson", "ZINegativeBinomial", "Poisson", "NegativeBinomial", "Binomial")
 
 export(
   ## hurdle count regression  

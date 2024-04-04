@@ -891,8 +891,8 @@ fm_summary[29,] <- round(c("ML-Pois" = sum(dpois(0, fitted(fm_pois))),
   "Adj-Pois" = NA,
   "Quasi-Pois" = NA,
   "NB" = sum(dnbinom(0, mu = fitted(fm_nbin), size = fm_nbin$theta)),
-  "NB-Hurdle" = sum(predict(fm_hurdle, type = "prob")[,1]),
-  "ZINB" = sum(predict(fm_zinb, type = "prob")[,1])))
+  "NB-Hurdle" = sum(predict(fm_hurdle, type = "density", at = 0)),
+  "ZINB" = sum(predict(fm_zinb, type = "density", at = 0))))
 fm_summary[26:29,2:3] <- NA
 fm_summary[is.na(fm_summary)] <- " "
 fm_summary <- paste(apply(cbind(rownames(fm_summary), fm_summary), 1, paste, collapse = " & "), "\\\\")
@@ -991,8 +991,8 @@ compared to the expected number of zero counts for the likelihood-based models:
 round(c("Obs" = sum(dt$ofp < 1),
   "ML-Pois" = sum(dpois(0, fitted(fm_pois))),
   "NB" = sum(dnbinom(0, mu = fitted(fm_nbin), size = fm_nbin$theta)),
-  "NB-Hurdle" = sum(predict(fm_hurdle, type = "prob")[,1]),
-  "ZINB" = sum(predict(fm_zinb, type = "prob")[,1])))
+  "NB-Hurdle" = sum(predict(fm_hurdle, type = "density", at = 0)),
+  "ZINB" = sum(predict(fm_zinb, type = "density", at = 0))))
 @
 Thus, the ML Poisson model is again not appropriate whereas the negative-binomial-based
 models are much better in modeling the zero counts. By construction, the

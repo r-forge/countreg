@@ -149,8 +149,8 @@ par(mfrow = c(1, 1))
 
 ## Number of zeros
 c(dmfs = sum(OralHealthNL$dmfs == 0),
-  ZINB = sum(predict(zinb, type = "prob")[,1]),
-  Hurdle = sum(predict(hnb, type = "prob")[,1]))
+  ZINB = sum(predict(zinb, type = "density", at = 0)),
+  Hurdle = sum(predict(hnb, type = "density", at = 0)))
 ## Correlation of observations and fitted means
 cor(cbind(dmfs = OralHealthNL$dmfs,
   ZINB = fitted(zinb), HNB = fitted(hnb)))
