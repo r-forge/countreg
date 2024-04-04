@@ -1,0 +1,183 @@
+---
+title: "Basics"
+format: html
+bibliography: countreg.bib
+crossref:
+  eq-prefix: ""
+---
+:::{.hidden}
+$$
+\newcommand{\E}{\mathsf{E}}
+\newcommand{\VAR}{\mathsf{VAR}}
+\newcommand{\COV}{\mathsf{COV}}
+\newcommand{\Prob}{\mathsf{P}}
+$$
+:::
+
+The basic count data regression models can
+be represented and understood using the GLM
+framework that emerged in the statistical literature in the early 1970s
+[@countreg:Nelder+Wedderburn:1972]. In the following, we briefly
+sketch some important aspects relating to the unifying conceptual properties
+and their implementation in R---for a detailed theoretical account of GLMs
+see @countreg:McCullagh+Nelder:1989.
+
+GLMs describe the dependence of a scalar variable $y_i$ ($i = 1, \dots, n$)
+on a vector of regressors $x_i$. The conditional distribution of
+$y_i | x_i$ is a linear exponential family with probability density function
+$$ 
+f(y; \lambda, \phi) \quad = \quad
+                              \exp \left( \frac{y \cdot \lambda - b(\lambda)}{\phi} +
+                              c(y, \phi) \right),
+$$ {#eq-family}
+where $\lambda$ is the canonical parameter that depends on the regressors via
+a linear predictor and $\phi$ is a dispersion parameter that is often known.
+The functions $b(\cdot)$ and $c(\cdot)$ are known and determine which member
+of the family is used, e.g., the normal, binomial or Poisson distribution.
+Conditional mean and variance of $y_i$ are given by
+$\E[y_i \, | \, x_i] = \mu_i = b'(\lambda_i)$ and
+$\VAR[y_i \, | \, x_i] = \phi \cdot b''(\lambda_i)$. Thus, up to a scale
+or dispersion parameter $\phi$, the distribution of $y_i$ is determined by
+its mean. Its variance is proportional to $V(\mu) = b''(\lambda(\mu))$,
+also called variance function.
+
+The dependence of the conditional mean $\E[y_i \, | \, x_i] = \mu_i$
+on the regressors $x_i$ is specified via
+$$ 
+g(\mu_i) \quad = \quad x_i^\top \beta,
+$$ {#eq-mean}
+where $g(\cdot)$ is a known link function and $\beta$ is the vector of regression
+coefficients which are typically estimated by maximum likelihood (ML)
+using the iterative weighted least squares (IWLS) algorithm.
+
+Instead of viewing GLMs as models for the full likelihood (as determined by
+Equation @eq-family)), they can also be regarded as regression models for the
+mean only (as specified in Equation @eq-mean) where the estimating functions
+used for fitting the model are derived from a particular family. As illustrated 
+in the remainder of this section, the estimating function point of view is particularly
+useful for relaxing the assumptions imposed by the Poisson likelihood.
+
+R provides a very flexible implementation of the general GLM
+framework in the function `glm()` [@countreg:Chambers+Hastie:1992]
+contained in the **stats** package. Its most important arguments are
+\begin{Soutput}
+glm(formula, data, subset, na.action, weights, offset,
+  family = gaussian, start = NULL, control = glm.control(...),
+  model = TRUE, y = TRUE, x = FALSE, ...)
+\end{Soutput}
+where `formula` plus `data` is the now standard way of specifying
+regression relationships in R/S introduced in
+@countreg:Chambers+Hastie:1992. The remaining arguments in the first line
+(`subset`, `na.action`, `weights`, and `offset`) are also standard 
+for setting up formula-based regression models in R/S.
+The arguments in the second line control aspects specific to GLMs while
+the arguments in the last line specify which components are returned
+in the fitted model object (of class `glm` which inherits from
+`lm`). By default the model frame (`model`) and the vector
+$(y_1, \dots, y_n)^\top$ (`y`) but not the model matrix (`x`,
+containing $x_1, \dots, x_n$ combined row-wise) are included. The
+`family` argument specifies the link $g(\mu)$ and variance
+function $V(\mu)$ of the model, `start` can be used to set 
+starting values for $\beta$, and `control` contains control parameters for the IWLS
+algorithm. For further arguments to `glm()` (including alternative specifications
+of starting values) see `?glm`.
+The high-level `glm()` interface relies on the function	
+`glm.fit()` which carries out the actual model fitting (without
+taking a formula-based input or returning classed output).
+
+For `glm` objects, a set of standard methods (including `print()`,
+`predict()`, `logLik()` and many others) are provided. Inference can 
+easily be performed using the `summary()` method for assessing the
+regression coefficients via partial Wald tests or the `anova()` method
+for comparing nested models via an analysis of deviance. These inference
+functions are complemented by further generic inference functions in
+contributed packages: e.g., **lmtest** [@countreg:Zeileis+Hothorn:2002]
+provides a `coeftest()` function that also computes partial Wald tests
+but allows for specification of alternative (robust) standard errors. Similarly,
+`waldtest()` from **lmtest** and `linearHypothesis()` from **car**
+[@countreg:Fox:2002] assess nested models via Wald tests (using
+different specifications for the nested models). Finally, `lrtest()`
+from **lmtest** compares nested models via likelihood ratio (LR) tests
+based on an interface similar to `waldtest()` and `anova()`.
+
+
+## Poisson Model
+
+The simplest distribution used for modeling count data is the 
+Poisson distribution with probability density function
+$$ 
+f(y; \mu) \quad = \quad \frac{\exp(-\mu) \cdot \mu^{y}}{y!},
+$$ {#eq-Poisson}
+which is of type (@eq-family) and thus Poisson regression
+is a special case of the GLM framework. The canonical link is
+$g(\mu) = \log(\mu)$ resulting in a log-linear relationship
+between mean and linear predictor. The variance in the Poisson
+model is identical to the mean, thus the dispersion is
+fixed at $\phi = 1$ and the variance function is $V(\mu) = \mu$.
+
+In R, this can easily be specified in the `glm()` 
+call just by setting `family = poisson` (where the default log link
+could also be changed in the `poisson()` call).
+
+In practice, the Poisson model is often useful for describing the
+mean $\mu_i$ but underestimates the variance in the data, rendering
+all model-based tests liberal. One way of dealing with this is
+to use the same estimating functions for the mean, but to base
+inference on the more robust sandwich covariance matrix estimator.
+In R, this estimator is provided by the `sandwich()`
+function in the **sandwich** package [@countreg:Zeileis:2004; @countreg:Zeileis:2006].
+
+
+## Quasi-Poisson model
+
+Another way of dealing with over-dispersion is to use the mean
+regression function and the variance function from the Poisson GLM
+but to leave the dispersion parameter $\phi$ unrestricted. Thus,
+$\phi$ is not assumed to be fixed at $1$ but is estimated from
+the data. This strategy leads
+to the same coefficient estimates as the standard Poisson model
+but inference is adjusted for over-dispersion. Consequently,
+both models (quasi-Poisson and sandwich-adjusted Poisson)
+adopt the estimating function view of the Poisson model and
+do _not_ correspond to models with fully specified likelihoods.
+
+In R, the quasi-Poisson model with estimated dispersion
+parameter can also be fitted with the `glm()` function, simply
+setting `family = quasipoisson`.
+
+
+
+## Negative binomial models
+
+A third way of modeling over-dispersed count data is to assume
+a negative binomial (NB) distribution for $y_i | x_i$ which can arise
+as a gamma mixture of Poisson distributions. One parameterization of
+its probability density function is
+$$
+f(y; \mu, \theta) \quad = \quad \frac{\Gamma(y + \theta)}{\Gamma(\theta) \cdot y!} \cdot
+                            \frac{\mu^{y} \cdot \theta^\theta}{(\mu + \theta)^{y + \theta}},
+$${#eq-negbin}
+with mean $\mu$ and shape parameter $\theta$; $\Gamma(\cdot)$ is the
+gamma function. For every fixed
+$\theta$, this is of type (@eq-family) and thus is another
+special case of the GLM framework. It also has $\phi = 1$
+but with variance function $V(\mu) = \mu + \frac{\mu^2}{\theta}$.
+
+Package **MASS** [@countreg:Venables+Ripley:2002] provides
+the family function `negative.binomial()` that can directly
+be plugged into `glm()` provided the argument `theta` is
+specified. One application would be the geometric model, the
+special case where $\theta = 1$, which can consequently be
+fitted in R by setting
+`family = negative.binomial(theta = 1)` in the `glm()`
+call.
+
+If $\theta$ is not known but to be estimated from the data,
+the negative binomial model is not a special case of the general
+GLM---however, an ML fit can easily be computed re-using GLM
+methodology by iterating estimation of $\beta$ given $\theta$
+and vice versa. This leads to ML estimates for both $\beta$
+and $\theta$ which can be computed using the function `glm.nb()`
+from the package **MASS**. It returns a model of class `negbin`
+inheriting from `glm` for which appropriate methods
+to the generic functions described above are again available.

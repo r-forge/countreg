@@ -1,0 +1,253 @@
+---
+title: "Zero-augmented models"
+format: html
+bibliography: countreg.bib
+number-sections: true
+crossref:
+  eq-prefix: ""
+---
+
+## Hurdle models
+
+In addition to over-dispersion, many empirical count data sets
+exhibit more zero observations than would be allowed for
+by the Poisson model. One model class capable of capturing
+both properties is the hurdle model, 
+originally proposed by @countreg:Mullahy:1986 in the econometrics literature
+[see @countreg:Cameron+Trivedi:1998; @countreg:Cameron+Trivedi:2005 for an overview].
+They are two-component models:
+A truncated count component, such as Poisson, geometric or negative binomial,
+is employed for positive counts, and
+a hurdle component models zero vs. larger counts.
+For the latter, either a binomial model or a censored count distribution can be employed.
+
+More formally, the hurdle model combines a count data model 
+$f_\mathrm{count}(y; x, \beta)$ (that is left-truncated at $y = 1$) and a 
+zero hurdle model $f_\mathrm{zero}(y; z, \gamma)$ (right-censored at $y = 1$):
+$$
+f_\mathrm{hurdle}(y; x, z, \beta, \gamma) =
+  \left\{
+  \begin{array}{ll}
+  f_\mathrm{zero}(0; z, \gamma) & \mbox{if } y = 0, \\
+  (1 - f_\mathrm{zero}(0; z, \gamma)) \cdot
+  f_\mathrm{count}(y; x, \beta)/(1 - f_\mathrm{count}(0; x, \beta)) & \mbox{if } y > 0
+  \end{array}
+  \right.
+$$ {#eq-hurdle}
+The model parameters $\beta$, $\gamma$, and potentially one or two additional
+dispersion parameters $\theta$
+(if $f_\mathrm{count}$ or $f_\mathrm{zero}$ or both are negative binomial densities)
+are estimated by ML, where the specification of the likelihood has the advantage that
+the count and the hurdle component can be maximized separately. The corresponding
+mean regression relationship is given by
+$$
+\log(\mu_i) \quad = \quad x_i^\top \beta +
+                    \log(1 - f_\mathrm{zero}(0; z_i, \gamma)) -
+		    \log(1 - f_\mathrm{count}(0; x_i, \beta)),
+$$ {#eq-hurdle-mean}
+again using the canonical log link.
+For interpreting the zero model as a hurdle, a binomial GLM is probably the most 
+intuitive specification\footnote{Note that
+binomial logit and censored geometric models as the hurdle part both lead to 
+the same likelihood function and thus to the same coefficient estimates [@countreg:Mullahy:1986].}.
+Another useful interpretation arises if the same regressors $x_i = z_i$ are
+used in the same count model in both components $f_\mathrm{count} = f_\mathrm{zero}$: 
+A test of the hypothesis $\beta = \gamma$ then tests whether the hurdle is
+needed or not.
+
+In R, hurdle count data models can be fitted with the
+`hurdle()` function from the **countreg** package [@countreg:Zeileis+Kleiber:2013].
+Both its fitting function and the returned model objects of class `hurdle`
+are modelled after the corresponding GLM functionality in R. The
+arguments of `hurdle()` are given by
+
+```
+hurdle(formula, data, subset, na.action, weights, offset,
+  dist = "poisson", zero.dist = "binomial", link = "logit",
+  control = hurdle.control(...),
+  model = TRUE, y = TRUE, x = FALSE, ...)
+```
+
+where the first line contains the standard model-frame specifications,
+the second and third lines have the arguments specific to hurdle models and
+the arguments in the last line control some components of the return value.
+
+If a `formula` of type `y ~ x1 + x2` is supplied, it not only
+describes the count regression relationship of $y_i$ and $x_i$ but also implies that
+the same set of regressors is used for the zero hurdle component $z_i = x_i$.
+This is could be made more explicit by equivalently writing the formula as
+`y ~ x1 + x2 | x1 + x2`. Of course, a different set of regressors
+could be specified for the zero hurdle component, e.g.,
+`y ~ x1 + x2 | z1 + z2 + z3`, giving the count data model `y ~ x1 + x2`
+conditional on (`|`) the zero hurdle model `y ~ z1 + z2 + z3`.
+
+The model likelihood can be specified by the `dist`, `zero.dist` and `link` arguments.
+The count data distribution `dist` is `"poisson"` by default (it
+can also be set to `"negbin"` or `"geometric"`), for which the canonical log link
+is always used. The distribution for the zero hurdle model can be specified via
+`zero.dist`. The default is a binomial model with `link` (defaulting
+to `"logit"`, but all link functions of the `binomial()` family are also supported),
+alternatively a right-censored count distribution (Poisson,
+negative binomial or geometric, all with log link) could be specified.
+
+ML estimation of all parameters employing analytical gradients is carried out
+using R's `optim()` with control options set in `hurdle.control()`.
+Starting values can be user-supplied, otherwise they are estimated by `glm.fit()`
+(the default). The covariance matrix estimate is derived numerically using
+the Hessian matrix returned by `optim()`.
+See @sec-hurdle for further technical details.
+
+The returned fitted-model object of class `hurdle` is a list similar
+to `glm` objects. Some of its elements---such as `coefficients` or
+`terms`---are lists with a zero and count component,
+respectively. For details see @sec-hurdle.
+
+A set of standard extractor functions for fitted model objects is available for
+objects of class `hurdle`, including the usual `summary()` method that
+provides partial Wald tests for all coefficients. No `anova()` method is provided,
+but the general `coeftest()`, `waldtest()` from **lmtest**, and `linearHypothesis()`
+from **car** can be used for Wald tests and `lrtest()` from **lmtest**
+for LR tests of nested models. The function `hurdletest()` is a convenience
+interface to `linearHypothesis()` for testing for the presence of a hurdle
+(which is only applicable if the same regressors and the same count distribution
+are used in both components).
+
+
+## Zero-inflated models
+
+Zero-inflated models [@countreg:Mullahy:1986; @countreg:Lambert:1992]
+are another model class capable of dealing with excess zero counts 
+\citep[see][for an overview]{countreg:Cameron+Trivedi:1998,countreg:Cameron+Trivedi:2005}.
+They are two-component mixture models
+combining a point mass at zero with a count distribution such as
+Poisson, geometric or negative binomial. Thus, there are two
+sources of zeros: zeros may come from both the point mass and
+from the count component. For modeling the unobserved state
+(zero vs. count), a binary model is used: in the simplest case
+only with an intercept but potentially containing regressors.
+
+Formally, the zero-inflated density is a mixture of a point mass
+at zero $I_{\{0\}}(y)$ and a count distribution $f_\mathrm{count}(y; x, \beta)$.
+The probability of observing a zero count is inflated with probability
+$\pi = f_\mathrm{zero}(0; z, \gamma)$:
+$$
+f_\mathrm{zeroinfl}(y; x, z, \beta, \gamma) \quad = \quad
+  f_\mathrm{zero}(0; z, \gamma) \cdot I_{\{0\}}(y) \; + \;
+  (1 - f_\mathrm{zero}(0; z, \gamma)) \cdot f_\mathrm{count}(y; x, \beta),
+$$ {#eq-zeroinfl}
+where $I(\cdot)$ is the indicator function and the unobserved probability $\pi$
+of belonging to the point mass component is modelled by a binomial GLM
+$\pi =  g^{-1}(z^\top \gamma)$.
+The corresponding regression equation for the mean is
+$$
+\mu_i \quad = \quad \pi_i \cdot 0 \; + \; (1 - \pi_i) \cdot \exp(x_i^\top \beta),
+$$ {#eq-zeroinfl-mean}
+using the canonical log link.
+The vector of regressors in the zero-inflation model $z_i$
+and the regressors in the count component $x_i$ need not to be distinct---in
+the simplest case, $z_i = 1$ is just
+an intercept. The default link function $g(\pi)$ in binomial GLMs is the
+logit link, but other links such as the probit are also available. The full
+set of parameters of $\beta$, $\gamma$, and potentially the dispersion parameter $\theta$ (if 
+a negative binomial count model is used) can be estimated by ML. Inference
+is typically performed for $\beta$ and $\gamma$, while $\theta$ is treated
+as a nuisance parameter even if a negative binomial model is used.
+
+In R, zero-inflated count data models can be fitted with the
+`zeroinfl()` function from the **countreg** package. Both 
+the fitting function interface and the returned model objects of class `zeroinfl`
+are almost identical to the corresponding `hurdle()` functionality and again
+modelled after the corresponding GLM functionality in R. The
+arguments of `zeroinfl()` are given by
+
+```
+zeroinfl(formula, data, subset, na.action, weights, offset,
+  dist = "poisson", link = "logit", control = zeroinfl.control(...),
+  model = TRUE, y = TRUE, x = FALSE, ...)
+```
+
+where all arguments have almost the same meaning as for `hurdle()`. The main
+difference is that there is no `zero.dist` argument: a binomial model is
+always used for distribution in the zero-inflation component.
+
+Again, ML estimates of all parameters are obtained from `optim()`,
+with control options set in `zeroinfl.control()` and employing analytical gradients.
+Starting values can be user-supplied, estimated by the expectation maximization (EM)
+algorithm, or by `glm.fit()` (the default).
+The covariance matrix estimate is derived numerically using
+the Hessian matrix returned by `optim()`. Using EM estimation for
+deriving starting values is typically slower but can be numerically more stable.
+It already maximizes the likelihood, but a single `optim()` iteration is used
+for determining the covariance matrix estimate.
+See @sec-zeroinfl for further technical details.
+
+The returned fitted model object is of class `zeroinfl` whose structure
+is virtually identical to that of `hurdle` models. As above,
+a set of standard extractor functions for fitted model objects is available for
+objects of class `zeroinfl`, including the usual `summary()` method that
+provides partial Wald tests for all coefficients. Again, no `anova()` method is provided,
+but the general functions `coeftest()` and `waldtest()` from **lmtest**,
+as well as `linearHypothesis()` from **car** can be used for Wald tests,
+and `lrtest()` from **lmtest** for LR tests of nested models. 
+
+
+## Technical details for hurdle models {#sec-hurdle}
+
+The fitting of hurdle models via ML in `hurdle()` is controlled by
+the arguments in the `hurdle.control()` wrapper function:
+
+```
+hurdle.control(method = "BFGS", maxit = 10000, trace = FALSE,
+  separate = TRUE, start = NULL, ...)
+```
+
+This modifies some default arguments passed on to the optimizer `optim()`,
+such as `method`, `maxit` and `trace`. The latter is also
+used within `hurdle()` and can be set to produce more verbose output
+concerning the fitting process. The argument `separate` controls
+whether the two components of the model are optimized separately (the default)
+or not. This is possible because there are no mixed sources for the zeros
+in the data (unlike in zero-inflation models). The argument `start`
+controls the choice of starting values for calling `optim()`, all remaining
+arguments passed through `...` are directly passed on to `optim()`.
+
+By default, starting values are estimated by calling `glm.fit()` for
+both components of the model separately, once for the counts and once
+for zero vs. non-zero counts. If starting values are supplied,
+`start` needs to be set to a named list with the parameters for the
+`$count` and `$zero` part of the model (and potentially a
+`$theta` dispersion parameter if a negative binomial distribution is used).
+
+The fitted model object of class `hurdle` is similar to `glm`
+objects and contains sufficient information on all aspects of the fitting
+process. In particular, the estimated parameters and associated covariances
+are included as well as the result from the `optim()` call. Furthermore,
+the call, formula, terms structure etc. is contained, potentially also the
+model frame, dependent variable and regressor matrices.
+
+Following `glm.nb()`, the $\theta$ parameter of the negative binomial
+distribution is treated as a nuisance parameter. Thus, the `$coefficients`
+component of the fitted model object just contains estimates of
+$\beta$ and $\gamma$ while the estimate of $\theta$ and its standard deviation 
+(on a log scale) are kept in extra list elements `$theta` and `$SE.logtheta`.
+
+
+## Technical details for zero-inflated models {#sec-zeroinfl}
+
+Both the interface of the `zeroinfl()` function as well as its fitted
+model objects are virtually identical to the corresponding `hurdle`
+functionality. Hence, we only provide some additional information for
+those aspects that differ from those discussed above. The details of the
+ML optimization are again provided by a `zeroinfl.control()` wrapper:
+
+```
+zeroinfl.control(method = "BFGS", maxit = 10000, trace = FALSE,
+  EM = FALSE, start = NULL, ...)
+```
+
+The only new argument here is the argument `EM` which allows for EM
+estimation of the starting values. Instead of calling `glm.fit()` only once for
+both components of the model, this process can be iterated until convergence of the
+parameters to the ML estimates. The optimizer is still called subsequently
+(for a single iteration) to obtain the Hessian matrix from which the estimated
+covariance matrix can be computed.
