@@ -5,19 +5,11 @@ project:
 website:
   title: "countreg: Count Data Regression"
   image: "countreg.png"
-  navbar:
-    title: false
+  sidebar:
+    style: docked
     logo: "countreg.png"
     logo-alt: "countreg logo"
     search: true
-    right:
-      - icon: "mastodon"
-        href: "https://fosstodon.org/@zeileis"
-        aria-label: "Achim Zeileis @ Mastodon"
-      - icon: "r-square-fill"
-        href: "https://CRAN.R-project.org/package=countreg"
-        aria-label: "countreg @ CRAN"
-  sidebar:
     collapse-level: 1
     contents:
       - text: Home
@@ -41,9 +33,15 @@ format:
   html:
     toc: true
     theme:
-      - flatly
+      - cosmo
       - custom.scss
     number-sections: false
     fontsize: '110%'
+    fontcolor: "#333333"
+    linkcolor: "#A270BF"
     code-copy: true
     code-overflow: scroll
+    title-block-style: none
+    grid: 
+      sidebar-width: 340px
+      margin-width: 340px

@@ -1,3 +1,5 @@
+## Count Data Regression
+
 Regression models for count data, including negative binomial, zero-inflated, zero-truncated,
 and hurdle models. Drivers for combination with flexmix and mboost are also provided.
 Previously available functions for graphical goodness-of-fit assessment (rootograms etc.)
