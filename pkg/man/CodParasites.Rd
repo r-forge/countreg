@@ -1,7 +1,7 @@
 \name{CodParasites}
 \alias{CodParasites}
 
-\encoding{latin1}
+\encoding{utf8}
 
 \title{Parasite Infections in Cod}
 
@@ -37,7 +37,7 @@ can infect marine fish, including cod.
 
 Hemmingsen et al. (2005) examined cod for trypanosome infections during annual cruises
 along the coast of Finnmark in North Norway over three successive years and in four
-different areas (A1 Sørøya; A2 Magerøya; A3 Tanafjord; A4 Varangerfjord). They show that
+different areas (A1 SÃ¸rÃ¸ya; A2 MagerÃ¸ya; A3 Tanafjord; A4 Varangerfjord). They show that
 trypanosome infections are strongest in the area Varangerfjord where the density of
 of red king crabs is highest. Thus, there is evidence that the introduction of the foreign
 red king crabs had an indirect detrimental effect on the health of the native cod population.
