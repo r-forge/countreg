@@ -3,13 +3,20 @@ project:
   output-dir: ../../www/
 
 website:
-  title: "$ALTDOC_PACKAGE_NAME"
+  title: "countreg: Count Data Regression"
+  image: "countreg.png"
   navbar:
+    title: false
+    logo: "countreg.png"
+    logo-alt: "countreg logo"
     search: true
-#    right:
-#      - icon: github
-#        href: $ALTDOC_PACKAGE_URL_GITHUB
-#        aria-label: $ALTDOC_PACKAGE_NAME GitHub
+    right:
+      - icon: "mastodon"
+        href: "https://fosstodon.org/@zeileis"
+        aria-label: "Achim Zeileis @ Mastodon"
+      - icon: "r-square-fill"
+        href: "https://CRAN.R-project.org/package=countreg"
+        aria-label: "countreg @ CRAN"
   sidebar:
     collapse-level: 1
     contents:
@@ -30,7 +37,13 @@ website:
       - text: Citation
         file: $ALTDOC_CITATION
 
-# format:
-#   html:
-#     theme: cosmo
-#     number-sections: false
+format:
+  html:
+    toc: true
+    theme:
+      - flatly
+      - custom.scss
+    number-sections: false
+    fontsize: '110%'
+    code-copy: true
+    code-overflow: scroll
