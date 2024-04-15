@@ -1,3 +1,21 @@
+# countreg 0.3-0
+
+* Major revision of the package, refactoring some crucial infrastructure.
+  Rootograms and other visualizations are in `topmodels` (currently on R-Forge),
+  see <https://topmodels.R-Forge.R-project.org/articles/topmodels.html>.
+  Distribution functions (`d`/`p`/`q`/`r`) are in `distributions3` (on CRAN),
+  see <https://www.zeileis.org/news/user2022/>.
+
+* Also, data sets `SerumPotassium` and `VolcanoHeights` are now in `topmodels`.
+
+* Improved `predict()` method with more `type` of predictions, including
+  moments (`type = "mean"` or `"variance"`), `"quantile"`, `"density"`,
+  cumulative distribution function (`"probability"`) etc.
+  By default, the prediction is computed for the `"full"` outcome model
+  (e.g., hurdle or zero-inflation) but can also be just the `"count"` or
+  `"zero"` component or the distribution `"truncated"` at zero.
+
+
 # countreg 0.2-1
 
 * Bug fix in `dhpois()` and `dhnbinom()` when `x` is a vector and `pi` is a
