@@ -571,9 +571,9 @@ predict.zeroinfl <- function(object, newdata,
     "density", "pdf", "pmf",
     "loglikelihood", "log_pdf",
     "distribution", "parameters",
-    "count"))
-  if(type == "count") {
-    model <- "count"
+    "count", "zero"))
+  if(type %in% c("zero", "count")) {
+    model <- type
     type <- "mean"
   }
   if(type == "response") type <- "mean"
