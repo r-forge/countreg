@@ -1,2 +1,4 @@
 ^data/GSOEP\.rda$
 ^man/GSOEP\.Rd$
+^_quarto$
+^altdoc$
