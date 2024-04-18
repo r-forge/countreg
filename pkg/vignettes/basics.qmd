@@ -14,6 +14,29 @@ $$
 $$
 :::
 
+```{r preliminaries}
+#| echo: false
+#| output: false
+
+library("sandwich")
+library("lmtest")
+library("MASS")
+library("car")
+library("countreg")
+library("modelsummary")
+
+clog <- function(x) log(x + 0.5)
+cfac <- function(x, breaks = NULL) {
+  if(is.null(breaks)) breaks <- unique(quantile(x, 0:10/10))
+  x <- cut(x, breaks, include.lowest = TRUE, right = FALSE)
+  levels(x) <- paste(breaks[-length(breaks)], ifelse(diff(breaks) > 1,
+    c(paste("-", breaks[-c(1, length(breaks))] - 1, sep = ""), "+"), ""), sep = "")
+  return(x)
+}
+
+refit_models <- TRUE
+```
+
 The basic count data regression models can
 be represented and understood using the GLM
 framework that emerged in the statistical literature in the early 1970s
@@ -181,3 +204,318 @@ and $\theta$ which can be computed using the function `glm.nb()`
 from the package **MASS**. It returns a model of class `negbin`
 inheriting from `glm` for which appropriate methods
 to the generic functions described above are again available.
+
+
+## Illustrations {#sec-illustrations}
+
+In the following, we illustrate all models described above by applying
+them to a cross-sectional data set from health economics. Before the parametric models are fitted,
+a basic exploratory analysis of the data set is carried out that addresses
+some problems typically encountered when visualizing count data. At the
+end of the section, all fitted models are compared highlighting that
+the modelled mean function is similar but the fitted likelihood
+is different and thus, the models differ with respect to explaining
+over-dispersion.
+
+@countreg:Deb+Trivedi:1997 analyze data on 4406
+individuals, aged 66 and over, who are covered by Medicare, a public
+insurance program. Originally obtained from the US National Medical
+Expenditure Survey (NMES) for 1987/88, the data are available from the data archive of the
+_Journal of Applied Econometrics_ at
+<https://journaldata.zbw.eu/dataset/demand-for-medical-care-by-the-elderly-a-finite-mixture-approach>. It was
+prepared for the R package **AER** accompanying
+@countreg:Kleiber+Zeileis:2008 and is also available as
+`DebTrivedi.rda` in the _Journal of Statistical Software_
+together with @countreg:Zeileis:2006. The objective is to model
+the demand for medical care---as captured by the number of physician/non-physician
+office and hospital outpatient visits---by the covariates available
+for the patients. Here, we adopt the number of physician office visits `visits`
+as the dependent variable and use the health status variables[^1]
+`health` (self-perceived health status),
+`chronic` (number of chronic conditions),
+as well as the socio-economic variables
+`gender`,
+`school` (number of years of education), and
+`insurance` (private insurance indicator) as regressors. For convenience, we
+select the variables used from the full data set:
+
+[^1]: In addition to the variables considered here,
+@countreg:Zeileis+Kleiber+Jackman:2008 also employ `hospital`, the number of
+hospital days. As this is more appropriately used as a dependent variable for 
+medical care rather than a regressor, it is omitted from the analysis here.
+
+```{r dt}
+data("NMES1988", package = "AER")
+dt <- NMES1988[, c(1, 7, 8, 13, 15, 18)]
+```
+
+```{r dt2}
+#| echo: false
+
+dt2 <- NMES1988[, -(2:6)]
+dt2$region <- relevel(dt2$region, "other")
+```
+
+To obtain a first overview of the dependent variable, we employ a histogram of the
+observed count frequencies. In R various tools could be used, e.g.,
+`hist(dt$visits, breaks = 0:90 - 0.5)` for a histogram with rectangles or
+```{r visits-plot}
+#| eval: false
+
+plot(table(dt$visits))
+```
+(see @fig-visits) for a histogram with lines which brings out the extremely
+large counts somewhat better. The histogram illustrates that the marginal distribution
+exhibits both substantial variation and a rather large number of zeros.
+
+```{r visits-plot2}
+#| echo: false
+#| fig-height: 5
+#| fig-width: 5
+#| label: fig-visits
+#| fig-pos: 'p'
+#| fig-cap:  Frequency distribution for number of physician office visits.
+
+plot(table(dt$visits), xlab = "Number of physician office visits", ylab = "Frequency", axes = FALSE)
+axis(2)
+axis(1, at = 0:18 * 5, labels = FALSE)
+axis(1, at = 0:9 * 10)
+```
+
+```{r bad-good}
+#| fig-height: 5
+#| fig-width: 10
+#| echo: false
+#| label: fig-bad-good
+#| fig-pos: p
+#| fig-cap: Bivariate explorative displays for number of physician office visits
+#|          plotted against number of chronic conditions.
+
+par(mfrow = c(1, 2))
+plot(visits ~ chronic, data = dt)
+plot(clog(visits) ~ cfac(chronic), data = dt)
+```
+
+A natural second step in the exploratory analysis is to look at pairwise bivariate 
+displays of the dependent variable against each of the regressors bringing out the
+partial relationships. In R, such bivariate displays
+can easily be generated with the `plot()` method for formulas, e.g., via `plot(y ~ x)`.
+This chooses different types of displays depending on the combination of quantitative
+and qualitative variables as dependent or regressor variable, respectively. However,
+count variables are treated as all numerical variables and therefore the command
+
+```{r bad}
+#| eval: false
+
+plot(visits ~ chronic, data = dt)
+```
+
+produces a simple scatterplot as shown in the left panel of @fig-bad-good.
+This is clearly not useful as both variables are count variables producing numerous
+ties in the bivariate distribution and thus obscuring a large number of points in
+the display. To overcome the problem, it is useful to group the number of chronic
+conditions into a factor with levels `0', `1', `2', and `3 or more' and produce a
+boxplot instead of a scatterplot. Furthermore, the picture is much clearer if the
+dependent variable is log-transformed (just as all count regression models discussed
+above also use a log link by default). As there are zero counts as well, we use a
+convenience function `clog()` providing a continuity-corrected logarithm.
+
+```{r clog}
+clog <- function(x) log(x + 0.5)
+```
+
+For transforming a count variable to a factor (for visualization purposes only),
+we define another convenience function `cfac()`
+
+```{r cfac}
+cfac <- function(x, breaks = NULL) {
+  if(is.null(breaks)) breaks <- unique(quantile(x, 0:10/10))
+  x <- cut(x, breaks, include.lowest = TRUE, right = FALSE)
+  levels(x) <- paste(breaks[-length(breaks)], ifelse(diff(breaks) > 1,
+    c(paste("-", breaks[-c(1, length(breaks))] - 1, sep = ""), "+"), ""),
+    sep = "")
+  return(x)
+}
+```
+
+which by default tries to take an educated guess how to choose the breaks between the categories.
+Clearly, the resulting exploratory display of the transformed variables produced by
+
+```{r good, eval=FALSE}
+plot(clog(visits) ~ cfac(chronic), data = dt)
+```
+
+(shown in the right panel of @fig-bad-good) brings out much better
+how the number of doctor visits increases with the number of chronic conditions.
+
+```{r visits2-plot1}
+#| fig-height: 9
+#| fig-width: 6.5
+#| echo: FALSE
+#| label: fig-visits2
+#| fig-pos: p
+#| fig-cap: Number of physician office visits plotted against regressors used.
+ 
+par(mfrow = c(3, 2))
+plot(clog(visits) ~ health, data = dt, varwidth = TRUE,
+  ylab = "Physician office visits (in clogs)", xlab = "Self-perceived health status", main = "health")
+plot(clog(visits) ~ cfac(chronic), data = dt,
+  ylab = "Physician office visits (in clogs)", xlab = "Number of chronic conditions", main = "chronic")
+plot(clog(visits) ~ insurance, data = dt, varwidth = TRUE,
+  ylab = "Physician office visits (in clogs)", xlab = "Covered by private insurance", main = "insurance")
+plot(clog(visits) ~ gender, data = dt, varwidth = TRUE,
+  ylab = "Physician office visits (in clogs)", xlab = "Gender", main = "gender")
+plot(cfac(visits, c(0:2, 4, 6, 10, 100)) ~ school, data = dt, breaks = 9,
+  ylab = "Physician office visits (number of visits)", xlab = "Number of years of education", main = "school")
+```
+
+Analogous displays for the number of physician office visits against all regressors
+can be produced via
+```{r visits2}
+#| eval: false
+
+plot(clog(visits) ~ health, data = dt, varwidth = TRUE)
+plot(clog(visits) ~ cfac(chronic), data = dt)
+plot(clog(visits) ~ insurance, data = dt, varwidth = TRUE)
+plot(clog(visits) ~ gender, data = dt, varwidth = TRUE)
+plot(cfac(visits, c(0:2, 4, 6, 10, 100)) ~ school, data = dt, breaks = 9)
+```
+and are shown (with slightly enhanced labeling) in @fig-visits2. 
+The last plot uses a different type of display. Here, the dependent count variable
+is not log-transformed but grouped into a factor and then a spinogram
+is produced. This also groups the regressor (as in a histogram) and then
+produces a highlighted mosaic plot. All displays show that the number of
+doctor visits increases or decreases with the regressors as expected: `visits`
+decreases with the general health status but increases with the number of
+chronic conditions or hospital stays. The median number of visits is also
+slightly higher for patients with a private insurance and higher level of 
+education. It is slightly lower for male compared to female patients.
+The overall impression from all displays is that the changes in the mean
+can only explain a modest amount of variation in the data.
+
+```{r models}
+#| echo: false
+#| output: false
+
+if(refit_models & file.exists("countreg-models.rda")) file.remove("countreg-models.rda")
+if(file.exists("countreg-models.rda")) {
+  load("countreg-models.rda")
+} else {
+  fm_pois   <-      glm(visits ~ ., data = dt, family = poisson)
+  fm_qpois  <-      glm(visits ~ ., data = dt, family = quasipoisson)
+  fm_nbin   <-   glm.nb(visits ~ ., data = dt)
+  fm_zinb0  <- zeroinfl(visits ~ ., data = dt, dist = "negbin")
+  fm_zinb   <- zeroinfl(visits ~ . | chronic + insurance + school + gender, data = dt, dist = "negbin")
+  fm_hurdle0<-   hurdle(visits ~ ., data = dt, dist = "negbin")
+  fm_hurdle <-   hurdle(visits ~ . | chronic + insurance + school + gender, data = dt, dist = "negbin")
+  fm_hurdle2<-   hurdle(visits ~ ., data = dt2, dist = "negbin")
+  if(!refit_models) save(fm_pois, fm_qpois, fm_nbin, fm_zinb0, fm_zinb, fm_hurdle0, fm_hurdle, fm_hurdle2, file = "countreg-models.rda")
+}
+```
+
+
+### Poisson regression
+
+As a first attempt to capture the relationship between the number of 
+physician office visits and all regressors---described in R by the
+formula `visits ~ .`---in a parametric
+regression model, we fit the basic Poisson regression model
+```{r poisson}
+#| eval: false
+
+fm_pois <- glm(visits ~ ., data = dt, family = poisson)
+```
+and obtain the coefficient estimates along with associated partial Wald tests
+```{r summary-poisson}
+summary(fm_pois)
+```
+All coefficient estimates confirm the results from the exploratory analysis
+in @fig-visits2. All coefficients are highly significant with the
+health variables leading to somewhat larger Wald statistics compared to the
+socio-economic variables. However, the Wald test
+results might be too optimistic due to a misspecification of the likelihood.
+As the exploratory analysis suggested that over-dispersion is present in this data
+set, we re-compute the Wald tests using sandwich standard errors via
+```{r coeftest-poisson}
+coeftest(fm_pois, vcov = sandwich)
+```
+All regressors are still significant but the standard errors seem to be more
+appropriate. This will also be confirmed by the following models that
+deal with over-dispersion (and excess zeros) in a more formal way.
+
+
+### Quasi-Poisson regression
+
+The quasi-Poisson model
+```{r quasipoisson}
+#| eval: false
+
+fm_qpois <- glm(visits ~ ., data = dt, family = quasipoisson)
+```
+leads to an estimated dispersion of
+$\hat \phi = `r round(summary(fm_qpois)$dispersion, digits = 3)`$ which
+is clearly larger than $1$ confirming that over-dispersion is present in
+the data.\footnote{Alternatively, over-dispersion can be confirmed by comparison
+of the log-likelihoods of the Poisson and negative binomial model.}
+The resulting partial Wald tests of the coefficients
+are rather similar to the results obtained from the Poisson regression with
+sandwich standard errors, leading to the same conclusions. As before, they
+can be obtained via
+```{r summary-quasipoisson}
+#| eval: false
+
+summary(fm_qpois)
+```
+The output is suppressed here and is presented in tabular form in @tbl-summary.
+
+
+### Negative binomial regression
+
+A more formal way to accommodate over-dispersion in a count data regression
+model is to use a negative binomial model, as in
+```{r nbin}
+#| eval: false
+
+fm_nbin <- glm.nb(visits ~ ., data = dt)
+summary(fm_nbin)
+```
+As shown in @tbl-summary,
+both regression coefficients and standard errors are rather similar
+to the quasi-Poisson and the sandwich-adjusted Poisson results above. Thus,
+in terms of predicted means all three models give very similar results;
+the associated partial Wald tests also lead to the same conclusions.
+
+One advantage of the negative binomial model is that it is associated with a formal
+likelihood so that information criteria are readily available. Furthermore, the expected
+number of zeros can be computed from the fitted densities via 
+$\sum_i f(0, \hat \mu_i, \hat \theta)$. 
+
+
+```{r summary-table}
+#| echo: false
+#| label: tbl-summary
+
+library(tibble)
+
+fm <- list("ML-Pois" = fm_pois, "Adj-Pois" = fm_pois, "Quasi-Pois" = fm_qpois,
+           "NB" = fm_nbin)
+zero_prob <- c("ML-Pois" = round(sum(dpois(0, fitted(fm_pois))), 0),
+               "Adj-Pois" = "",
+               "Quasi-Pois" = "",
+               "NB" = round(sum(dnbinom(0, mu = fitted(fm_nbin),
+                                        size = fm_nbin$theta)), 0))
+## TODO: Add number of parameters
+
+# f0 <- cbind(c("term", " f(0)"), rbind(names(zero_prob), zero_prob))
+f0 <- cbind("$\\sum_{i} \\hat{f}_{i}(0)$", t(zero_prob))
+row.names(f0) <- NULL
+colnames(f0) <- NULL
+f0 <- as_tibble(f0)
+
+
+modelsummary(fm, output = "markdown",
+             vcov = c("classical", "robust", "classical", "classical"),
+             gof_omit = "Num.Obs|F|RMSE|Std.Errors", add_rows = f0)
+
+```
+
