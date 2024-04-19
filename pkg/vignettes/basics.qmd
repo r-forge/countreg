@@ -491,11 +491,22 @@ number of zeros can be computed from the fitted densities via
 $\sum_i f(0, \hat \mu_i, \hat \theta)$. 
 
 
+```{r summary-table-caption}
+fm_cap <- paste("Summary of fitted count regression models for NMES data:",
+                "coefficient estimates from count model, zero-inflation model",
+                "(both with standard errors in parantheses)",
+                ", number of estimated parameters, maximized log-likelihood, AIC, BIC",
+                "and expected number of zeros (sum of fitted densities evaluated at zero).",
+                "The observed number of zeros is", sum(dt$visits < 1), "in",
+                nrow(dt), "observations.")
+```
+
+
 ```{r summary-table}
 #| echo: false
+#| warning: false
 #| label: tbl-summary
-
-library(tibble)
+#| tbl-cap: !expr fm_cap
 
 fm <- list("ML-Pois" = fm_pois, "Adj-Pois" = fm_pois, "Quasi-Pois" = fm_qpois,
            "NB" = fm_nbin)
@@ -504,18 +515,16 @@ zero_prob <- c("ML-Pois" = round(sum(dpois(0, fitted(fm_pois))), 0),
                "Quasi-Pois" = "",
                "NB" = round(sum(dnbinom(0, mu = fitted(fm_nbin),
                                         size = fm_nbin$theta)), 0))
-## TODO: Add number of parameters
+npars <- sapply(fm, function(x) attr(logLik(x), "df"))
+addrows <- cbind(c("no. of parameters", "$\\sum_{i} \\hat{f}_{i}(0)$"),
+                 t(cbind(npars, zero_prob)))
+addrows <- as.data.frame(addrows)
 
-# f0 <- cbind(c("term", " f(0)"), rbind(names(zero_prob), zero_prob))
-f0 <- cbind("$\\sum_{i} \\hat{f}_{i}(0)$", t(zero_prob))
-row.names(f0) <- NULL
-colnames(f0) <- NULL
-f0 <- as_tibble(f0)
-
+# end_coefs <- 2 * length(coef(fm_pois)) + 1
+# attr(addrows, "position") <- c(end_coefs, end_coefs + 4)
 
 modelsummary(fm, output = "markdown",
              vcov = c("classical", "robust", "classical", "classical"),
-             gof_omit = "Num.Obs|F|RMSE|Std.Errors", add_rows = f0)
-
+             gof_omit = "Num.Obs|F|RMSE|Std.Errors", add_rows = addrows)
 ```
 

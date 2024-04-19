@@ -5,7 +5,7 @@ Title: Count Data Regression
 Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org", comment = c(ORCID = "0000-0003-0918-3766")),
              person(given = "Christian", family = "Kleiber", role = "aut", email = "Christian.Kleiber@unibas.ch", comment = c(ORCID = "0000-0002-6781-4733")),
              person(given = "Thorsten", family = "Simon", role = "ctb", comment = c(ORCID = "0000-0002-3778-7738")),
-             person(given = "Kevin", family = "Huynh", role = "ctb", email = "Kevin.Huynh@unibas.ch"))
+             person(given = "Kevin", family = "Huynh", role = "ctb", email = "Kevin.Huynh@unibas.ch", comment = c(ORCID = "0000-0002-4621-2274")))
 Description: Regression models for count data, including negative binomial, zero-inflated, zero-truncated,
              and hurdle models. Drivers for combination with flexmix and mboost are also provided.
              Previously available functions for graphical goodness-of-fit assessment (rootograms etc.)
