@@ -7,6 +7,8 @@ crossref:
   eq-prefix: ""
 ---
 
+{{< include _preliminaries.qmd >}}
+
 ## Hurdle models
 
 In addition to over-dispersion, many empirical count data sets
@@ -189,6 +191,235 @@ provides partial Wald tests for all coefficients. Again, no `anova()` method is 
 but the general functions `coeftest()` and `waldtest()` from **lmtest**,
 as well as `linearHypothesis()` from **car** can be used for Wald tests,
 and `lrtest()` from **lmtest** for LR tests of nested models. 
+
+
+## Illustrations {#sec-illustrations}
+
+In the following, we illustrate hurdle and zero-inflated models by applying
+them to the cross-sectional data set used in @countreg:Deb+Trivedi:1997. It is 
+based on the US National Medical Expenditure Survey (NMES) for 1987/88 and is
+available from the data archive of the _Journal of Applied Econometrics_ at
+<https://journaldata.zbw.eu/dataset/demand-for-medical-care-by-the-elderly-a-finite-mixture-approach>. 
+It was prepared for the R package **AER** accompanying
+@countreg:Kleiber+Zeileis:2008 and is also available as `DebTrivedi.rda` in the
+_Journal of Statistical Software_ together with @countreg:Zeileis:2006. The same
+data set is used to illustrate some basic count data models in the article
+["Basics"](basics.qmd#sec-illustrations), which further contains a more detailed
+description and a basic exploratory analysis of the data.
+
+The objective is to model the number of physician office visits `visits`
+using the health status variables
+`health` (self-perceived health status),
+`chronic` (number of chronic conditions),
+as well as the socio-economic variables
+`gender`,
+`school` (number of years of education), and
+`insurance` (private insurance indicator) as regressors. For convenience, we
+select the variables used from the full data set:
+
+```{r dt_notrun}
+data("NMES1988", package = "AER")
+dt <- NMES1988[, c(1, 7, 8, 13, 15, 18)]
+```
+
+At the end, we will provide a brief comparison between the zero-adjusted models
+and the basic count data models illustrated in
+["Basics"](basics.qmd#sec-illustrations).
+
+
+### Hurdle regression
+
+The exploratory analysis in ["Basics"](basics.qmd#sec-illustrations) conveyed 
+the impression that there might be more zero observations
+than explained by the basic count data distributions, hence a negative
+binomial hurdle model is fitted via
+```{r hurdle0}
+#| eval: false
+fm_hurdle0 <- hurdle(visits ~ ., data = dt, dist = "negbin")
+```
+This uses the same type of count data model as in the preceeding section
+but it is now truncated for `visits < 1` and has an additional hurdle
+component modeling zero vs. count observations. By default, the hurdle
+component is a binomial GLM with logit link which contains all regressors used in the count
+model. The associated coefficient estimates and partial Wald tests for
+both model components are displayed via
+```{r summary-hurdle0}
+summary(fm_hurdle0)
+```
+The coefficients in the count component resemble those from the previous
+models, but the increase in the log-likelihood (see also @tbl-summary)
+conveys that the model has improved by including the hurdle component.
+However, it might be possible to omit the `health` variable from
+the hurdle model. To test this hypothesis, the reduced model is fitted
+via
+```{r hurdle}
+#| eval: false
+
+fm_hurdle <- hurdle(visits ~ . | chronic + insurance + school + gender,
+  data = dt, dist = "negbin")
+```
+and can then be compared to the full model in a Wald test
+```{r waldtest-hurdle}
+waldtest(fm_hurdle0, fm_hurdle)
+```
+or an LR test
+```{r lrtest-hurdle, eval=FALSE}
+lrtest(fm_hurdle0, fm_hurdle)
+```
+which leads to virtually identical results.
+
+```{r summary-table-prep}
+#| echo: false
+fm_cap <- paste("Summary of fitted count regression models for NMES data",
+                '(including the models from ["Basics"](basics.qmd#sec-illustrations)):',
+                "coefficient estimates from count model, zero-inflation model",
+                "(both with standard errors in parantheses)",
+                ", number of estimated parameters, maximized log-likelihood, AIC, BIC",
+                "and expected number of zeros (sum of fitted densities evaluated at zero).",
+                "The observed number of zeros is", sum(dt$visits < 1), "in",
+                nrow(dt), "observations.")
+
+# Modify output of hurdle and zeroinfl models
+msedit <- function(x) {
+  out <- modelsummary(x, output = "modelsummary_list")
+  out$tidy$term <- gsub("count_", "", out$tidy$term) # remove count_ prefix
+  out$glance$logLik <- logLik(x) # add loglik
+  
+  return(out)
+}
+
+ms_zero_models <- lapply(list("NB-Hurdle" = fm_hurdle, "ZINB" = fm_zinb), msedit)
+
+## Modify output of hurdle and zeroinfl models
+ms_fm_hurdle <- modelsummary(fm_hurdle, output = "modelsummary_list")
+
+# remove count_ prefix for variables
+ms_fm_hurdle$tidy$term <- gsub("count_", "", ms_fm_hurdle$tidy$term)
+
+# add loglik
+ms_fm_hurdle$glance$logLik <- logLik(fm_hurdle)
+```
+
+```{r summary-table}
+#| echo: false
+#| warning: false
+#| label: tbl-summary
+#| tbl-cap: !expr fm_cap
+
+fm <- c(list("ML-Pois" = fm_pois, "Adj-Pois" = fm_pois, "Quasi-Pois" = fm_qpois,
+           "NB" = fm_nbin), ms_zero_models)
+zero_prob <- c("ML-Pois" = round(sum(dpois(0, fitted(fm_pois))), 0),
+               "Adj-Pois" = "",
+               "Quasi-Pois" = "",
+               "NB" = round(sum(dnbinom(0, mu = fitted(fm_nbin),
+                                        size = fm_nbin$theta)), 0),
+               "NB-Hurdle" = round(sum(predict(fm_hurdle, type = "density", at = 0)), 0),
+               "ZINB" = round(sum(predict(fm_zinb, type = "density", at = 0)), 0))
+
+npars <- sapply(fm[-match(c("NB-Hurdle", "ZINB"), names(fm))],
+                function(x) attr(logLik(x), "df"))
+npars <- c(npars, sapply(list(fm_hurdle, fm_zinb), function(x) attr(logLik(x), "df")))
+addrows <- cbind(c("no. of parameters", "$\\sum_{i} \\hat{f}_{i}(0)$"),
+                 t(cbind(npars, zero_prob)))
+addrows <- as.data.frame(addrows)
+
+# end_coefs <- 2 * length(coef(fm_pois)) + 1
+# attr(addrows, "position") <- c(end_coefs, end_coefs + 4)
+
+out <- modelsummary(fm, output = "markdown",
+             vcov = c("classical", "robust", "classical", "classical",
+                      "classical", "classical"),
+             gof_omit = "R2|R2 Adj.|Num.Obs|F|RMSE|Std.Errors", add_rows = addrows)
+
+# remove _zero for parameters in zero part
+out@table_dataframe[,1] <- gsub("zero_", "", out@table_dataframe[,1])
+
+# add horizontal line before zero part
+tinytable::style_tt(out, i = length(coef(fm_pois))*2, line = "b", line_width = 0.05)
+
+```
+
+
+### Comparison
+
+Having fitted several count data regression models to the demand for medical care
+in the NMES data, it is, of course, of interest to understand what these models have
+in common and what their differences are. In this section, we show how to compute
+the components of @tbl-summary and provide some further comments and
+interpretations. 
+
+As a first comparison, it is of natural
+interest to inspect the estimated regression coefficients in the count data model
+
+```{r coef-count, results='hide'}
+fm <- list("ML-Pois" = fm_pois, "Quasi-Pois" = fm_qpois, "NB" = fm_nbin,
+  "Hurdle-NB" = fm_hurdle, "ZINB" = fm_zinb)
+sapply(fm, function(x) coef(x)[1:7])
+```
+
+The result (see @tbl-summary) shows that there are some small differences,
+especially between the GLMs and the
+zero-augmented models. However, the zero-augmented models have to be interpreted 
+slightly differently: While the GLMs all have the same mean function ($g(\mu_i) \quad = \quad x_i^\top \beta$, see ["Basics"](basics.qmd)),
+the zero-augmentation also enters the mean function, see (@eq-zeroinfl-mean) and
+(@eq-hurdle-mean). Nevertheless,
+the overall impression is that the estimated mean functions are rather similar.
+Moreover, the associated estimated standard errors
+are very similar as well (see @tbl-summary):
+```{r se-count, results='hide'}
+cbind("ML-Pois" = sqrt(diag(vcov(fm_pois))),
+  "Adj-Pois" = sqrt(diag(sandwich(fm_pois))),
+  sapply(fm[-1], function(x) sqrt(diag(vcov(x)))[1:7]))
+```
+The only exception are the model-based standard errors for the Poisson model,
+when treated as a fully specified model, which is obviously not appropriate for this data set.
+
+In summary, the models are not too different with respect to their fitted 
+mean functions. The differences become obvious if not only the mean but the
+full likelihood is considered:
+```{r logLik}
+rbind(logLik = sapply(fm, function(x) round(logLik(x), digits = 0)),
+  Df = sapply(fm, function(x) attr(logLik(x), "df")))
+```
+The ML Poisson model is clearly inferior to all other fits. The quasi-Poisson
+model and the sandwich-adjusted Poisson model are not associated with a fitted
+likelihood. The negative binomial already improves the fit dramatically but
+can in turn be improved by the hurdle and zero-inflated models which give
+almost identical fits. This also reflects that the over-dispersion in the data
+is captured better by the negative-binomial-based models than the plain
+Poisson model. Additionally, it is of interest how the zero counts
+are captured by the various models. Therefore, the observed zero counts are
+compared to the expected number of zero counts for the likelihood-based models:
+```{r zero-counts}
+round(c("Obs" = sum(dt$visits < 1),
+  "ML-Pois" = sum(dpois(0, fitted(fm_pois))),
+  "NB" = sum(dnbinom(0, mu = fitted(fm_nbin), size = fm_nbin$theta)),
+  "NB-Hurdle" = sum(predict(fm_hurdle, type = "density", at = 0)),
+  "ZINB" = sum(predict(fm_zinb, type = "density", at = 0))))
+```
+Thus, the ML Poisson model is again not appropriate whereas the negative-binomial-based
+models are much better in modeling the zero counts. By construction, the
+expected number of zero counts in the hurdle model matches the observed
+number.
+
+In summary, the hurdle and zero-inflation models lead to the best 
+results (in terms of likelihood) on this data set. Above, their mean function for the
+count component was already shown to be very similar, below we take a
+look at the fitted zero components:
+```{r coef-zero}
+t(sapply(fm[4:5], function(x) round(x$coefficients$zero, digits = 3)))
+```
+This shows that the absolute values are rather different---which is not
+surprising as they pertain to slightly different ways of modeling zero
+counts---but the signs of the coefficients match, i.e., are just inversed.
+For the hurdle model, the zero hurdle component describes the probability
+of observing a positive count whereas, for the ZINB model, the zero-inflation
+component predicts the probability of observing a zero count from the
+point mass component. Overall, both models lead to the same qualitative
+results and very similar model fits. Perhaps the hurdle model is slightly
+preferable because it has the nicer interpretation: there is one process
+that controls whether a patient sees a physician or not, and a second 
+process that determines how many office visits are made.
 
 
 ## Technical details for hurdle models {#sec-hurdle}
