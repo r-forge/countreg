@@ -1,0 +1,68 @@
+:::{.hidden}
+$$
+\newcommand{\E}{\mathsf{E}}
+\newcommand{\VAR}{\mathsf{VAR}}
+\newcommand{\COV}{\mathsf{COV}}
+\newcommand{\Prob}{\mathsf{P}}
+$$
+:::
+
+```{r preliminaries}
+#| echo: false
+#| output: false
+
+library("sandwich")
+library("lmtest")
+library("MASS")
+library("car")
+library("countreg")
+library("modelsummary")
+
+clog <- function(x) log(x + 0.5)
+cfac <- function(x, breaks = NULL) {
+  if(is.null(breaks)) breaks <- unique(quantile(x, 0:10/10))
+  x <- cut(x, breaks, include.lowest = TRUE, right = FALSE)
+  levels(x) <- paste(breaks[-length(breaks)], ifelse(diff(breaks) > 1,
+    c(paste("-", breaks[-c(1, length(breaks))] - 1, sep = ""), "+"), ""), sep = "")
+  return(x)
+}
+
+refit_models <- TRUE
+```
+
+```{r dt}
+#| echo: false
+
+data("NMES1988", package = "AER")
+dt <- NMES1988[, c(1, 7, 8, 13, 15, 18)]
+```
+
+```{r dt2}
+#| echo: false
+
+dt2 <- NMES1988[, -(2:6)]
+dt2$region <- relevel(dt2$region, "other")
+```
+
+
+```{r models}
+#| echo: false
+#| output: false
+
+# Fit models used in basics.qmd and zero-augmented.qmd
+
+if(refit_models & file.exists("countreg-models.rda")) file.remove("countreg-models.rda")
+if(file.exists("countreg-models.rda")) {
+  load("countreg-models.rda")
+} else {
+  fm_pois   <-      glm(visits ~ ., data = dt, family = poisson)
+  fm_qpois  <-      glm(visits ~ ., data = dt, family = quasipoisson)
+  fm_nbin   <-   glm.nb(visits ~ ., data = dt)
+  fm_zinb0  <- zeroinfl(visits ~ ., data = dt, dist = "negbin")
+  fm_zinb   <- zeroinfl(visits ~ . | chronic + insurance + school + gender, data = dt, dist = "negbin")
+  fm_hurdle0<-   hurdle(visits ~ ., data = dt, dist = "negbin")
+  fm_hurdle <-   hurdle(visits ~ . | chronic + insurance + school + gender, data = dt, dist = "negbin")
+  fm_hurdle2<-   hurdle(visits ~ ., data = dt2, dist = "negbin")
+  if(!refit_models) save(fm_pois, fm_qpois, fm_nbin, fm_zinb0, fm_zinb, fm_hurdle0, fm_hurdle, fm_hurdle2, file = "countreg-models.rda")
+}
+```

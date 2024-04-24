@@ -5,37 +5,10 @@ bibliography: countreg.bib
 crossref:
   eq-prefix: ""
 ---
-:::{.hidden}
-$$
-\newcommand{\E}{\mathsf{E}}
-\newcommand{\VAR}{\mathsf{VAR}}
-\newcommand{\COV}{\mathsf{COV}}
-\newcommand{\Prob}{\mathsf{P}}
-$$
-:::
 
-```{r preliminaries}
-#| echo: false
-#| output: false
+{{< include _preliminaries.qmd >}}
 
-library("sandwich")
-library("lmtest")
-library("MASS")
-library("car")
-library("countreg")
-library("modelsummary")
-
-clog <- function(x) log(x + 0.5)
-cfac <- function(x, breaks = NULL) {
-  if(is.null(breaks)) breaks <- unique(quantile(x, 0:10/10))
-  x <- cut(x, breaks, include.lowest = TRUE, right = FALSE)
-  levels(x) <- paste(breaks[-length(breaks)], ifelse(diff(breaks) > 1,
-    c(paste("-", breaks[-c(1, length(breaks))] - 1, sep = ""), "+"), ""), sep = "")
-  return(x)
-}
-
-refit_models <- TRUE
-```
+## Generalized linear models
 
 The basic count data regression models can
 be represented and understood using the GLM
@@ -244,16 +217,11 @@ select the variables used from the full data set:
 hospital days. As this is more appropriately used as a dependent variable for 
 medical care rather than a regressor, it is omitted from the analysis here.
 
-```{r dt}
+```{r dt_notrun}
+#| eval: false
+
 data("NMES1988", package = "AER")
 dt <- NMES1988[, c(1, 7, 8, 13, 15, 18)]
-```
-
-```{r dt2}
-#| echo: false
-
-dt2 <- NMES1988[, -(2:6)]
-dt2$region <- relevel(dt2$region, "other")
 ```
 
 To obtain a first overview of the dependent variable, we employ a histogram of the
@@ -393,26 +361,6 @@ education. It is slightly lower for male compared to female patients.
 The overall impression from all displays is that the changes in the mean
 can only explain a modest amount of variation in the data.
 
-```{r models}
-#| echo: false
-#| output: false
-
-if(refit_models & file.exists("countreg-models.rda")) file.remove("countreg-models.rda")
-if(file.exists("countreg-models.rda")) {
-  load("countreg-models.rda")
-} else {
-  fm_pois   <-      glm(visits ~ ., data = dt, family = poisson)
-  fm_qpois  <-      glm(visits ~ ., data = dt, family = quasipoisson)
-  fm_nbin   <-   glm.nb(visits ~ ., data = dt)
-  fm_zinb0  <- zeroinfl(visits ~ ., data = dt, dist = "negbin")
-  fm_zinb   <- zeroinfl(visits ~ . | chronic + insurance + school + gender, data = dt, dist = "negbin")
-  fm_hurdle0<-   hurdle(visits ~ ., data = dt, dist = "negbin")
-  fm_hurdle <-   hurdle(visits ~ . | chronic + insurance + school + gender, data = dt, dist = "negbin")
-  fm_hurdle2<-   hurdle(visits ~ ., data = dt2, dist = "negbin")
-  if(!refit_models) save(fm_pois, fm_qpois, fm_nbin, fm_zinb0, fm_zinb, fm_hurdle0, fm_hurdle, fm_hurdle2, file = "countreg-models.rda")
-}
-```
-
 
 ### Poisson regression
 
@@ -492,9 +440,10 @@ $\sum_i f(0, \hat \mu_i, \hat \theta)$.
 
 
 ```{r summary-table-caption}
+#| echo: false
 fm_cap <- paste("Summary of fitted count regression models for NMES data:",
-                "coefficient estimates from count model, zero-inflation model",
-                "(both with standard errors in parantheses)",
+                "coefficient estimates from count model",
+                "(with standard errors in parantheses)",
                 ", number of estimated parameters, maximized log-likelihood, AIC, BIC",
                 "and expected number of zeros (sum of fitted densities evaluated at zero).",
                 "The observed number of zeros is", sum(dt$visits < 1), "in",
