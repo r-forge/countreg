@@ -13,7 +13,7 @@ Description: Regression models for count data, including negative binomial, zero
 LazyLoad: yes
 Depends: R (>= 3.6.0), MASS
 Imports: graphics, grDevices, stats, utils, distributions3 (>= 0.2.1), Formula
-Suggests: AER, brglm2, car, flexmix (>= 2.3-11), gamlss, gamlss.dist, ggplot2, lmtest, mboost, methods, nonnest2, sandwich, topmodels, knitr, rmarkdown
+Suggests: AER, brglm2, car, flexmix (>= 2.3-11), gamlss, gamlss.dist, ggplot2, lmtest, mboost, methods, modelsummary, nonnest2, sandwich, topmodels, knitr, rmarkdown
 Additional_repositories: https://R-Forge.R-project.org
 VignetteBuilder: knitr
 License: GPL-2 | GPL-3

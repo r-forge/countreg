@@ -47,7 +47,7 @@ coefficients which are typically estimated by maximum likelihood (ML)
 using the iterative weighted least squares (IWLS) algorithm.
 
 Instead of viewing GLMs as models for the full likelihood (as determined by
-Equation @eq-family)), they can also be regarded as regression models for the
+Equation @eq-family), they can also be regarded as regression models for the
 mean only (as specified in Equation @eq-mean) where the estimating functions
 used for fitting the model are derived from a particular family. As illustrated 
 in the remainder of this section, the estimating function point of view is particularly
@@ -203,7 +203,11 @@ together with @countreg:Zeileis:2006. The objective is to model
 the demand for medical care---as captured by the number of physician/non-physician
 office and hospital outpatient visits---by the covariates available
 for the patients. Here, we adopt the number of physician office visits `visits`
-as the dependent variable and use the health status variables[^1]
+as the dependent variable and use the health status variables^[In addition to 
+the variables considered here,
+@countreg:Zeileis+Kleiber+Jackman:2008 also employ `hospital`, the number of
+hospital days. As this is more appropriately used as a dependent variable for 
+medical care rather than a regressor, it is omitted from the analysis here.]
 `health` (self-perceived health status),
 `chronic` (number of chronic conditions),
 as well as the socio-economic variables
@@ -211,11 +215,6 @@ as well as the socio-economic variables
 `school` (number of years of education), and
 `insurance` (private insurance indicator) as regressors. For convenience, we
 select the variables used from the full data set:
-
-[^1]: In addition to the variables considered here,
-@countreg:Zeileis+Kleiber+Jackman:2008 also employ `hospital`, the number of
-hospital days. As this is more appropriately used as a dependent variable for 
-medical care rather than a regressor, it is omitted from the analysis here.
 
 ```{r dt_notrun}
 #| eval: false
@@ -403,8 +402,8 @@ fm_qpois <- glm(visits ~ ., data = dt, family = quasipoisson)
 leads to an estimated dispersion of
 $\hat \phi = `r round(summary(fm_qpois)$dispersion, digits = 3)`$ which
 is clearly larger than $1$ confirming that over-dispersion is present in
-the data.\footnote{Alternatively, over-dispersion can be confirmed by comparison
-of the log-likelihoods of the Poisson and negative binomial model.}
+the data.^[Alternatively, over-dispersion can be confirmed by comparison
+of the log-likelihoods of the Poisson and negative binomial model.]
 The resulting partial Wald tests of the coefficients
 are rather similar to the results obtained from the Poisson regression with
 sandwich standard errors, leading to the same conclusions. As before, they
