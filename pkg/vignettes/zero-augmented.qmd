@@ -11,21 +11,20 @@ crossref:
 
 ## Hurdle models
 
-In addition to over-dispersion, many empirical count data sets
-exhibit more zero observations than would be allowed for
-by the Poisson model. One model class capable of capturing
-both properties is the hurdle model, 
-originally proposed by @countreg:Mullahy:1986 in the econometrics literature
-[see @countreg:Cameron+Trivedi:1998; @countreg:Cameron+Trivedi:2005 for an overview].
-They are two-component models:
-A truncated count component, such as Poisson, geometric or negative binomial,
-is employed for positive counts, and
-a hurdle component models zero vs. larger counts.
-For the latter, either a binomial model or a censored count distribution can be employed.
+In addition to over-dispersion, many empirical count data sets exhibit
+more zero observations than would be allowed for by the Poisson model.
+One model class capable of capturing both properties is the hurdle
+model, originally proposed by @countreg:Mullahy:1986 in the econometrics
+literature [see @countreg:Cameron+Trivedi:1998;
+@countreg:Cameron+Trivedi:2005 for an overview]. They are two-component
+models: A truncated count component, such as Poisson, geometric or
+negative binomial, is employed for positive counts, and a hurdle
+component models zero vs. larger counts. For the latter, either a
+binomial model or a censored count distribution can be employed.
 
-More formally, the hurdle model combines a count data model 
-$f_\mathrm{count}(y; x, \beta)$ (that is left-truncated at $y = 1$) and a 
-zero hurdle model $f_\mathrm{zero}(y; z, \gamma)$ (right-censored at $y = 1$):
+More formally, the hurdle model combines a count data model
+$f_\mathrm{count}(y; x, \beta)$ (that is left-truncated at $y = 1$) and
+a zero hurdle model $f_\mathrm{zero}(y; z, \gamma)$ (right-censored at $y = 1$):
 $$
 f_\mathrm{hurdle}(y; x, z, \beta, \gamma) =
   \left\{
@@ -36,34 +35,35 @@ f_\mathrm{hurdle}(y; x, z, \beta, \gamma) =
   \end{array}
   \right.
 $$ {#eq-hurdle}
-The model parameters $\beta$, $\gamma$, and potentially one or two additional
-dispersion parameters $\theta$
-(if $f_\mathrm{count}$ or $f_\mathrm{zero}$ or both are negative binomial densities)
-are estimated by ML, where the specification of the likelihood has the advantage that
-the count and the hurdle component can be maximized separately. The corresponding
-mean regression relationship is given by
+The model parameters $\beta$, $\gamma$, and potentially
+one or two additional dispersion parameters $\theta$ (if
+$f_\mathrm{count}$ or $f_\mathrm{zero}$ or both are negative binomial
+densities) are estimated by ML, where the specification of the
+likelihood has the advantage that the count and the hurdle component can
+be maximized separately. The corresponding mean regression relationship
+is given by
 $$
 \log(\mu_i) \quad = \quad x_i^\top \beta +
                     \log(1 - f_\mathrm{zero}(0; z_i, \gamma)) -
-		    \log(1 - f_\mathrm{count}(0; x_i, \beta)),
+            \log(1 - f_\mathrm{count}(0; x_i, \beta)),
 $$ {#eq-hurdle-mean}
-again using the canonical log link.
-For interpreting the zero model as a hurdle, a binomial GLM is probably the most 
-intuitive specification\footnote{Note that
+again using the canonical log link. For
+interpreting the zero model as a hurdle, a binomial GLM is probably the
+most intuitive specification^[Note that
 binomial logit and censored geometric models as the hurdle part both lead to 
-the same likelihood function and thus to the same coefficient estimates [@countreg:Mullahy:1986].}.
-Another useful interpretation arises if the same regressors $x_i = z_i$ are
-used in the same count model in both components $f_\mathrm{count} = f_\mathrm{zero}$: 
-A test of the hypothesis $\beta = \gamma$ then tests whether the hurdle is
-needed or not.
+the same likelihood function and thus to the same coefficient estimates [@countreg:Mullahy:1986].].
+Another useful interpretation arises if the same regressors $x_i = z_i$
+are used in the same count model in both components
+$f_\mathrm{count} = f_\mathrm{zero}$: A test of the hypothesis
+$\beta = \gamma$ then tests whether the hurdle is needed or not.
 
-In R, hurdle count data models can be fitted with the
-`hurdle()` function from the **countreg** package [@countreg:Zeileis+Kleiber:2013].
-Both its fitting function and the returned model objects of class `hurdle`
-are modelled after the corresponding GLM functionality in R. The
-arguments of `hurdle()` are given by
+In R, hurdle count data models can be fitted with the `hurdle()`
+function from the **countreg** package [@countreg:Zeileis+Kleiber:2013].
+Both its fitting function and the returned model objects of class
+`hurdle` are modelled after the corresponding GLM functionality in R.
+The arguments of `hurdle()` are given by
 
-```
+```         
 hurdle(formula, data, subset, na.action, weights, offset,
   dist = "poisson", zero.dist = "binomial", link = "logit",
   control = hurdle.control(...),
@@ -71,65 +71,65 @@ hurdle(formula, data, subset, na.action, weights, offset,
 ```
 
 where the first line contains the standard model-frame specifications,
-the second and third lines have the arguments specific to hurdle models and
-the arguments in the last line control some components of the return value.
+the second and third lines have the arguments specific to hurdle models
+and the arguments in the last line control some components of the return value.
 
-If a `formula` of type `y ~ x1 + x2` is supplied, it not only
-describes the count regression relationship of $y_i$ and $x_i$ but also implies that
-the same set of regressors is used for the zero hurdle component $z_i = x_i$.
-This is could be made more explicit by equivalently writing the formula as
-`y ~ x1 + x2 | x1 + x2`. Of course, a different set of regressors
-could be specified for the zero hurdle component, e.g.,
+If a `formula` of type `y ~ x1 + x2` is supplied, it not only describes
+the count regression relationship of $y_i$ and $x_i$ but also implies
+that the same set of regressors is used for the zero hurdle component
+$z_i = x_i$. This is could be made more explicit by equivalently writing
+the formula as `y ~ x1 + x2 | x1 + x2`. Of course, a different set of
+regressors could be specified for the zero hurdle component, e.g.,
 `y ~ x1 + x2 | z1 + z2 + z3`, giving the count data model `y ~ x1 + x2`
 conditional on (`|`) the zero hurdle model `y ~ z1 + z2 + z3`.
 
-The model likelihood can be specified by the `dist`, `zero.dist` and `link` arguments.
-The count data distribution `dist` is `"poisson"` by default (it
-can also be set to `"negbin"` or `"geometric"`), for which the canonical log link
-is always used. The distribution for the zero hurdle model can be specified via
-`zero.dist`. The default is a binomial model with `link` (defaulting
-to `"logit"`, but all link functions of the `binomial()` family are also supported),
-alternatively a right-censored count distribution (Poisson,
-negative binomial or geometric, all with log link) could be specified.
+The model likelihood can be specified by the `dist`, `zero.dist` and
+`link` arguments. The count data distribution `dist` is `"poisson"` by
+default (it can also be set to `"negbin"` or `"geometric"`), for which
+the canonical log link is always used. The distribution for the zero
+hurdle model can be specified via `zero.dist`. The default is a binomial
+model with `link` (defaulting to `"logit"`, but all link functions of
+the `binomial()` family are also supported), alternatively a
+right-censored count distribution (Poisson, negative binomial or
+geometric, all with log link) could be specified.
 
-ML estimation of all parameters employing analytical gradients is carried out
-using R's `optim()` with control options set in `hurdle.control()`.
-Starting values can be user-supplied, otherwise they are estimated by `glm.fit()`
-(the default). The covariance matrix estimate is derived numerically using
-the Hessian matrix returned by `optim()`.
-See @sec-hurdle for further technical details.
+ML estimation of all parameters employing analytical gradients is
+carried out using R's `optim()` with control options set in
+`hurdle.control()`. Starting values can be user-supplied, otherwise they
+are estimated by `glm.fit()` (the default). The covariance matrix
+estimate is derived numerically using the Hessian matrix returned by
+`optim()`. See @sec-hurdle for further technical details.
 
-The returned fitted-model object of class `hurdle` is a list similar
-to `glm` objects. Some of its elements---such as `coefficients` or
-`terms`---are lists with a zero and count component,
-respectively. For details see @sec-hurdle.
+The returned fitted-model object of class `hurdle` is a list similar to
+`glm` objects. Some of its elements---such as `coefficients` or
+`terms`---are lists with a zero and count component, respectively. For
+details see @sec-hurdle.
 
-A set of standard extractor functions for fitted model objects is available for
-objects of class `hurdle`, including the usual `summary()` method that
-provides partial Wald tests for all coefficients. No `anova()` method is provided,
-but the general `coeftest()`, `waldtest()` from **lmtest**, and `linearHypothesis()`
-from **car** can be used for Wald tests and `lrtest()` from **lmtest**
-for LR tests of nested models. The function `hurdletest()` is a convenience
-interface to `linearHypothesis()` for testing for the presence of a hurdle
-(which is only applicable if the same regressors and the same count distribution
+A set of standard extractor functions for fitted model objects is
+available for objects of class `hurdle`, including the usual `summary()`
+method that provides partial Wald tests for all coefficients. No
+`anova()` method is provided, but the general `coeftest()`, `waldtest()`
+from **lmtest**, and `linearHypothesis()` from **car** can be used for
+Wald tests and `lrtest()` from **lmtest** for LR tests of nested models.
+The function `hurdletest()` is a convenience interface to
+`linearHypothesis()` for testing for the presence of a hurdle (which is
+only applicable if the same regressors and the same count distribution
 are used in both components).
-
 
 ## Zero-inflated models
 
 Zero-inflated models [@countreg:Mullahy:1986; @countreg:Lambert:1992]
-are another model class capable of dealing with excess zero counts 
-\citep[see][for an overview]{countreg:Cameron+Trivedi:1998,countreg:Cameron+Trivedi:2005}.
-They are two-component mixture models
-combining a point mass at zero with a count distribution such as
-Poisson, geometric or negative binomial. Thus, there are two
-sources of zeros: zeros may come from both the point mass and
-from the count component. For modeling the unobserved state
-(zero vs. count), a binary model is used: in the simplest case
+are another model class capable of dealing with excess zero counts [see
+@countreg:Cameron+Trivedi:1998; -@countreg:Cameron+Trivedi:2005 for an
+overview]. They are two-component mixture models combining a point mass
+at zero with a count distribution such as Poisson, geometric or negative
+binomial. Thus, there are two sources of zeros: zeros may come from both
+the point mass and from the count component. For modeling the unobserved
+state (zero vs. count), a binary model is used: in the simplest case
 only with an intercept but potentially containing regressors.
 
-Formally, the zero-inflated density is a mixture of a point mass
-at zero $I_{\{0\}}(y)$ and a count distribution $f_\mathrm{count}(y; x, \beta)$.
+Formally, the zero-inflated density is a mixture of a point mass at zero
+$I_{\{0\}}(y)$ and a count distribution $f_\mathrm{count}(y; x, \beta)$.
 The probability of observing a zero count is inflated with probability
 $\pi = f_\mathrm{zero}(0; z, \gamma)$:
 $$
@@ -137,136 +137,187 @@ f_\mathrm{zeroinfl}(y; x, z, \beta, \gamma) \quad = \quad
   f_\mathrm{zero}(0; z, \gamma) \cdot I_{\{0\}}(y) \; + \;
   (1 - f_\mathrm{zero}(0; z, \gamma)) \cdot f_\mathrm{count}(y; x, \beta),
 $$ {#eq-zeroinfl}
-where $I(\cdot)$ is the indicator function and the unobserved probability $\pi$
-of belonging to the point mass component is modelled by a binomial GLM
-$\pi =  g^{-1}(z^\top \gamma)$.
-The corresponding regression equation for the mean is
+where $I(\cdot)$ is the indicator function and the
+unobserved probability $\pi$ of belonging to the point mass component is
+modelled by a binomial GLM $\pi = g^{-1}(z^\top \gamma)$. The
+corresponding regression equation for the mean is
 $$
 \mu_i \quad = \quad \pi_i \cdot 0 \; + \; (1 - \pi_i) \cdot \exp(x_i^\top \beta),
 $$ {#eq-zeroinfl-mean}
-using the canonical log link.
-The vector of regressors in the zero-inflation model $z_i$
-and the regressors in the count component $x_i$ need not to be distinct---in
-the simplest case, $z_i = 1$ is just
-an intercept. The default link function $g(\pi)$ in binomial GLMs is the
-logit link, but other links such as the probit are also available. The full
-set of parameters of $\beta$, $\gamma$, and potentially the dispersion parameter $\theta$ (if 
-a negative binomial count model is used) can be estimated by ML. Inference
-is typically performed for $\beta$ and $\gamma$, while $\theta$ is treated
-as a nuisance parameter even if a negative binomial model is used.
+using the canonical log link. The vector of
+regressors in the zero-inflation model $z_i$ and the regressors in the
+count component $x_i$ need not to be distinct---in the simplest case,
+$z_i = 1$ is just an intercept. The default link function $g(\pi)$ in
+binomial GLMs is the logit link, but other links such as the probit are
+also available. The full set of parameters of $\beta$, $\gamma$, and
+potentially the dispersion parameter $\theta$ (if a negative binomial
+count model is used) can be estimated by ML. Inference is typically
+performed for $\beta$ and $\gamma$, while $\theta$ is treated as a
+nuisance parameter even if a negative binomial model is used.
 
 In R, zero-inflated count data models can be fitted with the
-`zeroinfl()` function from the **countreg** package. Both 
-the fitting function interface and the returned model objects of class `zeroinfl`
-are almost identical to the corresponding `hurdle()` functionality and again
-modelled after the corresponding GLM functionality in R. The
+`zeroinfl()` function from the **countreg** package. Both the fitting
+function interface and the returned model objects of class `zeroinfl`
+are almost identical to the corresponding `hurdle()` functionality and
+again modelled after the corresponding GLM functionality in R. The
 arguments of `zeroinfl()` are given by
 
-```
+```         
 zeroinfl(formula, data, subset, na.action, weights, offset,
   dist = "poisson", link = "logit", control = zeroinfl.control(...),
   model = TRUE, y = TRUE, x = FALSE, ...)
 ```
 
-where all arguments have almost the same meaning as for `hurdle()`. The main
-difference is that there is no `zero.dist` argument: a binomial model is
-always used for distribution in the zero-inflation component.
+where all arguments have almost the same meaning as for `hurdle()`. The
+main difference is that there is no `zero.dist` argument: a binomial
+model is always used for distribution in the zero-inflation component.
 
-Again, ML estimates of all parameters are obtained from `optim()`,
-with control options set in `zeroinfl.control()` and employing analytical gradients.
-Starting values can be user-supplied, estimated by the expectation maximization (EM)
-algorithm, or by `glm.fit()` (the default).
-The covariance matrix estimate is derived numerically using
+Again, ML estimates of all parameters are obtained from `optim()`, with
+control options set in `zeroinfl.control()` and employing analytical
+gradients. Starting values can be user-supplied, estimated by the
+expectation maximization (EM) algorithm, or by `glm.fit()` (the
+default). The covariance matrix estimate is derived numerically using
 the Hessian matrix returned by `optim()`. Using EM estimation for
-deriving starting values is typically slower but can be numerically more stable.
-It already maximizes the likelihood, but a single `optim()` iteration is used
-for determining the covariance matrix estimate.
-See @sec-zeroinfl for further technical details.
+deriving starting values is typically slower but can be numerically more
+stable. It already maximizes the likelihood, but a single `optim()`
+iteration is used for determining the covariance matrix estimate. See
+@sec-zeroinfl for further technical details.
 
 The returned fitted model object is of class `zeroinfl` whose structure
-is virtually identical to that of `hurdle` models. As above,
-a set of standard extractor functions for fitted model objects is available for
+is virtually identical to that of `hurdle` models. As above, a set of
+standard extractor functions for fitted model objects is available for
 objects of class `zeroinfl`, including the usual `summary()` method that
-provides partial Wald tests for all coefficients. Again, no `anova()` method is provided,
-but the general functions `coeftest()` and `waldtest()` from **lmtest**,
-as well as `linearHypothesis()` from **car** can be used for Wald tests,
-and `lrtest()` from **lmtest** for LR tests of nested models. 
-
+provides partial Wald tests for all coefficients. Again, no `anova()`
+method is provided, but the general functions `coeftest()` and
+`waldtest()` from **lmtest**, as well as `linearHypothesis()` from
+**car** can be used for Wald tests, and `lrtest()` from **lmtest** for
+LR tests of nested models.
 
 ## Illustrations {#sec-illustrations}
 
-In the following, we illustrate hurdle and zero-inflated models by applying
-them to the cross-sectional data set used in @countreg:Deb+Trivedi:1997. It is 
-based on the US National Medical Expenditure Survey (NMES) for 1987/88 and is
-available from the data archive of the _Journal of Applied Econometrics_ at
-<https://journaldata.zbw.eu/dataset/demand-for-medical-care-by-the-elderly-a-finite-mixture-approach>. 
+In the following, we illustrate hurdle and zero-inflated models by
+applying them to the cross-sectional data set used in
+@countreg:Deb+Trivedi:1997. It is based on the US National Medical
+Expenditure Survey (NMES) for 1987/88 and is available from the data
+archive of the *Journal of Applied Econometrics* at
+<https://journaldata.zbw.eu/dataset/demand-for-medical-care-by-the-elderly-a-finite-mixture-approach>.
 It was prepared for the R package **AER** accompanying
-@countreg:Kleiber+Zeileis:2008 and is also available as `DebTrivedi.rda` in the
-_Journal of Statistical Software_ together with @countreg:Zeileis:2006. The same
-data set is used to illustrate some basic count data models in the article
-["Basics"](basics.qmd#sec-illustrations), which further contains a more detailed
-description and a basic exploratory analysis of the data.
+@countreg:Kleiber+Zeileis:2008 and is also available as `DebTrivedi.rda`
+in the *Journal of Statistical Software* together with
+@countreg:Zeileis:2006. The same data set is used to illustrate some
+basic count data models in the article
+["Basics"](basics.qmd#sec-illustrations), which contains a more
+detailed description and a basic exploratory analysis of the data.
 
 The objective is to model the number of physician office visits `visits`
-using the health status variables
-`health` (self-perceived health status),
-`chronic` (number of chronic conditions),
-as well as the socio-economic variables
-`gender`,
-`school` (number of years of education), and
-`insurance` (private insurance indicator) as regressors. For convenience, we
-select the variables used from the full data set:
+using the health status variables `health` (self-perceived health
+status), `chronic` (number of chronic conditions), as well as the
+socio-economic variables `gender`, `school` (number of years of
+education), and `insurance` (private insurance indicator) as regressors.
+For convenience, we select the variables used from the full data set:
 
 ```{r dt_notrun}
 data("NMES1988", package = "AER")
 dt <- NMES1988[, c(1, 7, 8, 13, 15, 18)]
 ```
 
-At the end, we will provide a brief comparison between the zero-adjusted models
-and the basic count data models illustrated in
+At the end, we will provide a brief comparison between the zero-adjusted
+models and the basic count data models illustrated in
 ["Basics"](basics.qmd#sec-illustrations).
-
 
 ### Hurdle regression
 
-The exploratory analysis in ["Basics"](basics.qmd#sec-illustrations) conveyed 
-the impression that there might be more zero observations
-than explained by the basic count data distributions, hence a negative
+The exploratory analysis in ["Basics"](basics.qmd#sec-illustrations)
+conveyed the impression that there might be more zero observations than
+explained by the basic count data distributions, hence a negative
 binomial hurdle model is fitted via
+
 ```{r hurdle0}
 #| eval: false
 fm_hurdle0 <- hurdle(visits ~ ., data = dt, dist = "negbin")
 ```
+
 This uses the same type of count data model as in the preceeding section
 but it is now truncated for `visits < 1` and has an additional hurdle
 component modeling zero vs. count observations. By default, the hurdle
-component is a binomial GLM with logit link which contains all regressors used in the count
-model. The associated coefficient estimates and partial Wald tests for
-both model components are displayed via
+component is a binomial GLM with logit link which contains all
+regressors used in the count model. The associated coefficient estimates
+and partial Wald tests for both model components are displayed via
+
 ```{r summary-hurdle0}
 summary(fm_hurdle0)
 ```
+
 The coefficients in the count component resemble those from the previous
 models, but the increase in the log-likelihood (see also @tbl-summary)
 conveys that the model has improved by including the hurdle component.
-However, it might be possible to omit the `health` variable from
-the hurdle model. To test this hypothesis, the reduced model is fitted
-via
+However, it might be possible to omit the `health` variable from the
+hurdle model. To test this hypothesis, the reduced model is fitted via
+
 ```{r hurdle}
 #| eval: false
 
 fm_hurdle <- hurdle(visits ~ . | chronic + insurance + school + gender,
   data = dt, dist = "negbin")
 ```
+
 and can then be compared to the full model in a Wald test
+
 ```{r waldtest-hurdle}
 waldtest(fm_hurdle0, fm_hurdle)
 ```
+
 or an LR test
+
 ```{r lrtest-hurdle, eval=FALSE}
 lrtest(fm_hurdle0, fm_hurdle)
 ```
+
 which leads to virtually identical results.
+
+### Zero-inflated regression
+
+A different way of augmenting the negative binomial count model
+`fm_nbin` with additional probability weight for zero counts is a
+zero-inflated negative binomial (ZINB) regression. The default model is
+fitted via
+
+```{r zinb0}
+#| eval: false
+
+fm_zinb0 <- zeroinfl(visits ~ ., data = dt, dist = "negbin")
+```
+
+As for the hurdle model above, all regressors from the count model are
+also used in the zero-inflation model. Again, we can modify the
+regressors in the zero-inflation part, e.g., by fitting a second model
+
+```{r zinb}
+#| eval: false
+
+fm_zinb <- zeroinfl(visits ~ . | chronic + insurance + school + gender,
+  data = dt, dist = "negbin")
+```
+
+that has the same variables in the zero-inflation part as the hurdle
+component in `fm_hurdle`. By omitting the `health` variable, the fit
+does not change significantly which can again be brought out by a Wald
+test
+
+```{r waldtest-zinb}
+waldtest(fm_zinb0, fm_zinb)
+```
+
+or an LR test `lrtest(fm_zinb0, fm_zinb)` that produces virtually
+identical results. The chosen fitted model can again be inspected via
+
+```{r summary-zinb}
+#| eval: false
+
+summary(fm_zinb)
+```
+
+See @tbl-summary for a more concise summary.
 
 ```{r summary-table-prep}
 #| echo: false
@@ -339,57 +390,81 @@ tinytable::style_tt(out, i = length(coef(fm_pois))*2, line = "b", line_width = 0
 
 ```
 
-
 ### Comparison
 
-Having fitted several count data regression models to the demand for medical care
-in the NMES data, it is, of course, of interest to understand what these models have
-in common and what their differences are. In this section, we show how to compute
-the components of @tbl-summary and provide some further comments and
-interpretations. 
+Having fitted hurdle and zero-inflated models to the demand for medical
+care in the NMES data, it is, of course, of interest to understand what
+these models have in common and what their differences are, especially
+in comparison to the basic count data models described in
+["Basics"](basics.qmd#sec-illustrations). In this section, we show how
+to compute the components of @tbl-summary and provide some further
+comments and interpretations.
 
-As a first comparison, it is of natural
-interest to inspect the estimated regression coefficients in the count data model
+Before we start the analysis, we refit the models from
+["Basics"](basics.qmd#sec-illustrations):
 
-```{r coef-count, results='hide'}
+```{r refit}
+#| eval: false
+
+fm_pois <- glm(visits ~ ., data = dt, family = poisson)
+fm_qpois <- glm(visits ~ ., data = dt, family = quasipoisson)
+fm_nbin <- glm.nb(visits ~ ., data = dt)
+
+```
+
+As a first comparison, it is of natural interest to inspect the
+estimated regression coefficients in the count data model
+
+```{r coef-count}
+#| output: false
+
 fm <- list("ML-Pois" = fm_pois, "Quasi-Pois" = fm_qpois, "NB" = fm_nbin,
   "Hurdle-NB" = fm_hurdle, "ZINB" = fm_zinb)
 sapply(fm, function(x) coef(x)[1:7])
 ```
 
-The result (see @tbl-summary) shows that there are some small differences,
-especially between the GLMs and the
-zero-augmented models. However, the zero-augmented models have to be interpreted 
-slightly differently: While the GLMs all have the same mean function ($g(\mu_i) \quad = \quad x_i^\top \beta$, see ["Basics"](basics.qmd)),
-the zero-augmentation also enters the mean function, see (@eq-zeroinfl-mean) and
-(@eq-hurdle-mean). Nevertheless,
-the overall impression is that the estimated mean functions are rather similar.
-Moreover, the associated estimated standard errors
-are very similar as well (see @tbl-summary):
-```{r se-count, results='hide'}
+The result (see @tbl-summary) shows that there are some small
+differences, especially between the GLMs and the zero-augmented models.
+However, the zero-augmented models have to be interpreted slightly
+differently: While the GLMs all have the same mean function
+($g(\mu_i) = x_i^\top \beta$, see ["Basics"](basics.qmd)), the
+zero-augmentation also enters the mean function, see (@eq-zeroinfl-mean)
+and (@eq-hurdle-mean). Nevertheless, the overall impression is that the
+estimated mean functions are rather similar. Moreover, the associated
+estimated standard errors are very similar as well (see @tbl-summary):
+
+```{r se-count}
+#| output: false
+
 cbind("ML-Pois" = sqrt(diag(vcov(fm_pois))),
   "Adj-Pois" = sqrt(diag(sandwich(fm_pois))),
   sapply(fm[-1], function(x) sqrt(diag(vcov(x)))[1:7]))
 ```
-The only exception are the model-based standard errors for the Poisson model,
-when treated as a fully specified model, which is obviously not appropriate for this data set.
 
-In summary, the models are not too different with respect to their fitted 
-mean functions. The differences become obvious if not only the mean but the
-full likelihood is considered:
+The only exception are the model-based standard errors for the Poisson
+model, when treated as a fully specified model, which is obviously not
+appropriate for this data set.
+
+In summary, the models are not too different with respect to their
+fitted mean functions. The differences become obvious if not only the
+mean but the full likelihood is considered:
+
 ```{r logLik}
 rbind(logLik = sapply(fm, function(x) round(logLik(x), digits = 0)),
   Df = sapply(fm, function(x) attr(logLik(x), "df")))
 ```
-The ML Poisson model is clearly inferior to all other fits. The quasi-Poisson
-model and the sandwich-adjusted Poisson model are not associated with a fitted
-likelihood. The negative binomial already improves the fit dramatically but
-can in turn be improved by the hurdle and zero-inflated models which give
-almost identical fits. This also reflects that the over-dispersion in the data
-is captured better by the negative-binomial-based models than the plain
-Poisson model. Additionally, it is of interest how the zero counts
-are captured by the various models. Therefore, the observed zero counts are
-compared to the expected number of zero counts for the likelihood-based models:
+
+The ML Poisson model is clearly inferior to all other fits. The
+quasi-Poisson model and the sandwich-adjusted Poisson model are not
+associated with a fitted likelihood. The negative binomial already
+improves the fit dramatically but can in turn be improved by the hurdle
+and zero-inflated models which give almost identical fits. This also
+reflects that the over-dispersion in the data is captured better by the
+negative-binomial-based models than the plain Poisson model.
+Additionally, it is of interest how the zero counts are captured by the
+various models. Therefore, the observed zero counts are compared to the
+expected number of zero counts for the likelihood-based models:
+
 ```{r zero-counts}
 round(c("Obs" = sum(dt$visits < 1),
   "ML-Pois" = sum(dpois(0, fitted(fm_pois))),
@@ -397,71 +472,76 @@ round(c("Obs" = sum(dt$visits < 1),
   "NB-Hurdle" = sum(predict(fm_hurdle, type = "density", at = 0)),
   "ZINB" = sum(predict(fm_zinb, type = "density", at = 0))))
 ```
-Thus, the ML Poisson model is again not appropriate whereas the negative-binomial-based
-models are much better in modeling the zero counts. By construction, the
-expected number of zero counts in the hurdle model matches the observed
-number.
 
-In summary, the hurdle and zero-inflation models lead to the best 
-results (in terms of likelihood) on this data set. Above, their mean function for the
-count component was already shown to be very similar, below we take a
-look at the fitted zero components:
+Thus, the ML Poisson model is again not appropriate whereas the
+negative-binomial-based models are much better in modeling the zero
+counts. By construction, the expected number of zero counts in the
+hurdle model matches the observed number.
+
+In summary, the hurdle and zero-inflation models lead to the best
+results (in terms of likelihood) on this data set. Above, their mean
+function for the count component was already shown to be very similar,
+below we take a look at the fitted zero components:
+
 ```{r coef-zero}
 t(sapply(fm[4:5], function(x) round(x$coefficients$zero, digits = 3)))
 ```
+
 This shows that the absolute values are rather different---which is not
 surprising as they pertain to slightly different ways of modeling zero
-counts---but the signs of the coefficients match, i.e., are just inversed.
-For the hurdle model, the zero hurdle component describes the probability
-of observing a positive count whereas, for the ZINB model, the zero-inflation
-component predicts the probability of observing a zero count from the
-point mass component. Overall, both models lead to the same qualitative
-results and very similar model fits. Perhaps the hurdle model is slightly
-preferable because it has the nicer interpretation: there is one process
-that controls whether a patient sees a physician or not, and a second 
-process that determines how many office visits are made.
-
+counts---but the signs of the coefficients match, i.e., are just
+inversed. For the hurdle model, the zero hurdle component describes the
+probability of observing a positive count whereas, for the ZINB model,
+the zero-inflation component predicts the probability of observing a
+zero count from the point mass component. Overall, both models lead to
+the same qualitative results and very similar model fits. Perhaps the
+hurdle model is slightly preferable because it has the nicer
+interpretation: there is one process that controls whether a patient
+sees a physician or not, and a second process that determines how many
+office visits are made.
 
 ## Technical details for hurdle models {#sec-hurdle}
 
-The fitting of hurdle models via ML in `hurdle()` is controlled by
-the arguments in the `hurdle.control()` wrapper function:
+The fitting of hurdle models via ML in `hurdle()` is controlled by the
+arguments in the `hurdle.control()` wrapper function:
 
-```
+```         
 hurdle.control(method = "BFGS", maxit = 10000, trace = FALSE,
   separate = TRUE, start = NULL, ...)
 ```
 
-This modifies some default arguments passed on to the optimizer `optim()`,
-such as `method`, `maxit` and `trace`. The latter is also
+This modifies some default arguments passed on to the optimizer
+`optim()`, such as `method`, `maxit` and `trace`. The latter is also
 used within `hurdle()` and can be set to produce more verbose output
-concerning the fitting process. The argument `separate` controls
-whether the two components of the model are optimized separately (the default)
-or not. This is possible because there are no mixed sources for the zeros
-in the data (unlike in zero-inflation models). The argument `start`
-controls the choice of starting values for calling `optim()`, all remaining
-arguments passed through `...` are directly passed on to `optim()`.
+concerning the fitting process. The argument `separate` controls whether
+the two components of the model are optimized separately (the default)
+or not. This is possible because there are no mixed sources for the
+zeros in the data (unlike in zero-inflation models). The argument
+`start` controls the choice of starting values for calling `optim()`,
+all remaining arguments passed through `...` are directly passed on to
+`optim()`.
 
 By default, starting values are estimated by calling `glm.fit()` for
 both components of the model separately, once for the counts and once
-for zero vs. non-zero counts. If starting values are supplied,
-`start` needs to be set to a named list with the parameters for the
-`$count` and `$zero` part of the model (and potentially a
-`$theta` dispersion parameter if a negative binomial distribution is used).
+for zero vs. non-zero counts. If starting values are supplied, `start`
+needs to be set to a named list with the parameters for the `$count` and
+`$zero` part of the model (and potentially a `$theta` dispersion
+parameter if a negative binomial distribution is used).
 
-The fitted model object of class `hurdle` is similar to `glm`
-objects and contains sufficient information on all aspects of the fitting
-process. In particular, the estimated parameters and associated covariances
-are included as well as the result from the `optim()` call. Furthermore,
-the call, formula, terms structure etc. is contained, potentially also the
-model frame, dependent variable and regressor matrices.
+The fitted model object of class `hurdle` is similar to `glm` objects
+and contains sufficient information on all aspects of the fitting
+process. In particular, the estimated parameters and associated
+covariances are included as well as the result from the `optim()` call.
+Furthermore, the call, formula, terms structure etc. is contained,
+potentially also the model frame, dependent variable and regressor
+matrices.
 
 Following `glm.nb()`, the $\theta$ parameter of the negative binomial
-distribution is treated as a nuisance parameter. Thus, the `$coefficients`
-component of the fitted model object just contains estimates of
-$\beta$ and $\gamma$ while the estimate of $\theta$ and its standard deviation 
-(on a log scale) are kept in extra list elements `$theta` and `$SE.logtheta`.
-
+distribution is treated as a nuisance parameter. Thus, the
+`$coefficients` component of the fitted model object just contains
+estimates of $\beta$ and $\gamma$ while the estimate of $\theta$ and its
+standard deviation (on a log scale) are kept in extra list elements
+`$theta` and `$SE.logtheta`.
 
 ## Technical details for zero-inflated models {#sec-zeroinfl}
 
@@ -471,14 +551,145 @@ functionality. Hence, we only provide some additional information for
 those aspects that differ from those discussed above. The details of the
 ML optimization are again provided by a `zeroinfl.control()` wrapper:
 
-```
+```         
 zeroinfl.control(method = "BFGS", maxit = 10000, trace = FALSE,
   EM = FALSE, start = NULL, ...)
 ```
 
 The only new argument here is the argument `EM` which allows for EM
-estimation of the starting values. Instead of calling `glm.fit()` only once for
-both components of the model, this process can be iterated until convergence of the
-parameters to the ML estimates. The optimizer is still called subsequently
-(for a single iteration) to obtain the Hessian matrix from which the estimated
-covariance matrix can be computed.
+estimation of the starting values. Instead of calling `glm.fit()` only
+once for both components of the model, this process can be iterated
+until convergence of the parameters to the ML estimates. The optimizer
+is still called subsequently (for a single iteration) to obtain the
+Hessian matrix from which the estimated covariance matrix can be
+computed.
+
+## Methods for fitted zero-inflated and hurdle models {#sec-methods}
+
+Users typically should not need to compute on the internal structure of
+`hurdle` or `zeroinfl` objects because a set of standard
+extractor functions is provided, an overview is given in
+@tbl-methods. This includes methods to the generic
+functions `print()` and `summary()` which print the estimated
+coefficients along with further information. The `summary()` in
+particular supplies partial Wald tests based on the coefficients and the
+covariance matrix. As usual, the `summary()` method returns an object of
+class `summary.hurdle` or `summary.zeroinfl`, respectively,
+containing the relevant summary statistics which can subsequently be
+printed using the associated `print()` method.
+
+The methods for `coef()` and `vcov()` by default return a single vector
+of coefficients and their associated covariance matrix, respectively,
+i.e., all coefficients are concatenated. By setting their `model`
+argument, the estimates for a single component can be extracted.
+Concatenating the parameters by default and providing a matching
+covariance matrix estimate (that does not contain the covariances of
+further nuisance parameters) facilitates the application of generic
+inference functions such as `coeftest()`, `waldtest()`, and
+`linearHypothesis()`. All of these compute Wald tests for which
+coefficient estimates and associated covariances is essentially all
+information required and can therefore be queried in an object-oriented
+way with the `coef()` and `vcov()` methods.
+
+Similarly, the `terms()` and `model.matrix()` extractors can be used to
+extract the relevant information for either component of the model. A
+`logLik()` method is provided, hence `AIC()` can be called to compute
+information criteria and `lrtest()` for conducting LR tests of nested
+models.
+
+The `predict()` method computes predicted means (default) or
+probabilities (i.e., likelihood contributions) for observed or new data.
+Additionally, the means from the count and zero component, respectively,
+can be predicted. For the count component, this is the predicted count
+mean (without hurdle/inflation): $\exp(x_i^\top \beta)$. For the zero
+component, this is the the ratio of probabilities
+$(1 - f_\mathrm{zero}(0; z_i, \gamma))/(1 - f_\mathrm{count}(0; x_i, \beta))$
+of observing non-zero counts in hurdle models. In zero-inflation models,
+it is the probability $f_\mathrm{zero}(0; z_i, \gamma)$ of observing a
+zero from the point mass component in zero-inflated models
+
+Predicted means for the observed data can also be obtained by the
+`fitted()` method. Deviations between observed counts $y_i$ and
+predicted means $\hat \mu_i$ can be obtained by the `residuals()` method
+returning either raw residuals $y_i - \hat \mu_i$ or the Pearson
+residuals (raw residuals standardized by square root of the variance
+function) with the latter being the default.
+
+| Function             | Description                                                                                                                                                                                                       |
+|--------------------|----------------------------------------------------|
+| `print()`            | simple printed display with coefficient estimates                                                                                                                                                                 |
+| `summary()`          | standard regression output (coefficient estimates, standard errors, partial Wald tests); returns an object of class "`summary.`*class*" containing the relevant summary statistics (which has a `print()` method) |
+| `coef()`             | extract coefficients of model (full or components), a single vector of all coefficients by default                                                                                                                |
+| `vcov()`             | associated covariance matrix (with matching names)                                                                                                                                                                |
+| `predict()`          | predictions (means or probabilities) for new data                                                                                                                                                                 |
+| `fitted()`           | fitted means for observed data                                                                                                                                                                                    |
+| `residuals()`        | extract residuals (response or Pearson)                                                                                                                                                                           |
+| `terms()`            | extract terms of model components                                                                                                                                                                                 |
+| `model.matrix()`     | extract model matrix of model components                                                                                                                                                                          |
+| `logLik()`           | extract fitted log-likelihood                                                                                                                                                                                     |
+| `coeftest()`         | partial Wald tests of coefficients                                                                                                                                                                                |
+| `waldtest()`         | Wald tests of nested models                                                                                                                                                                                       |
+| `linearHypothesis()` | Wald tests of linear hypotheses                                                                                                                                                                                   |
+| `lrtest()`           | likelihood ratio tests of nested models                                                                                                                                                                           |
+| `AIC()`              | compute information criteria (AIC, BIC, ...)                                                                                                                                                                      |
+
+: Functions and methods for objects of class `zeroinfl` and `hurdle`.
+The first ten rows refer to methods, the remaining rows contain generic
+functions whose default methods work because of the information supplied
+by the methods above. {#tbl-methods}
+
+
+## Replication of textbook results {.unnumbered .appendix}
+
+@countreg:Cameron+Trivedi:1998 [p. 204] use a somewhat extended version
+of the model employed above. Because not all variables in that extended
+model are significant, a reduced set of variables was used throughout
+the main text. Here, however, we use the full model to show that the
+tools in **countreg** reproduce the results of
+@countreg:Cameron+Trivedi:1998.
+
+After omitting the responses other than `visits` and setting `"other"`
+as the reference category for `region` using
+
+```{r dt2a}
+#| eval: false
+
+dt2 <- NMES1988[, -(2:6)]
+dt2$region <- relevel(dt2$region, "other")
+```
+
+we fit a model that contains all explanatory variables, both in the
+count model and the zero hurdle model:
+
+```{r hurdle2}
+#| eval: false
+
+fm_hurdle2 <- hurdle(visits ~ ., data = dt2, dist = "negbin")
+```
+
+The resulting coefficient estimates are virtually identical to those
+published in @countreg:Cameron+Trivedi:1998 [p. 204]. The associated
+Wald statistics are also very similar provided that sandwich standard
+errors are used [which is not stated explicitely in
+@countreg:Cameron+Trivedi:1998].
+
+```{r hurdle2-summary}
+cfz <- coef(fm_hurdle2, model = "zero")
+cfc <- coef(fm_hurdle2, model = "count")
+se <- sqrt(diag(sandwich(fm_hurdle2)))
+round(cbind(zero = cfz, zero_t = cfz/se[-seq(along = cfc)], 
+  count = cfc, count_t = cfc/se[seq(along = cfc)]),
+  digits = 3)[c(3, 2, 4, 5, 7, 6, 8, 9:17, 1),]
+logLik(fm_hurdle2)
+1/fm_hurdle2$theta
+```
+
+There are some small and very few larger deviations in the Wald
+statistics which are probably explicable by different approximations to
+the gradient of $\theta$ (or $1/\theta$ or $\log(\theta)$) and the usage
+of different non-linear optimizers (and at least ten years of software
+development).
+
+More replication exercises are performed in the example sections of
+**AER** [@countreg:Zeileis+Kleiber:2008], the software package
+accompanying @countreg:Kleiber+Zeileis:2008.
