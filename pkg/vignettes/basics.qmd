@@ -2,6 +2,7 @@
 title: "Basics"
 format: html
 bibliography: countreg.bib
+number-sections: true
 crossref:
   eq-prefix: ""
 ---
