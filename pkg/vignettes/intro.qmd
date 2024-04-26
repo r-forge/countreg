@@ -1,0 +1,132 @@
+---
+title: "Introduction"
+format: html
+bibliography: countreg.bib
+crossref:
+  eq-prefix: ""
+---
+
+Modeling count variables is a common task in economics and the social
+sciences. The classical Poisson regression model for count
+data is often of limited use in these disciplines because empirical
+count data sets typically exhibit over-dispersion and/or an excess
+number of zeros. The former issue can be addressed by extending 
+the plain Poisson regression model in various directions: e.g.,
+using sandwich covariances or estimating an additional dispersion
+parameter (in a so-called quasi-Poisson model). Another more formal
+way is to use a negative binomial (NB) regression. All of these models
+belong to the family of generalized linear models 
+[GLMs, see @countreg:Nelder+Wedderburn:1972; @countreg:McCullagh+Nelder:1989].
+However, although these models typically can capture over-dispersion
+rather well, they are in many applications not sufficient for 
+modeling excess zeros. Since @countreg:Mullahy:1986 and
+@countreg:Lambert:1992 there is increased interest, both in the
+econometrics and statistics literature, in zero-augmented models
+that address this issue by a second model component capturing zero counts.
+Hurdle models [@countreg:Mullahy:1986] combine a left-truncated
+count component with a right-censored hurdle component. Zero-inflation
+models [@countreg:Lambert:1992] take a somewhat different
+approach: they are mixture models that combine a count component and a point mass at zero.
+An overview of count data models in econometrics, including 
+hurdle and zero-inflated models, is provided in
+@countreg:Cameron+Trivedi:1998,countreg:Cameron+Trivedi:2005.
+
+In R [@countreg:R:2008], GLMs are provided
+by the model fitting functions `glm()` [@countreg:Chambers+Hastie:1992]
+in the **stats** package and `glm.nb()` in the **MASS**
+package [@countreg:Venables+Ripley:2002] along with associated
+methods for diagnostics and inference. Here, we discuss the implementation
+of hurdle and zero-inflated models in the functions `hurdle()` and
+`zeroinfl()` in the **countreg** package [@countreg:Zeileis+Kleiber:2013],
+available from the Comprehensive R Archive Network (CRAN)
+at <http://CRAN.R-project.org/package=countreg>.
+The design of both modeling functions as well as the methods operating
+on the associated fitted model objects follows that of the base R
+functionality so that the new software integrates easily into the
+computational toolbox for modeling count data in R.
+
+The remainder of this article provides an overview of the supported
+count data models in **countreg**. More detailed discussions of the classical
+count data models and their zero-augmented counterparts can be found in ["Basics"](basics.qmd) and ["Zero-augmented models"](zero-augmented.qmd),
+respectively. Both links contain applications of the respective models to a microeconomic cross-section data set on the demand for medical care.
+
+
+## Models and software {#sec-software}
+
+```{r ovw-tab-cap}
+#| echo: false
+
+tab_cap <- paste("Overview of discussed count regression models.",
+                 "All GLMs use the same log-linear mean function ($\\log(\\mu) = x^\\top \\beta$)",
+                 "but make different assumptions about the remaining likelihood.",
+                 "The zero-augmented models extend the mean function by",
+                 "modifying (typically, increasing) the likelihood of zero counts.")
+```
+
+```{r ovw-tab}
+#| echo: false
+#| label: tbl-overview
+#| tbl-cap: !expr tab_cap
+
+model_type <- c("GLM", "", "", "", "zero-augmented", "")
+distribution <- c("Poisson", "", "", "NB", "Poisson", "NB")
+est_method <- c("ML", "quasi", "adjusted", "ML", "ML", "ML")
+description <- c('Poisson regression: classical GLM, estimated by maximum likelihood (ML)',
+                 paste('"quasi-Poisson regression": same mean function,',
+                       'estimated by quasi-ML (QML) or equivalently generalized',
+                       'estimating equations (GEE), inference adjustment via',
+                       'estimated dispersion parameter'),
+                 paste('"adjusted Poisson regression": same mean function,',
+                       'estimated by QML/GEE, inference adjustment via',
+                       'sandwich covariances'),
+                 paste('NB regression: extended GLM, estimated by ML',
+                       'including additional shape parameter'),
+                 'zero-inflated Poisson (ZIP), hurdle Poisson',
+                 'zero-inflated NB (ZINB), hurdle NB')
+
+tab <- data.frame(Type = model_type, Distribution = distribution,
+                  Method = est_method, Description = description)
+tab <- tinytable::tt(tab)
+tinytable::style_tt(tab, i = 4, line = "b", line_color = "lightgrey")
+```
+
+In this section, we briefly outline the theory and its implementation in 
+R [@countreg:R:2008] for some basic count data regression
+models as well as their zero-augmented extensions (see @tbl-overview
+for an overview). The classical Poisson, geometric
+and negative binomial models are described in a generalized linear model (GLM)
+framework; they are implemented in R by the `glm()` function
+[@countreg:Chambers+Hastie:1992] in the **stats** package and the
+`glm.nb()` function in the **MASS** package [@countreg:Venables+Ripley:2002].
+The hurdle and zero-inflated extensions of these models are provided by the
+functions `hurdle()` and `zeroinfl()` in package **countreg** [@countreg:Zeileis+Kleiber:2013].
+The original implementation of @countreg:Jackman:2008 was improved
+by @countreg:Kleiber+Zeileis:2008 for **countreg** to make the fitting functions and the
+fitted model objects more similar to their `glm()` and `glm.nb()` counterparts.
+The most important features of the new `hurdle()` and `zeroinfl()` functions
+are discussed below while some technical aspects are deferred to the appendix.
+
+An alternative implementation of zero-inflated count models is available in
+the currently orphaned package **zicounts**
+[@countreg:Mwalili:2007]. Another extension of zero-inflated Poisson models is available
+in package **ZIGP** [@countreg:Erhardt:2008] which allows dispersion---in addition to
+mean and zero-inflation level---to depend on regressors.
+However, the interfaces of both packages are less standard with fewer (or no)
+standard methods provided. Therefore, re-using generic inference tools is more
+cumbersome and hence these packages are not discussed here. 
+
+Two packages that embed zero-inflated models into more general implementations
+of GLMs and GAMs (generalized additive models) are **gamlss** 
+[@countreg:Stasinopoulos+Rigby:2007] and **VGAM** [@countreg:Yee:2008].
+The latter also provides hurdle models (under the name zero-altered models).
+Both implementations allow specification of only one set of regressors.
+
+In addition to zero-augmented models, there are many further extensions to
+the classical Poisson model which are not discussed here. Some important model
+classes include finite mixture models---implemented in R in package **flexmix**
+[@countreg:Leisch:2004]---and generalized estimating equations
+(GEE)---provided in R by package **geepack**
+[@countreg:Halekoh+Hojsgaard+Yan:2006]---and mixed-effects models---available
+in R in packages **lme4** and **nlme** [see @countreg:Pinheiro+Bates:2000].
+Further information about the models and alternative R implementations
+can be found in the respective references.
