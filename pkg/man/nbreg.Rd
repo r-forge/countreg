@@ -23,7 +23,9 @@ nbreg(formula, data, subset, na.action, weights, offset, theta = NULL,
     included in the linear predictor. See below for more information on offsets.}
   \item{theta}{numeric. Optional. If specified, then the dispersion parameter is 
     not estimated.}
-  \item{dist}{character specification of the NB type. Either \code{"NB2"} or \code{"NB1"}}
+  \item{dist}{character specification of the NB type. Either \code{"NB2"}
+   or \code{"NB1"}. Lowercase versions \code{"nb2"} and \code{"nb1"} are
+   equivalent.}
   \item{link}{character specification of the link function for the mean.
     Currently, only \code{"log"} is supported.}
   \item{link.theta}{character specification of the link function for the

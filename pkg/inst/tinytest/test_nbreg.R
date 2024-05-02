@@ -24,6 +24,19 @@ expect_equal(coef(fm_nb2), coef_ref, tol, info = "Compare coefs to reference for
 expect_equal(sqrt(diag(vcov(fm_nb2))), se_ref, tol, info = "Compare SEs to reference for nbreg NB2")
 expect_equal(logLik(fm_nb2), ll_ref, tol, info = "Compare logLik to reference for nbreg NB2")
 
+
+fm_nb2_lower <- nbreg(form, data = CrabSatellites, dist = "nb2", link = link,
+                      link.theta = link_theta)
+expect_identical(coef(fm_nb2), coef(fm_nb2_lower),
+                 info = "Check if coefs of lowercase nb2 are identical")
+expect_identical(vcov(fm_nb2), vcov(fm_nb2_lower),
+                 info = "Check if vcov of lowercase nb2 is identical")
+expect_identical(logLik(fm_nb2), logLik(fm_nb2_lower),
+                 info = "Check if loglik of lowercase nb2 is identical")
+expect_identical(residuals(fm_nb2, "pearson"), residuals(fm_nb2_lower, "pearson"),
+                 info = "Check if pearson resids of lowercase nb2 are identical")
+
+
 # NB1
 fm_nb1 <- nbreg(form, data = CrabSatellites, dist = "NB1", link = link,
                 link.theta = link_theta)
@@ -38,6 +51,18 @@ ll_ref <- structure(-365.354036365778, df = 6L, nobs = 173L, class = "logLik")
 expect_equal(coef(fm_nb1), coef_ref, tol, info = "Compare coefs to reference for nbreg NB1")
 expect_equal(sqrt(diag(vcov(fm_nb1))), se_ref, tol, info = "Compare SEs to reference for nbreg NB1")
 expect_equal(logLik(fm_nb1), ll_ref, tol, info = "Compare logLik to reference for nbreg NB1")
+
+
+fm_nb1_lower <- nbreg(form, data = CrabSatellites, dist = "nb1", link = link,
+                      link.theta = link_theta)
+expect_identical(coef(fm_nb1), coef(fm_nb1_lower),
+                 info = "Check if coefs of lowercase nb1 are identical")
+expect_identical(vcov(fm_nb1), vcov(fm_nb1_lower),
+                 info = "Check if vcov of lowercase nb1 is identical")
+expect_identical(logLik(fm_nb1), logLik(fm_nb1_lower),
+                 info = "Check if loglik of lowercase nb1 is identical")
+expect_identical(residuals(fm_nb1, "pearson"), residuals(fm_nb1_lower, "pearson"),
+                 info = "Check if pearson resids of lowercase nb1 are identical")
 
 
 ## Test predictions

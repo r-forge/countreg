@@ -11,9 +11,12 @@ nbreg <- function(formula, data, subset, na.action, weights, offset,
   if(is.character(link.theta)) linkobj <- make.link2(link.theta)
   stopifnot(inherits(linkobj, "link-glm"))
   link.theta <- linkobj
+  
+  ## allow lowercase dist
+  dist <- toupper(dist)
 
   switch(dist,
-         NB2 ={
+         NB2 = {
            densFun <- dnbinom
            derivFun <- snbinom
            hessFun <- hnbinom
