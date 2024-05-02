@@ -199,7 +199,8 @@ nbreg <- function(formula, data, subset, na.action, weights, offset,
   if(fix) {
     colnames(vc) <- rownames(vc) <- colnames(X)
   } else {
-    colnames(vc) <- rownames(vc) <- c(colnames(X), colnames(Z))
+    colnames(vc) <- rownames(vc) <- c(paste("mu", colnames(X), sep = "_"),
+                                      paste("theta", colnames(Z), sep = "_"))
 
   }
 

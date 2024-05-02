@@ -4,6 +4,7 @@ tol <- 1e-6
 
 data("CrabSatellites")
 form <- satellites ~ width + color
+form_h <- satellites ~ width + color | weight
 link <- "log"
 link_theta <- "log"
 
@@ -15,9 +16,9 @@ fm_nb2 <- nbreg(form, data = CrabSatellites, link = link, link.theta = link_thet
 coef_ref <- c(`mu_(Intercept)` = -3.68546352253491, mu_width = 0.17839041962828,
               mu_color.L = -0.414226407908124, mu_color.Q = 0.130116604025637,
               mu_color.C = 0.0440867559068667, `theta_(Intercept)` = -0.0703175555237518)
-se_ref <- c(`(Intercept)` = 1.26893204172812, width = 0.0480652291478379,
-            color.L = 0.294290216100736, color.Q = 0.242444381199419,
-            color.C = 0.178874473742344, `(Intercept)` = 0.180284018618521)
+se_ref <- c(`mu_(Intercept)` = 1.26893204172812, mu_width = 0.0480652291478379,
+            mu_color.L = 0.294290216100736, mu_color.Q = 0.242444381199419,
+            mu_color.C = 0.178874473742344, `theta_(Intercept)` = 0.180284018618521)
 ll_ref <- structure(-374.297920053537, df = 6L, nobs = 173L, class = "logLik")
 
 expect_equal(coef(fm_nb2), coef_ref, tol, info = "Compare coefs to reference for nbreg NB2")
@@ -43,9 +44,9 @@ fm_nb1 <- nbreg(form, data = CrabSatellites, dist = "NB1", link = link,
 coef_ref <- c(`mu_(Intercept)` = -3.76573267042693, mu_width = 0.177062322435001,
               mu_color.L = -0.640016895815285, mu_color.Q = -0.193085157579817,
               mu_color.C = -0.0692478243188591, `theta_(Intercept)` = -1.14820467167638)
-se_ref <- c(`(Intercept)` = 0.967179850729637, width = 0.035764633133798,
-            color.L = 0.306204683640572, color.Q = 0.242492659108847,
-            color.C = 0.167208012013685, `(Intercept)` = 0.195036632753825)
+se_ref <- c(`mu_(Intercept)` = 0.967179850729637, mu_width = 0.035764633133798,
+            mu_color.L = 0.306204683640572, mu_color.Q = 0.242492659108847,
+            mu_color.C = 0.167208012013685, `theta_(Intercept)` = 0.195036632753825)
 ll_ref <- structure(-365.354036365778, df = 6L, nobs = 173L, class = "logLik")
 
 expect_equal(coef(fm_nb1), coef_ref, tol, info = "Compare coefs to reference for nbreg NB1")
