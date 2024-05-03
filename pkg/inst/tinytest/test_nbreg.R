@@ -66,6 +66,18 @@ expect_identical(residuals(fm_nb1, "pearson"), residuals(fm_nb1_lower, "pearson"
                  info = "Check if pearson resids of lowercase nb1 are identical")
 
 
+## Test theta = inf
+fm_nb2_inf <- nbreg(form, data = CrabSatellites, link = link,
+                    link.theta = link_theta, theta = Inf)
+fm_pois <- glm(form, data = CrabSatellites, family = poisson())
+
+expect_equivalent(coef(fm_nb2_inf)[names(coef(fm_nb2_inf)) != "theta_(Intercept)"],
+                  coef(fm_pois), tol, info = "Compare coefs of nbreg NB2 with theta = Inf to Poisson")
+expect_equivalent(logLik(fm_nb2_inf), logLik(fm_pois), tol,
+                  info = "Compare logLik of nbreg NB2 with theta = Inf to Poisson")
+
+
+
 ## Test predictions
 test_mean <- function(model, data, reference, add_info) {
   expect_equal(predict(model, newdata = data, type = "response"),

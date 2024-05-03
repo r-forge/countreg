@@ -22,6 +22,12 @@ snbinom <- function(x, mu, size, parameter = c("mu", "size"), drop = TRUE) {
       log(size) + 1 - log(mu + size) - (x + size) / (mu + size) else NULL
   )
   colnames(s) <- c("mu", "size")[c("mu", "size") %in% parameter]
+  
+  # return limit of derivative for size = inf (= Poisson)
+  idx_inf <- is.infinite(size)
+  if("mu" %in% parameter) s[is.infinite(size), "mu"] <- x[idx_inf]/mu[idx_inf] - 1
+  if("size" %in% parameter) s[is.infinite(size), "size"] <- 0
+  
   s[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps)), ] <- 0
   if(drop & NCOL(s) < 2L) drop(s) else s
 }
@@ -38,6 +44,13 @@ hnbinom <- function(x, mu, size, parameter = c("mu", "size"), drop = TRUE) {
   colnames(h) <- c(if("mu" %in% parameter) "mu",
                    if("size" %in% parameter) "size",
                    if(any(c("mu.size", "size.mu") %in% parameter)) "mu.size")
+  
+  # return limit of derivative for size = inf (= Poisson)
+  idx_inf <- is.infinite(size)
+  if("mu" %in% parameter) h[is.infinite(size), "mu"] <- -x[idx_inf]/mu[idx_inf]^2
+  if("size" %in% parameter) h[is.infinite(size), "size"] <- 0
+  if(any(c("mu.size", "size.mu") %in% parameter)) h[is.infinite(size), "mu.size"] <- 0
+  
   h[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps)), ] <- 0
   if(drop & NCOL(h) < 2L) drop(h) else h
 }

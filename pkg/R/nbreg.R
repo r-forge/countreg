@@ -67,13 +67,20 @@ nbreg <- function(formula, data, subset, na.action, weights, offset,
     if(!fix) theta <- link.theta$linkinv(etaTheta)
 
     gr <- derivFun(Y, mu = mu, size = theta,
-                  parameter = c("mu", "size"), drop = FALSE)
+                  parameter = c("mu", if(fix) NULL else "size"), drop = FALSE)
     hm <- hessFun(Y, mu = mu, size = theta,
-                            parameter = c("mu","size", "mu.size"),
+                            parameter = c("mu", if(fix) NULL else "size",
+                                          if(fix) NULL else "mu.size"),
                             drop = FALSE)
-    hessMat2(hm, gr, X, Z, etaX = eta, etaZ = etaTheta, fix = fix, dlinkX = link$mu.eta,
-             ddlinkX = link$dmu.eta, dlinkZ = link.theta$mu.eta, ddlinkZ = link.theta$dmu.eta,
-             weights = weights)
+
+    if(fix){
+      return(hessMat1(hm[,1], gr[,1], X, eta = eta, dlinkX = link$mu.eta, ddlinkX = link$dmu.eta))
+    } else {
+      return(hessMat2(hm, gr, X, Z, etaX = eta, etaZ = etaTheta, fix = fix,
+                      dlinkX = link$mu.eta, ddlinkX = link$dmu.eta,
+                      dlinkZ = link.theta$mu.eta, ddlinkZ = link.theta$dmu.eta,
+                      weights = weights))
+    }
   }
 
   
