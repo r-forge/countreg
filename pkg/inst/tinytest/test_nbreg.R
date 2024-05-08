@@ -69,14 +69,26 @@ expect_identical(residuals(fm_nb1, "pearson"), residuals(fm_nb1_lower, "pearson"
 ## Test theta = inf
 fm_nb2_inf <- nbreg(form, data = CrabSatellites, link = link,
                     link.theta = link_theta, theta = Inf)
+fm_nb1_inf <- nbreg(form, data = CrabSatellites, dist = "NB1", link = link,
+                    link.theta = link_theta, theta = Inf)
 fm_pois <- glm(form, data = CrabSatellites, family = poisson())
 
-expect_equivalent(coef(fm_nb2_inf)[names(coef(fm_nb2_inf)) != "theta_(Intercept)"],
-                  coef(fm_pois), tol, info = "Compare coefs of nbreg NB2 with theta = Inf to Poisson")
-expect_equivalent(logLik(fm_nb2_inf), logLik(fm_pois), tol,
-                  info = "Compare logLik of nbreg NB2 with theta = Inf to Poisson")
-expect_true(all(is.finite(vcov(fm_nb2_inf))), info = "Finite vcov for nbreg NB2 with theta = Inf")
+test_theta_inf <- function(nb_model, poisson_model, tol) {
+  dist <- nb_model$dist
+  stopifnot(dist == "NB2" || dist == "NB1")
+  
+  expect_equivalent(coef(nb_model)[names(coef(nb_model)) != "theta_(Intercept)"],
+                    coef(poisson_model), tol,
+                    info = paste("Compare coefs of nbreg", dist, "with theta = Inf to Poisson"))
+  expect_equivalent(logLik(nb_model), logLik(poisson_model), tol,
+                    info = paste("Compare logLik of nbreg", dist, "with theta = Inf to Poisson"))
+  expect_true(all(is.finite(vcov(nb_model))),
+              info = paste("Finite vcov for nbreg", dist, "with theta = Inf"))
+  
+}
 
+test_theta_inf(fm_nb2_inf, fm_pois, tol)
+test_theta_inf(fm_nb1_inf, fm_pois, tol)
 
 ## Test predictions
 test_mean <- function(model, data, reference, add_info) {
