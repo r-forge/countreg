@@ -25,7 +25,7 @@ snbinom <- function(x, mu, size, parameter = c("mu", "size"), drop = TRUE) {
   
   # return limit of derivative for size = inf (= Poisson)
   idx_inf <- is.infinite(size)
-  if("mu" %in% parameter) s[is.infinite(size), "mu"] <- x[idx_inf]/mu[idx_inf] - 1
+  if("mu" %in% parameter) s[is.infinite(size), "mu"] <- spois(x[idx_inf], mu[idx_inf])
   if("size" %in% parameter) s[is.infinite(size), "size"] <- 0
   
   s[(x < 0) | (abs(x - round(x)) > sqrt(.Machine$double.eps)), ] <- 0
@@ -47,7 +47,7 @@ hnbinom <- function(x, mu, size, parameter = c("mu", "size"), drop = TRUE) {
   
   # return limit of derivative for size = inf (= Poisson)
   idx_inf <- is.infinite(size)
-  if("mu" %in% parameter) h[is.infinite(size), "mu"] <- -x[idx_inf]/mu[idx_inf]^2
+  if("mu" %in% parameter) h[is.infinite(size), "mu"] <- hpois(x[idx_inf], mu[idx_inf])
   if("size" %in% parameter) h[is.infinite(size), "size"] <- 0
   if(any(c("mu.size", "size.mu") %in% parameter)) h[is.infinite(size), "mu.size"] <- 0
   
