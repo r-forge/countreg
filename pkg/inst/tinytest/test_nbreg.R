@@ -8,11 +8,9 @@ form_h <- satellites ~ width + color | weight
 link <- "log"
 link_theta <- "log"
 
-## TODO : Add NBH model and NB1-H model
 
 # NB2
 fm_nb2 <- nbreg(form, data = CrabSatellites, link = link, link.theta = link_theta)
-
 coef_ref <- c(`mu_(Intercept)` = -3.68546352253491, mu_width = 0.17839041962828,
               mu_color.L = -0.414226407908124, mu_color.Q = 0.130116604025637,
               mu_color.C = 0.0440867559068667, `theta_(Intercept)` = -0.0703175555237518)
@@ -20,11 +18,9 @@ se_ref <- c(`mu_(Intercept)` = 1.26893204172812, mu_width = 0.0480652291478379,
             mu_color.L = 0.294290216100736, mu_color.Q = 0.242444381199419,
             mu_color.C = 0.178874473742344, `theta_(Intercept)` = 0.180284018618521)
 ll_ref <- structure(-374.297920053537, df = 6L, nobs = 173L, class = "logLik")
-
 expect_equal(coef(fm_nb2), coef_ref, tol, info = "Compare coefs to reference for nbreg NB2")
 expect_equal(sqrt(diag(vcov(fm_nb2))), se_ref, tol, info = "Compare SEs to reference for nbreg NB2")
 expect_equal(logLik(fm_nb2), ll_ref, tol, info = "Compare logLik to reference for nbreg NB2")
-
 
 fm_nb2_lower <- nbreg(form, data = CrabSatellites, dist = "nb2", link = link,
                       link.theta = link_theta)
@@ -38,6 +34,23 @@ expect_identical(residuals(fm_nb2, "pearson"), residuals(fm_nb2_lower, "pearson"
                  info = "Check if pearson resids of lowercase nb2 are identical")
 
 
+# NBH
+fm_nbh <- nbreg(form_h, data = CrabSatellites, dist = "NB2", link = link,
+                link.theta = link_theta)
+coef_ref <- c(`mu_(Intercept)` = -2.2440670873349, mu_width = 0.125911269094792, 
+              mu_color.L = -0.259193239569225, mu_color.Q = 0.0310068596163533, 
+              mu_color.C = 0.0326075887875688, `theta_(Intercept)` = -3.97309995040085, 
+              theta_weight = 1.55635228341314)
+se_ref <- c(`mu_(Intercept)` = 1.11648575682368, mu_width = 0.040472236809787, 
+            mu_color.L = 0.29064964663664, mu_color.Q = 0.238930308321897, 
+            mu_color.C = 0.175702134821161, `theta_(Intercept)` = 0.870539633894667, 
+            theta_weight = 0.349940939749115)
+ll_ref <- structure(-363.505261263564, df = 7L, nobs = 173L, class = "logLik")
+expect_equal(coef(fm_nbh), coef_ref, tol, info = "Compare coefs to reference for nbreg NBH")
+expect_equal(sqrt(diag(vcov(fm_nbh))), se_ref, tol, info = "Compare SEs to reference for nbreg NBH")
+expect_equal(logLik(fm_nbh), ll_ref, tol, info = "Compare logLik to reference for nbreg NBH")
+
+
 # NB1
 fm_nb1 <- nbreg(form, data = CrabSatellites, dist = "NB1", link = link,
                 link.theta = link_theta)
@@ -48,11 +61,9 @@ se_ref <- c(`mu_(Intercept)` = 0.967179850729637, mu_width = 0.035764633133798,
             mu_color.L = 0.306204683640572, mu_color.Q = 0.242492659108847,
             mu_color.C = 0.167208012013685, `theta_(Intercept)` = 0.195036632753825)
 ll_ref <- structure(-365.354036365778, df = 6L, nobs = 173L, class = "logLik")
-
 expect_equal(coef(fm_nb1), coef_ref, tol, info = "Compare coefs to reference for nbreg NB1")
 expect_equal(sqrt(diag(vcov(fm_nb1))), se_ref, tol, info = "Compare SEs to reference for nbreg NB1")
 expect_equal(logLik(fm_nb1), ll_ref, tol, info = "Compare logLik to reference for nbreg NB1")
-
 
 fm_nb1_lower <- nbreg(form, data = CrabSatellites, dist = "nb1", link = link,
                       link.theta = link_theta)
@@ -64,6 +75,23 @@ expect_identical(logLik(fm_nb1), logLik(fm_nb1_lower),
                  info = "Check if loglik of lowercase nb1 is identical")
 expect_identical(residuals(fm_nb1, "pearson"), residuals(fm_nb1_lower, "pearson"),
                  info = "Check if pearson resids of lowercase nb1 are identical")
+
+
+# NB1-H
+fm_nb1h <- nbreg(form_h, data = CrabSatellites, dist = "NB1", link = link,
+                 link.theta = link_theta)
+coef_ref <- c(`mu_(Intercept)` = -1.97326851123967, mu_width = 0.112488668821603, 
+              mu_color.L = -0.552411887406806, mu_color.Q = -0.220354983473709, 
+              mu_color.C = -0.0634412493751442, `theta_(Intercept)` = -3.93755772164971, 
+              theta_weight = 1.09665147594751)
+se_ref <- c(`mu_(Intercept)` = 1.08226233020628, mu_width = 0.0390075410880065, 
+            mu_color.L = 0.302060703169686, mu_color.Q = 0.236700736166993, 
+            mu_color.C = 0.160739400248805, `theta_(Intercept)` = 1.00554524213124, 
+            theta_weight = 0.387054747389924)
+ll_ref <- structure(-361.298100848771, df = 7L, nobs = 173L, class = "logLik")
+expect_equal(coef(fm_nb1h), coef_ref, tol, info = "Compare coefs to reference for nbreg NB1-H")
+expect_equal(sqrt(diag(vcov(fm_nb1h))), se_ref, tol, info = "Compare SEs to reference for nbreg NB1-H")
+expect_equal(logLik(fm_nb1h), ll_ref, tol, info = "Compare logLik to reference for nbreg NB1-H")
 
 
 ## Test theta = inf
@@ -153,6 +181,11 @@ test_pred <- function(model, form, data, Y, link, link_theta, tol, add_info){
 }
 
 test_pred(fm_nb2, form, CrabSatellites, CrabSatellites$satellites,
-          link, link_theta, tol, add_info = paste("nbreg NB2"))
+          link, link_theta, tol, add_info = "nbreg NB2")
 test_pred(fm_nb1, form, CrabSatellites, CrabSatellites$satellites,
-          link, link_theta, tol, add_info = paste("nbreg NB1"))
+          link, link_theta, tol, add_info = "nbreg NB1")
+test_pred(fm_nbh, form_h, CrabSatellites, CrabSatellites$satellites,
+          link, link_theta, tol, add_info = "nbreg NBH")
+test_pred(fm_nb1h, form_h, CrabSatellites, CrabSatellites$satellites,
+          link, link_theta, tol, add_info = "nbreg NB1-H")
+
