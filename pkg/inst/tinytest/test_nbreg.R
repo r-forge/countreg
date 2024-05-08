@@ -75,7 +75,7 @@ expect_equivalent(coef(fm_nb2_inf)[names(coef(fm_nb2_inf)) != "theta_(Intercept)
                   coef(fm_pois), tol, info = "Compare coefs of nbreg NB2 with theta = Inf to Poisson")
 expect_equivalent(logLik(fm_nb2_inf), logLik(fm_pois), tol,
                   info = "Compare logLik of nbreg NB2 with theta = Inf to Poisson")
-
+expect_true(all(is.finite(vcov(fm_nb2_inf))), info = "Finite vcov for nbreg NB2 with theta = Inf")
 
 
 ## Test predictions
