@@ -1,4 +1,5 @@
 ## Comparisons against reference
+library(topmodels)
 library(Formula)
 tol <- 1e-6
 
@@ -120,14 +121,21 @@ test_theta_inf(fm_nb1_inf, fm_pois, tol)
 
 ## Test predictions
 test_mean <- function(model, data, reference, add_info) {
+  require("topmodels")
+  
   expect_equal(predict(model, newdata = data, type = "response"),
                reference, tol = tol,
                info = paste("Mean prediction of", add_info))
+  expect_equal(as.numeric(procast(model, newdata = data, type = "mean")$mean), reference,
+               tol = tol, info = paste("topmodels mean prediction of", add_info))
   expect_equivalent(predict(model, newdata = data, type = "response"), fitted(model),
-                    info = paste("Fitted and mean prediction of", add_info))
+                    tol = tol, info = paste("Fitted and mean prediction of", add_info))
 }
 
 test_pred <- function(model, form, data, Y, link, link_theta, tol, add_info){
+  require("topmodels")
+  require("Formula")
+  
   dist <- model$dist
   stopifnot(dist == "NB2" || dist == "NB1")
   
@@ -173,6 +181,9 @@ test_pred <- function(model, form, data, Y, link, link_theta, tol, add_info){
   
   expect_equivalent(predict(model, data, type = "prob"), probs, tol,
                     info = paste("Probability predictions of", add_info))
+  expect_equivalent(as.matrix(procast(model, data, type = "density", at = y_unique)),
+                    probs, tol, info = paste("topmodels probability predictions of",
+                                             add_info))
   expect_equal(predict(model, data, type = "theta"), theta, tol,
                info = paste("Predicted theta of", add_info))
   expect_equal(predict(model, data, type = "parameters"),
