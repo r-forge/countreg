@@ -35,6 +35,64 @@ expect_identical(residuals(fm_hp11, "pearson"), residuals(fm_hp1, "pearson"),
                  info = "Check if pearson resids from single-part formula are identical")
 
 
+# geometric-poisson
+fm_hp2 <- hurdle(form, data = CrabSatellites, zero = "geometric", dist = "poisson")
+coef_ref <- c(`count_(Intercept)` = 0.52667131775527, count_width = 0.0397109265472577, 
+              count_color.L = 0.107779650124439, count_color.Q = 0.394877726205593, 
+              count_color.C = 0.169369411874262, `zero_(Intercept)` = -11.7555177268425, 
+              zero_width = 0.467955985251572, zero_color.L = -0.958372471323788, 
+              zero_color.Q = -0.589269206154217, zero_color.C = -0.098672167212181)
+se_ref <- c(`count_(Intercept)` = 0.600167451122502, count_width = 0.0222775187986676, 
+            count_color.L = 0.144023240226206, count_color.Q = 0.121096067125091, 
+            count_color.C = 0.0936545055002974, `zero_(Intercept)` = 2.74141393130281, 
+            zero_width = 0.105528725732855, zero_color.L = 0.58032526258691, 
+            zero_color.Q = 0.474722800302479, zero_color.C = 0.337382299253634)
+ll_ref <- structure(-355.646193700518, df = 10L, nobs = 173L, class = "logLik")
+expect_equal(coef(fm_hp2), coef_ref, tol, info = "Compare coefs to reference for hurdle geometric-poisson")
+expect_equal(sqrt(diag(vcov(fm_hp2))), se_ref, tol, info = "Compare SEs to reference for hurdle geometric-poisson")
+expect_equal(logLik(fm_hp2), ll_ref, tol, info = "Compare logLik to reference for hurdle geometric-poisson")
+expect_equal(coef(fm_hp2, model = "zero"), coef(fm_hp1, model = "zero"), tol,
+             info = "logit and geometric zero models are identical")
+
+
+# poisson-geometric
+fm_p_g <- hurdle(form, data = CrabSatellites, dist = "geometric", zero = "poisson")
+coef_ref <- c(`count_(Intercept)` = 0.0651428428002858, count_width = 0.0487416343129737, 
+              count_color.L = 0.1062110550535, count_color.Q = 0.473900811521687, 
+              count_color.C = 0.188547027992332, `zero_(Intercept)` = -7.77983128190527, 
+              zero_width = 0.292745587161981, zero_color.L = -0.609317402102402, 
+              zero_color.Q = -0.473857184589676, zero_color.C = -0.142615188467327)
+se_ref <- c(`count_(Intercept)` = 1.48668492513064, count_width = 0.0555008761016575, 
+            count_color.L = 0.376934554794095, count_color.Q = 0.308010553377792, 
+            count_color.C = 0.218467175134894, `zero_(Intercept)` = 1.68297368011838, 
+            zero_width = 0.0635598044517968, zero_color.L = 0.368202398547663, 
+            zero_color.Q = 0.297330489665648, zero_color.C = 0.210653530897402)
+ll_ref <- structure(-357.395233883897, df = 10L, nobs = 173L, class = "logLik")
+expect_equal(coef(fm_p_g), coef_ref, tol, info = "Compare coefs to reference for hurdle poisson-geometric")
+expect_equal(sqrt(diag(vcov(fm_p_g))), se_ref, tol, info = "Compare SEs to reference for hurdle poisson-geometric")
+expect_equal(logLik(fm_p_g), ll_ref, tol, info = "Compare logLik to reference for hurdle poisson-geometric")
+
+
+# negbin-negbin (poorly conditioned zero-hurdle)
+fm_nb2_nb2 <- hurdle(form, data = CrabSatellites, dist = "negbin", zero = "negbin")
+coef_ref <- c(`count_(Intercept)` = 0.43853962784324, count_width = 0.0420235024635511, 
+              count_color.L = 0.101310893405628, count_color.Q = 0.414370582115084, 
+              count_color.C = 0.171572744443123, `zero_(Intercept)` = -7.78032721575754, 
+              zero_width = 0.29276682441464, zero_color.L = -0.609379553658299, 
+              zero_color.Q = -0.473885818877084, zero_color.C = -0.142614297219935)
+se_ref <- c(`count_(Intercept)` = 0.851461470439592, count_width = 0.0316794941991245, 
+            count_color.L = 0.20979469324798, count_color.Q = 0.174092532986972, 
+            count_color.C = 0.128649639952385, `zero_(Intercept)` = 1.68431774631175, 
+            zero_width = 0.0636257145756324, zero_color.L = 0.368258280965331, 
+            zero_color.Q = 0.29735794660727, zero_color.C = 0.210668310571957)
+se_ltheta_ref <- c(count = 0.377383705831662, zero = 140.219767434209)
+ll_ref <- structure(-345.907624112724, df = 12L, nobs = 173L, class = "logLik")
+expect_equal(coef(fm_nb2_nb2), coef_ref, tol, info = "Compare coefs to reference for hurdle NB2-NB2")
+expect_equal(sqrt(diag(vcov(fm_nb2_nb2))), se_ref, tol, info = "Compare SEs to reference for hurdle NB2-NB2")
+expect_equal(fm_nb2_nb2$SE.logtheta, se_ltheta_ref, tol, info = "Compare SEs of logtheta to reference for hurdle NB2-NB2")
+expect_equal(logLik(fm_nb2_nb2), ll_ref, tol, info = "Compare logLik to reference for hurdle NB2-NB2")
+
+
 ## Test predictions
 test_mean <- function(model, data, muX, p0_zero, p0_count, tol, add_info) {
   ## Use 'textbook' formulas for computing means, different to implementation
@@ -80,6 +138,8 @@ test_pred <- function(model, form, data, Y, link, zero_dist, count_dist, tol, ad
     linkinv <- plogis
   } else if (link == "probit") {
     linkinv <- pnorm
+  } else if (link == "log"){
+    linkinv <- exp
   } else {
     stop(paste(link, "link not supported."))
   }
@@ -94,9 +154,9 @@ test_pred <- function(model, form, data, Y, link, zero_dist, count_dist, tol, ad
     } else {
       return(switch(zero_dist,
                     "binomial" = 1 - muZ,
-                    # "poisson" = dpois(0, lambda = muZ),
-                    # "negbin" = dnbinom(0, size = model$theta["zero"], mu = muZ),
-                    # "geometric" = dnbinom(0, size = 1, mu = muZ)
+                    "poisson" = dpois(0, lambda = muZ),
+                    "negbin" = dnbinom(0, size = model$theta["zero"], mu = muZ),
+                    "geometric" = dnbinom(0, size = 1, mu = muZ)
                     ))
     }
   }
@@ -105,8 +165,8 @@ test_pred <- function(model, form, data, Y, link, zero_dist, count_dist, tol, ad
   f_count <- function(x) {
     return(switch(count_dist,
                   "poisson" = dpois(x, lambda = muX),
-                  # "negbin" = dnbinom(x, size = model$theta["count"], mu = muX),
-                  # "geometric" = dnbinom(x, size = 1, mu = muX),
+                  "negbin" = dnbinom(x, size = model$theta["count"], mu = muX),
+                  "geometric" = dnbinom(x, size = 1, mu = muX),
                   # "binomial" = dbinom(x, prob = muX/model$size, size = model$size)
                   ))
   }
@@ -139,3 +199,9 @@ test_pred <- function(model, form, data, Y, link, zero_dist, count_dist, tol, ad
 
 test_pred(fm_hp1, form, CrabSatellites, CrabSatellites$satellites, "logit",
           "binomial", "poisson", tol, add_info = "hurdle logit-poisson")
+test_pred(fm_hp2, form, CrabSatellites, CrabSatellites$satellites, "log",
+          "geometric", "poisson", tol, add_info = "hurdle geometric-poisson")
+test_pred(fm_p_g, form, CrabSatellites, CrabSatellites$satellites, "log",
+          "poisson", "geometric", tol, add_info = "hurdle poisson-geometric")
+test_pred(fm_nb2_nb2, form, CrabSatellites, CrabSatellites$satellites, "log",
+          "negbin", "negbin", tol, add_info = "hurdle NB2-NB2")
