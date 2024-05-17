@@ -5,95 +5,77 @@ tol <- 1e-6
 data("CrabSatellites")
 form <- satellites ~ width + color | width + color
 
-# logit-poisson
-fm_hp1 <- hurdle(form, data = CrabSatellites, dist = "poisson")
-coef_ref <- c(`count_(Intercept)` = 0.52667131775527, count_width = 0.0397109265472577, 
-              count_color.L = 0.107779650124439, count_color.Q = 0.394877726205593, 
-              count_color.C = 0.169369411874262, `zero_(Intercept)` = -11.7555177268425, 
-              zero_width = 0.467955985251572, zero_color.L = -0.958372471323788, 
-              zero_color.Q = -0.589269206154217, zero_color.C = -0.098672167212181)
-se_ref <- c(`count_(Intercept)` = 0.600167451122502, count_width = 0.0222775187986676, 
-            count_color.L = 0.144023240226206, count_color.Q = 0.121096067125091, 
-            count_color.C = 0.0936545055002974, `zero_(Intercept)` = 2.74141393130641, 
-            zero_width = 0.105528725732993, zero_color.L = 0.580325262586876, 
-            zero_color.Q = 0.474722800302477, zero_color.C = 0.337382299253625)
-ll_ref <- structure(-355.646193700518, df = 10L, nobs = 173L, class = "logLik")
-expect_equal(coef(fm_hp1), coef_ref, tol, info = "Compare coefs to reference for hurdle logit-poisson")
-expect_equal(sqrt(diag(vcov(fm_hp1))), se_ref, tol, info = "Compare SEs to reference for hurdle logit-poisson")
-expect_equal(logLik(fm_hp1), ll_ref, tol, info = "Compare logLik to reference for hurdle logit-poisson")
+# Reference values for coefs etc. of hurdle models and specs for fitting
+ref_list <- list(# logit-poisson
+                logit_p = list(formula = form,
+                                coef = c(`count_(Intercept)` = 0.52667131775527, count_width = 0.0397109265472577, 
+                                         count_color.L = 0.107779650124439, count_color.Q = 0.394877726205593, 
+                                         count_color.C = 0.169369411874262, `zero_(Intercept)` = -11.7555177268425, 
+                                         zero_width = 0.467955985251572, zero_color.L = -0.958372471323788, 
+                                         zero_color.Q = -0.589269206154217, zero_color.C = -0.098672167212181),
+                                se = c(`count_(Intercept)` = 0.600167451122502, count_width = 0.0222775187986676, 
+                                       count_color.L = 0.144023240226206, count_color.Q = 0.121096067125091, 
+                                       count_color.C = 0.0936545055002974, `zero_(Intercept)` = 2.74141393130641, 
+                                       zero_width = 0.105528725732993, zero_color.L = 0.580325262586876, 
+                                       zero_color.Q = 0.474722800302477, zero_color.C = 0.337382299253625),
+                                ll = structure(-355.646193700518, df = 10L, nobs = 173L, class = "logLik"),
+                                dist = "poisson",
+                                zero = "binomial",
+                                link = "logit"),
+                 # geometric-poisson
+                 g_p = list(formula = form,
+                            coef = c(`count_(Intercept)` = 0.52667131775527, count_width = 0.0397109265472577, 
+                                     count_color.L = 0.107779650124439, count_color.Q = 0.394877726205593, 
+                                     count_color.C = 0.169369411874262, `zero_(Intercept)` = -11.7555177268425, 
+                                     zero_width = 0.467955985251572, zero_color.L = -0.958372471323788, 
+                                     zero_color.Q = -0.589269206154217, zero_color.C = -0.098672167212181),
+                            se = c(`count_(Intercept)` = 0.600167451122502, count_width = 0.0222775187986676, 
+                                   count_color.L = 0.144023240226206, count_color.Q = 0.121096067125091, 
+                                   count_color.C = 0.0936545055002974, `zero_(Intercept)` = 2.74141393130281, 
+                                   zero_width = 0.105528725732855, zero_color.L = 0.58032526258691, 
+                                   zero_color.Q = 0.474722800302479, zero_color.C = 0.337382299253634),
+                            ll = structure(-355.646193700518, df = 10L, nobs = 173L, class = "logLik"),
+                            dist = "poisson",
+                            zero = "geometric",
+                            link = "log"),
+                 # poisson-geometric
+                 p_g = list(formula = form,
+                            coef = c(`count_(Intercept)` = 0.0651428428002858, count_width = 0.0487416343129737, 
+                                      count_color.L = 0.1062110550535, count_color.Q = 0.473900811521687, 
+                                      count_color.C = 0.188547027992332, `zero_(Intercept)` = -7.77983128190527, 
+                                      zero_width = 0.292745587161981, zero_color.L = -0.609317402102402, 
+                                      zero_color.Q = -0.473857184589676, zero_color.C = -0.142615188467327),
+                            se = c(`count_(Intercept)` = 1.48668492513064, count_width = 0.0555008761016575, 
+                                   count_color.L = 0.376934554794095, count_color.Q = 0.308010553377792, 
+                                   count_color.C = 0.218467175134894, `zero_(Intercept)` = 1.68297368011838, 
+                                   zero_width = 0.0635598044517968, zero_color.L = 0.368202398547663, 
+                                   zero_color.Q = 0.297330489665648, zero_color.C = 0.210653530897402),
+                            ll = structure(-357.395233883897, df = 10L, nobs = 173L, class = "logLik"),
+                            dist = "geometric",
+                            zero = "poisson",
+                            link = "log"),
+                # negbin-negbin (poorly conditioned zero-hurdle)
+                nb2_nb2 = list(formula = form,
+                               coef = c(`count_(Intercept)` = 0.43853962784324, count_width = 0.0420235024635511, 
+                                        count_color.L = 0.101310893405628, count_color.Q = 0.414370582115084, 
+                                        count_color.C = 0.171572744443123, `zero_(Intercept)` = -7.78032721575754, 
+                                        zero_width = 0.29276682441464, zero_color.L = -0.609379553658299, 
+                                        zero_color.Q = -0.473885818877084, zero_color.C = -0.142614297219935),
+                               se = c(`count_(Intercept)` = 0.851461470439592, count_width = 0.0316794941991245, 
+                                      count_color.L = 0.20979469324798, count_color.Q = 0.174092532986972, 
+                                      count_color.C = 0.128649639952385, `zero_(Intercept)` = 1.68431774631175, 
+                                      zero_width = 0.0636257145756324, zero_color.L = 0.368258280965331, 
+                                      zero_color.Q = 0.29735794660727, zero_color.C = 0.210668310571957),
+                               se_ltheta = c(count = 0.377383705831662, zero = 140.219767434209),
+                               ll = structure(-345.907624112724, df = 12L, nobs = 173L, class = "logLik"),
+                               dist = "negbin",
+                               zero = "negbin",
+                               link = "log")
+                 )
 
 
-## Test single-part formula = using same covariates in both parts
-fm_hp11 <- hurdle(satellites ~ width + color, data = CrabSatellites, dist = "poisson")
-expect_identical(coef(fm_hp11), coef(fm_hp1),
-                 info = "Check if coefs from single-part formula are identical")
-expect_identical(vcov(fm_hp11), vcov(fm_hp1),
-                 info = "Check if vcov from single-part formula is identical")
-expect_identical(logLik(fm_hp11), logLik(fm_hp1),
-                 info = "Check if loglik from single-part formula is identical")
-expect_identical(residuals(fm_hp11, "pearson"), residuals(fm_hp1, "pearson"),
-                 info = "Check if pearson resids from single-part formula are identical")
 
-
-# geometric-poisson
-fm_hp2 <- hurdle(form, data = CrabSatellites, zero = "geometric", dist = "poisson")
-coef_ref <- c(`count_(Intercept)` = 0.52667131775527, count_width = 0.0397109265472577, 
-              count_color.L = 0.107779650124439, count_color.Q = 0.394877726205593, 
-              count_color.C = 0.169369411874262, `zero_(Intercept)` = -11.7555177268425, 
-              zero_width = 0.467955985251572, zero_color.L = -0.958372471323788, 
-              zero_color.Q = -0.589269206154217, zero_color.C = -0.098672167212181)
-se_ref <- c(`count_(Intercept)` = 0.600167451122502, count_width = 0.0222775187986676, 
-            count_color.L = 0.144023240226206, count_color.Q = 0.121096067125091, 
-            count_color.C = 0.0936545055002974, `zero_(Intercept)` = 2.74141393130281, 
-            zero_width = 0.105528725732855, zero_color.L = 0.58032526258691, 
-            zero_color.Q = 0.474722800302479, zero_color.C = 0.337382299253634)
-ll_ref <- structure(-355.646193700518, df = 10L, nobs = 173L, class = "logLik")
-expect_equal(coef(fm_hp2), coef_ref, tol, info = "Compare coefs to reference for hurdle geometric-poisson")
-expect_equal(sqrt(diag(vcov(fm_hp2))), se_ref, tol, info = "Compare SEs to reference for hurdle geometric-poisson")
-expect_equal(logLik(fm_hp2), ll_ref, tol, info = "Compare logLik to reference for hurdle geometric-poisson")
-expect_equal(coef(fm_hp2, model = "zero"), coef(fm_hp1, model = "zero"), tol,
-             info = "logit and geometric zero models are identical")
-
-
-# poisson-geometric
-fm_p_g <- hurdle(form, data = CrabSatellites, dist = "geometric", zero = "poisson")
-coef_ref <- c(`count_(Intercept)` = 0.0651428428002858, count_width = 0.0487416343129737, 
-              count_color.L = 0.1062110550535, count_color.Q = 0.473900811521687, 
-              count_color.C = 0.188547027992332, `zero_(Intercept)` = -7.77983128190527, 
-              zero_width = 0.292745587161981, zero_color.L = -0.609317402102402, 
-              zero_color.Q = -0.473857184589676, zero_color.C = -0.142615188467327)
-se_ref <- c(`count_(Intercept)` = 1.48668492513064, count_width = 0.0555008761016575, 
-            count_color.L = 0.376934554794095, count_color.Q = 0.308010553377792, 
-            count_color.C = 0.218467175134894, `zero_(Intercept)` = 1.68297368011838, 
-            zero_width = 0.0635598044517968, zero_color.L = 0.368202398547663, 
-            zero_color.Q = 0.297330489665648, zero_color.C = 0.210653530897402)
-ll_ref <- structure(-357.395233883897, df = 10L, nobs = 173L, class = "logLik")
-expect_equal(coef(fm_p_g), coef_ref, tol, info = "Compare coefs to reference for hurdle poisson-geometric")
-expect_equal(sqrt(diag(vcov(fm_p_g))), se_ref, tol, info = "Compare SEs to reference for hurdle poisson-geometric")
-expect_equal(logLik(fm_p_g), ll_ref, tol, info = "Compare logLik to reference for hurdle poisson-geometric")
-
-
-# negbin-negbin (poorly conditioned zero-hurdle)
-fm_nb2_nb2 <- hurdle(form, data = CrabSatellites, dist = "negbin", zero = "negbin")
-coef_ref <- c(`count_(Intercept)` = 0.43853962784324, count_width = 0.0420235024635511, 
-              count_color.L = 0.101310893405628, count_color.Q = 0.414370582115084, 
-              count_color.C = 0.171572744443123, `zero_(Intercept)` = -7.78032721575754, 
-              zero_width = 0.29276682441464, zero_color.L = -0.609379553658299, 
-              zero_color.Q = -0.473885818877084, zero_color.C = -0.142614297219935)
-se_ref <- c(`count_(Intercept)` = 0.851461470439592, count_width = 0.0316794941991245, 
-            count_color.L = 0.20979469324798, count_color.Q = 0.174092532986972, 
-            count_color.C = 0.128649639952385, `zero_(Intercept)` = 1.68431774631175, 
-            zero_width = 0.0636257145756324, zero_color.L = 0.368258280965331, 
-            zero_color.Q = 0.29735794660727, zero_color.C = 0.210668310571957)
-se_ltheta_ref <- c(count = 0.377383705831662, zero = 140.219767434209)
-ll_ref <- structure(-345.907624112724, df = 12L, nobs = 173L, class = "logLik")
-expect_equal(coef(fm_nb2_nb2), coef_ref, tol, info = "Compare coefs to reference for hurdle NB2-NB2")
-expect_equal(sqrt(diag(vcov(fm_nb2_nb2))), se_ref, tol, info = "Compare SEs to reference for hurdle NB2-NB2")
-expect_equal(fm_nb2_nb2$SE.logtheta, se_ltheta_ref, tol, info = "Compare SEs of logtheta to reference for hurdle NB2-NB2")
-expect_equal(logLik(fm_nb2_nb2), ll_ref, tol, info = "Compare logLik to reference for hurdle NB2-NB2")
-
-
-## Test predictions
+## Helpers
 test_mean <- function(model, data, muX, p0_zero, p0_count, tol, add_info) {
   ## Use 'textbook' formulas for computing means, different to implementation
   # hurdle mean
@@ -157,7 +139,7 @@ test_pred <- function(model, form, data, Y, link, zero_dist, count_dist, tol, ad
                     "poisson" = dpois(0, lambda = muZ),
                     "negbin" = dnbinom(0, size = model$theta["zero"], mu = muZ),
                     "geometric" = dnbinom(0, size = 1, mu = muZ)
-                    ))
+      ))
     }
   }
   
@@ -168,7 +150,7 @@ test_pred <- function(model, form, data, Y, link, zero_dist, count_dist, tol, ad
                   "negbin" = dnbinom(x, size = model$theta["count"], mu = muX),
                   "geometric" = dnbinom(x, size = 1, mu = muX),
                   # "binomial" = dbinom(x, prob = muX/model$size, size = model$size)
-                  ))
+    ))
   }
   
   
@@ -197,11 +179,44 @@ test_pred <- function(model, form, data, Y, link, zero_dist, count_dist, tol, ad
   
 }
 
-test_pred(fm_hp1, form, CrabSatellites, CrabSatellites$satellites, "logit",
-          "binomial", "poisson", tol, add_info = "hurdle logit-poisson")
-test_pred(fm_hp2, form, CrabSatellites, CrabSatellites$satellites, "log",
-          "geometric", "poisson", tol, add_info = "hurdle geometric-poisson")
-test_pred(fm_p_g, form, CrabSatellites, CrabSatellites$satellites, "log",
-          "poisson", "geometric", tol, add_info = "hurdle poisson-geometric")
-test_pred(fm_nb2_nb2, form, CrabSatellites, CrabSatellites$satellites, "log",
-          "negbin", "negbin", tol, add_info = "hurdle NB2-NB2")
+
+## Compare with reference values and test predictions
+for (ref in ref_list) {
+  mod <- hurdle(ref[["formula"]], data = CrabSatellites, dist = ref[["dist"]],
+                zero = ref[["zero"]], link = ref[["link"]])
+  mod_name <- paste("hurdle" , paste(if (ref[["zero"]] == "binomial") ref[["link"]] else ref[["zero"]], ref[["dist"]], sep = "-"))
+  
+  # Compare with reference values
+  expect_equal(coef(mod), ref[["coef"]], tol, info = paste("Compare coefs to reference for", mod_name))
+  expect_equal(sqrt(diag(vcov(mod))), ref[["se"]], tol, info = paste("Compare SEs to reference for", mod_name))
+  expect_equal(logLik(mod), ref[["ll"]], tol, info = paste("Compare logLik to reference for", mod_name))
+  if (ref[["dist"]] == "negbin" || ref[["zero"]] == "negbin") {
+    expect_equal(mod$SE.logtheta, ref[["se_ltheta"]], tol, info = paste("Compare SEs of logtheta to reference for", mod_name))
+  }
+  
+  # Test predictions
+  test_pred(mod, ref[["formula"]], CrabSatellites, CrabSatellites$satellites, ref[["link"]],
+            ref[["zero"]], ref[["dist"]], tol, add_info = mod_name)
+}
+
+
+## Test single-part formula = using same covariates in both parts
+
+# logit-poisson
+fm_hp1 <- hurdle(form, data = CrabSatellites, dist = "poisson")
+fm_hp11 <- hurdle(satellites ~ width + color, data = CrabSatellites, dist = "poisson")
+expect_identical(coef(fm_hp11), coef(fm_hp1),
+                 info = "Check if coefs from single-part formula are identical")
+expect_identical(vcov(fm_hp11), vcov(fm_hp1),
+                 info = "Check if vcov from single-part formula is identical")
+expect_identical(logLik(fm_hp11), logLik(fm_hp1),
+                 info = "Check if loglik from single-part formula is identical")
+expect_identical(residuals(fm_hp11, "pearson"), residuals(fm_hp1, "pearson"),
+                 info = "Check if pearson resids from single-part formula are identical")
+
+
+## Test if logit and geometric models are equivalent
+# geometric-poisson
+fm_hp2 <- hurdle(form, data = CrabSatellites, zero = "geometric", dist = "poisson")
+expect_equal(coef(fm_hp2, model = "zero"), coef(fm_hp1, model = "zero"), tol,
+             info = "logit and geometric zero models are identical")
