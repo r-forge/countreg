@@ -18,6 +18,18 @@ expect_equal(sqrt(diag(vcov(fm_hp1))), se_ref, tol, info = "Compare SEs to refer
 expect_equal(logLik(fm_hp1), ll_ref, tol, info = "Compare logLik to reference for hurdle logit-poisson")
 
 
+## Test single-part formula = using same covariates in both parts
+fm_hp11 <- hurdle(satellites ~ width + color, data = CrabSatellites, dist = "poisson")
+expect_identical(coef(fm_hp11), coef(fm_hp1),
+                 info = "Check if coefs from single-part formula are identical")
+expect_identical(vcov(fm_hp11), vcov(fm_hp1),
+                 info = "Check if vcov from single-part formula is identical")
+expect_identical(logLik(fm_hp11), logLik(fm_hp1),
+                 info = "Check if loglik from single-part formula is identical")
+expect_identical(residuals(fm_hp11, "pearson"), residuals(fm_hp1, "pearson"),
+                 info = "Check if pearson resids from single-part formula are identical")
+
+
 ## Test predictions
 test_mean <- function(model, data, muX, p0_zero, p0_count, tol, add_info) {
   ## Use 'textbook' formulas for computing means, different to implementation
