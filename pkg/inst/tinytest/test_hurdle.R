@@ -5,8 +5,13 @@ tol <- 1e-6
 data("CrabSatellites")
 form <- satellites ~ width + color | width + color
 
+# logit-poisson
 fm_hp1 <- hurdle(form, data = CrabSatellites, dist = "poisson")
-coef_ref <- dput(coef(fm_hp1))
+coef_ref <- c(`count_(Intercept)` = 0.52667131775527, count_width = 0.0397109265472577, 
+              count_color.L = 0.107779650124439, count_color.Q = 0.394877726205593, 
+              count_color.C = 0.169369411874262, `zero_(Intercept)` = -11.7555177268425, 
+              zero_width = 0.467955985251572, zero_color.L = -0.958372471323788, 
+              zero_color.Q = -0.589269206154217, zero_color.C = -0.098672167212181)
 se_ref <- c(`count_(Intercept)` = 0.600167451122502, count_width = 0.0222775187986676, 
             count_color.L = 0.144023240226206, count_color.Q = 0.121096067125091, 
             count_color.C = 0.0936545055002974, `zero_(Intercept)` = 2.74141393130641, 
