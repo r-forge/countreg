@@ -2,6 +2,11 @@
 library(Formula)
 tol <- 1e-6
 
+# increased tolerance for comparing theta and SE of logtheta in nb2_nb2 because
+# the zero-hurdle in nb2_nb2 is poorly conditioned
+tol_theta <- tol * 100
+tol_se_ltheta <- tol * 1000
+
 data("CrabSatellites")
 form <- satellites ~ width + color | width + color
 
@@ -66,6 +71,7 @@ ref_list <- list(# logit-poisson
                                       count_color.C = 0.128649639952385, `zero_(Intercept)` = 1.68431774631175, 
                                       zero_width = 0.0636257145756324, zero_color.L = 0.368258280965331, 
                                       zero_color.Q = 0.29735794660727, zero_color.C = 0.210668310571957),
+                               theta = c(count = 5.44999491584071, zero = 8608.19058947861),
                                se_ltheta = c(count = 0.377383705831662, zero = 140.219767434209),
                                ll = structure(-345.907624112724, df = 12L, nobs = 173L, class = "logLik"),
                                dist = "negbin",
@@ -191,7 +197,8 @@ for (ref in ref_list) {
   expect_equal(sqrt(diag(vcov(mod))), ref[["se"]], tol, info = paste("Compare SEs to reference for", mod_name))
   expect_equal(logLik(mod), ref[["ll"]], tol, info = paste("Compare logLik to reference for", mod_name))
   if (ref[["dist"]] == "negbin" || ref[["zero"]] == "negbin") {
-    expect_equal(mod$SE.logtheta, ref[["se_ltheta"]], tol, info = paste("Compare SEs of logtheta to reference for", mod_name))
+    expect_equal(mod$theta, ref[["theta"]], tol_theta, info = paste("Compare theta to reference for", mod_name))
+    expect_equal(mod$SE.logtheta, ref[["se_ltheta"]], tol_se_ltheta, info = paste("Compare SEs of logtheta to reference for", mod_name))
   }
   
   # Test predictions
