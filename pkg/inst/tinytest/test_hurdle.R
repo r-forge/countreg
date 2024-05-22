@@ -102,6 +102,9 @@ test_mean <- function(model, data, muX, p0_zero, p0_count, tol, add_info) {
   expect_equivalent(predict(model, newdata = data, type = "mean", model = "zero"),
                     1 - p0_zero, tol, info = paste("Zero mean prediction of", add_info))
   
+  # fitted and prediction
+  expect_equivalent(predict(model, newdata = data, type = "response"), fitted(model),
+                    tol = tol, info = paste("Fitted and mean prediction of", add_info))
 }
 
 test_pred <- function(model, form, data, Y, link, zero_dist, count_dist, tol, add_info) {
