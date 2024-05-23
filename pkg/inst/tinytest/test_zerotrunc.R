@@ -1,3 +1,4 @@
+## Comparisons against reference and prediction tests
 tol <- 1e-6
 
 ## data

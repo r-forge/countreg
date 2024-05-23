@@ -1,4 +1,4 @@
-## Comparisons against reference
+## Comparisons against reference and prediction tests
 tol <- 1e-6
 
 # increased tolerance for comparing theta and SE of logtheta in nb2_nb2 because

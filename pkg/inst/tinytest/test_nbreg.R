@@ -197,4 +197,3 @@ test_pred(fm_nbh, form_h, CrabSatellites, CrabSatellites$satellites,
           link, link_theta, tol, add_info = "nbreg NBH")
 test_pred(fm_nb1h, form_h, CrabSatellites, CrabSatellites$satellites,
           link, link_theta, tol, add_info = "nbreg NB1-H")
-
