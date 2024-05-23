@@ -1,5 +1,4 @@
 ## Comparisons against reference
-library(Formula)
 tol <- 1e-6
 
 # increased tolerance for comparing theta and SE of logtheta in nb2_nb2 because
@@ -125,12 +124,16 @@ test_pred <- function(model, form, data, Y, link, zero_dist, count_dist, tol, ad
   lin_pred <- X %*% coef(model, "count")
   lin_pred_Z <- Z %*% coef(model, "zero")
   
-  if (link == "logit") {
-    linkinv <- plogis
+  linkinv <- if (link == "logit") {
+    plogis
   } else if (link == "probit") {
-    linkinv <- pnorm
-  } else if (link == "log"){
-    linkinv <- exp
+    pnorm
+  } else if (link == "log") {
+    exp
+  } else if (link == "cloglog") {
+    function(x) -expm1(-exp(x)) 
+  } else if (link == "cauchit") {
+    pcauchy 
   } else {
     stop(paste(link, "link not supported."))
   }

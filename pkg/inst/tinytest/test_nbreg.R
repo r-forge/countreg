@@ -1,6 +1,4 @@
 ## Comparisons against reference
-library(topmodels)
-library(Formula)
 tol <- 1e-6
 
 data("CrabSatellites")
