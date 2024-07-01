@@ -3,14 +3,18 @@ nbreg <- function(formula, data, subset, na.action, weights, offset,
   model = TRUE, y = TRUE, x = FALSE, z = FALSE, hessA = TRUE,...) # hessA argument to use analytical hessian
 {
   ## link function
-  if(is.character(link)) linkobj <- make.link2(link)
-  stopifnot(inherits(linkobj, "link-glm"))
-  link <- linkobj
+  if(is.character(link)) {
+    linkobj <- make.link2(link)
+    stopifnot(inherits(linkobj, "link-glm"))
+    link <- linkobj
+  }
 
   ## link function for theta
-  if(is.character(link.theta)) linkobj <- make.link2(link.theta)
-  stopifnot(inherits(linkobj, "link-glm"))
-  link.theta <- linkobj
+  if(is.character(link.theta)) {
+    linkobj <- make.link2(link.theta)
+    stopifnot(inherits(linkobj, "link-glm"))
+    link.theta <- linkobj
+  }
   
   ## allow lowercase dist
   dist <- toupper(dist)
