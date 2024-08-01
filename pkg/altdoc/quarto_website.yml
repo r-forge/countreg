@@ -26,7 +26,7 @@ website:
       - text: Documentation
         menu:
         - text: Negative binomial regression
-          file: nbreg.qmd
+          file: man/nbreg.qmd
         - text: Hurdle models
           file: man/hurdle.qmd
         - text: Zero-inflated models
