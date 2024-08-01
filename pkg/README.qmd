@@ -1,6 +1,134 @@
-## Count Data Regression
+<!-- README.md is generated from README.qmd via: quarto render README.qmd --to gfm -->
 
-Regression models for count data, including negative binomial, zero-inflated, zero-truncated,
-and hurdle models. Drivers for combination with flexmix and mboost are also provided.
-Previously available functions for graphical goodness-of-fit assessment (rootograms etc.)
-are now provided in the 'topmodels' package on R-Forge.
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "##",
+  fig.path = "man/figures/README-",
+  out.width = "75%",
+  fig.width = 6,
+  dpi = 300,
+  asp = 0.625
+)
+```
+
+<img src="https://topmodels.R-Forge.R-project.org/countreg/countreg.png" align="right" alt="countreg logo" width="150" />
+
+# countreg: Count Data Regression in R
+
+## Overview
+
+The core of the `countreg` package consists of functions for a variety of count data
+regression models:
+
+* `nbreg()`: _Negative binomial regression_ (type 1 and 2), including both constant and
+  varying dispersion parameters which can depend on regressors.
+* `zeroinfl()` and `hurdle()`: _Zero-inflated and hurdle models_ for count data
+  based on Poisson, geometric, negative binomial, and binomial distributions. These allow
+  for excess zeros compared to the unadjusted underlying distributions (or also a deficit
+  of zeros in case of the hurdle model).
+* `zerotrunc()`: _Zero-truncated count regression_ based on Poisson, geometric, and
+  negative binomial distributions. These models can be employed for the zero-truncated
+  count part of hurdle models.
+* `FLXMRnegbin()`: _Finite mixtures of negative binomial regressions_ via driver
+  for the [flexmix](https://CRAN.R-project.org/package=flexmix) package.
+* `MBnegbin()`: _Model-based boosting of negative binomial regressions_ via driver
+  for the [mboost](https://CRAN.R-project.org/package=mboost) package.
+
+Previously available functions for _graphical goodness-of-fit assessment_ (rootograms,
+PIT histograms, Q-Q plots based on randomized quantile residulas, etc.) are now provided
+in the [topmodels](https://topmodels.R-Forge.R-project.org) package.
+
+_Distribution functions_ (d/p/q/r) for the different zero-truncated, zero-inflated, and
+hurdle count distributions are availabe in the
+[distributions3](https://alexpghayes.github.io/distributions3/) package along with
+corresponding distribution objects.
+
+
+## Installation
+
+The latest development version can be installed from R-universe:
+
+``` r
+install.packages("countreg", repos = "https://zeileis.R-universe.dev")
+```
+
+
+## License
+
+The package is available under the
+[General Public License version 3](https://www.gnu.org/licenses/gpl-3.0.html)
+or [version 2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+
+
+## Illustration
+
+For demonstrating some of the available count regression models we analyze
+the number of male satellites around nesting female horseshoe crabs during mating.
+Because larger females that are in better condition tend to attract more satellites
+we consider their carapace width and color as (numeric) regressor variables.
+Package and data can be loaded and tranformed via:
+
+```{r setup}
+library("countreg")
+data("CrabSatellites", package = "countreg")
+cs <- CrabSatellites |>
+  transform(color = as.numeric(color)) |>
+  subset(select = c("satellites", "width", "color"))
+```
+
+The following four count models are compared: a Poisson generalized linear model
+via `glm()`, a negative binomial regression with `nbreg()`,
+a negative binomial hurdle model with `hurdle()`, and a zero-inflated negative
+binomial model with `zeroinfl()`.
+
+```{r models}
+cs_p    <-      glm(satellites ~ ., data = cs, family = poisson)
+cs_nb   <-    nbreg(satellites ~ ., data = cs)
+cs_hnb  <-   hurdle(satellites ~ ., data = cs, dist = "negbin")
+cs_zinb <- zeroinfl(satellites ~ ., data = cs, dist = "negbin")
+```
+
+The `glm()` function is from base R, all other models are from `countreg`.
+All negative binomial models employ the type 2 parameterization. The
+hurdle and zero-inflated models employ binary models for the zero hurdle
+and zero-inflated part, respectively.
+
+For a quick overview we compare the estimated coefficients from all
+parts of the models and compute their BIC.
+
+```{r comparison}
+cbind(
+  poisson = coef(cs_p),
+  nb = coef(cs_nb, model = "mu"),
+  hnb_count = coef(cs_hnb, model = "count"),
+  hnb_zero = coef(cs_hnb, model = "zero"),
+  zinb_count = coef(cs_zinb, model = "count"),
+  zinb_zero = coef(cs_zinb, model = "zero")
+)
+BIC(cs_p, cs_nb, cs_hnb, cs_zinb)
+```
+
+This shows that
+
+* The number of male satellites increase with `width` and
+  decrease with `color` of the female carapace.
+* The effect of the regressors mostly distinguishes between
+  having any satellites or not while the expectation in the
+  count part has almost no dependency on the regressors.
+* There is overdispersion in the number of satellites because
+  the negative binomial models fit much better than the simple
+  Poisson model.
+* There is only litte difference between the hurdle and zero-inflated
+  model (except that the sign in the zero part is flipped because
+  one models the probability to exceed zero while the other models
+  the probability of an excess zero).
+
+The summary of the hurdle negative binomial model provides
+further details such as the non-significance of the regressors in
+the count part and the estimate of the overdispersion parameter
+`theta`.
+
+```{r summary}
+summary(cs_hnb)
+```

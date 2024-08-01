@@ -1,33 +1,148 @@
 project:
   type: website
-  output-dir: ../../www/
+  output-dir: ../../../topmodels/www/countreg/
 
 website:
-  title: "countreg: Count Data Regression"
-  image: "countreg.png"
-  sidebar:
-    style: docked
-    logo: "countreg.png"
+  title: countreg
+  site-url: https://topmodels.R-Forge.R-project.org/countreg/
+  favicon: countreg.png
+  image: countreg.png
+  open-graph:
+    image: countreg.png
+  twitter-card:
+    site: '@AchimZeileis'
+    card-style: summary
+    image: countreg.png
+    image-alt: 'countreg: Count Data Regression in R'
+  navbar:
+    logo: "countreg-wide.png"
     logo-alt: "countreg logo"
+    title: false
+    pinned: false
     search: true
-    collapse-level: 1
-    contents:
-      - text: Home
+    left:
+      - text: Get started
         file: index.qmd
-      - section: $ALTDOC_VIGNETTE_BLOCK
-      - section: $ALTDOC_MAN_BLOCK
+      - text: Documentation
+        menu:
+        - text: Negative binomial regression
+          file: nbreg.qmd
+        - text: Hurdle models
+          file: man/hurdle.qmd
+        - text: Zero-inflated models
+          file: man/zeroinfl.qmd
+        - text: Zero-truncated models
+          file: man/zerotrunc.qmd
+        - text: Finite mixtures, boosting, GLMs
+          file: man/FLXMRnegbin.qmd
+        - text: Diagnostic tests
+          file: man/disptest.qmd
+        - text: Data sets
+          file: man/CrabSatellites.qmd
+        - text: Distribution extensions
+          file: man/binom.qmd
+      - text: Vignettes
+        menu:
+        - text: "Introduction"
+          file: vignettes/intro.qmd
+        - text: "Basics"
+          file: vignettes/basics.qmd
+        - text: "Zero-augmented models"
+          file: vignettes/zero-augmented.qmd
       - text: News
-        file: $ALTDOC_NEWS
-      - text: Changelog
-        file: $ALTDOC_CHANGELOG
-      - text: License
-        file: $ALTDOC_LICENSE
-      - text: Licence
-        file: $ALTDOC_LICENCE
-      - text: Code of conduct
-        file: $ALTDOC_CODE_OF_CONDUCT
+        file: NEWS.md
       - text: Citation
-        file: $ALTDOC_CITATION
+        file: CITATION.md
+    right:
+      - text: Contact
+        file: contact.qmd
+      - icon: code
+        href: https://R-Forge.R-project.org/projects/countreg
+        aria-label: countreg @ R-Forge
+  sidebar:
+    - id: documentation
+      title: "Documentation"
+      style: "floating"
+      collapse-level: 1
+      contents:
+        - section: Negative binomial regression
+          contents:
+            - text: nbreg
+              file: man/nbreg.qmd
+            - text: nbreg.control
+              file: man/nbreg.control.qmd
+            - text: predict.nbreg
+              file: man/predict.nbreg.qmd
+        - section: Hurdle models
+          contents:
+            - text: hurdle
+              file: man/hurdle.qmd
+            - text: hurdle.control
+              file: man/hurdle.control.qmd
+            - text: predict.hurdle
+              file: man/predict.hurdle.qmd
+        - section: Zero-inflated models
+          contents:
+            - text: zeroinfl
+              file: man/zeroinfl.qmd
+            - text: zeroinfl.control
+              file: man/zeroinfl.control.qmd
+            - text: predict.zeroinfl
+              file: man/predict.zeroinfl.qmd
+        - section: Zero-truncated models
+          contents:
+            - text: zerotrunc
+              file: man/zerotrunc.qmd
+            - text: zerotrunc.control
+              file: man/zerotrunc.control.qmd
+            - text: predict.zerotrunc
+              file: man/predict.zerotrunc.qmd
+        - section: Finite mixtures, boosting, GLMs
+          contents:
+            - text: FLXMRnegbin
+              file: man/FLXMRnegbin.qmd
+            - text: MBnegbin
+              file: man/MBnegbin.qmd
+            - text: ztpoisson
+              file: man/ztpoisson.qmd
+        - section: Diagnostic tests
+          contents:
+            - text: disptest
+              file: man/disptest.qmd
+            - text: hurdletest
+              file: man/hurdletest.qmd
+            - text: zitest
+              file: man/zitest.qmd
+        - section: Data sets
+          contents:
+            - text: CrabSatellites
+              file: man/CrabSatellites.qmd
+            - text: GSOEP
+              file: man/GSOEP.qmd
+            - text: OralHealthNL
+              file: man/OralHealthNL.qmd
+            - text: TakeoverBids
+              file: man/TakeoverBids.qmd
+        - section: Distribution extensions
+          contents:
+            - text: Binomial
+              file: man/binom.qmd
+            - text: Poisson
+              file: man/pois.qmd
+            - text: Negative binomial
+              file: man/nbinom.qmd
+            - text: Hurdle Poisson
+              file: man/hpois.qmd
+            - text: Hurdle negative binomial
+              file: man/hnbinom.qmd
+            - text: Zero-inflated Poisson
+              file: man/zipois.qmd
+            - text: Zero-inflated negative binomial
+              file: man/zinbinom.qmd
+            - text: Zero-truncated Poisson
+              file: man/ztpois.qmd
+            - text: Zero-truncated negative binomial
+              file: man/ztnbinom.qmd
 
 format:
   html:
@@ -36,12 +151,13 @@ format:
       - cosmo
       - custom.scss
     number-sections: false
-    fontsize: '110%'
-    fontcolor: "#333333"
-    linkcolor: "#A270BF"
+    fontsize: 110%
+    fontcolor: '#333333'
+    linkcolor: '#b52267'
+    code-link: true
     code-copy: true
     code-overflow: scroll
     title-block-style: none
-    grid: 
+    grid:
       sidebar-width: 340px
       margin-width: 340px

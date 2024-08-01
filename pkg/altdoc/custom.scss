@@ -3,19 +3,27 @@
 @import url(http://fonts.googleapis.com/css?family=Source+Code+Pro:400italic,700italic,400,700);
 $font-family-sans-serif: 'Roboto';
 
-/* hcl(290, c(60, 65, 25), c(55, 45, 90)) */
+/* hcl(351, c(89.3, 22), c(41, 90)) */
 $body-color: #333333 !default;
-$link-color: #A270BF;
+$link-color: #b52267;
 $code-color: #333333;
-$navbar-bg: #F2E7FB;    
-$navbar-fg: #A270BF;    
-$navbar-hl: #A270BF;
-$sidebar-bg: #F2E7FB;    
+$navbar-bg: #ececec;
+$navbar-fg: #b52267;
+$navbar-hl: #b52267;
 $sidebar-fg: #333333;
-$sidebar-hl: #A270BF;
-$toc-color: #A270BF;
-$toc-hl: #A270BF;
+$sidebar-hl: #b52267;
+$toc-color: #b52267;
+$toc-hl: #b52267;
 
-.navbar-brand > img {
-  max-height: 70px;
+/*-- scss:rules --*/
+.navbar-brand-container {
+    a {
+        &.navbar-brand-logo {
+            margin: 0;
+            padding: 0;
+            img {
+                max-height: 1.6em;
+            }
+        }
+    }
 }

@@ -12,8 +12,8 @@ with parameter \code{lambda}.
 \usage{
 spois(x, lambda, parameter = "lambda", drop = TRUE)
 hpois(x, lambda, parameter = "lambda", drop = TRUE)
-mean_pois(lambda, drop =TRUE)
-var_pois(lambda, drop =TRUE)
+mean_pois(lambda, drop = TRUE)
+var_pois(lambda, drop = TRUE)
 }
 \arguments{
   \item{x}{vector of quantiles.}
