@@ -2,14 +2,15 @@
 
 <!-- README.md is generated from README.qmd via: quarto render README.qmd --to gfm -->
 
-<img src="https://topmodels.R-Forge.R-project.org/countreg/countreg.png" align="right" alt="countreg logo" width="150" />
+<img src="https://topmodels.R-Forge.R-project.org/countreg/countreg.png" align="right" alt="countreg logo" width="120" />
 
-# countreg: Count Data Regression in R
+# Count Data Regression
 
 ## Overview
 
-The core of the `countreg` package consists of functions for a variety
-of count data regression models:
+The core of the R package
+[countreg](https://topmodels.R-Forge.R-project.org/countreg/) consists
+of functions for a variety of count data regression models:
 
 -   `nbreg()`: *Negative binomial regression* (type 1 and 2), including
     both constant and varying dispersion parameters which can depend on
@@ -41,7 +42,8 @@ along with corresponding distribution objects.
 
 ## Installation
 
-The latest development version can be installed from R-universe:
+The latest development version can be installed from
+[R-universe](https://zeileis.R-universe.dev/countreg):
 
 ``` r
 install.packages("countreg", repos = "https://zeileis.R-universe.dev")
