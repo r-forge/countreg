@@ -15,10 +15,10 @@ For discussions we also try to follow these channels:
 
 * Achim Zeileis
   [![ORCID](orcid.svg){width=18px}](https://orcid.org/0000-0003-0918-3766)
-  [🌐](https://www.zeileis.org/)
+  [<i class="bi bi-globe" role="img" aria-label="Personal web page"></i>](https://www.zeileis.org/)
 * Christian Kleiber
   [![ORCID](orcid.svg){width=18px}](https://orcid.org/0000-0002-6781-4733)
-  [🌐](https://wwz.unibas.ch/en/kleiber/)
+  [<i class="bi bi-globe" role="img" aria-label="Personal web page"></i>](https://wwz.unibas.ch/en/kleiber/)
 * Thorsten Simon
   [![ORCID](orcid.svg){width=18px}](https://orcid.org/0000-0002-3778-7738)
 * Kevin Huynh
