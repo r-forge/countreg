@@ -15,8 +15,8 @@ website:
     image: countreg.png
     image-alt: 'countreg: Count Data Regression in R'
   navbar:
-    logo: "countreg-wide.png"
-    logo-alt: "countreg logo"
+    logo: countreg-wide.png
+    logo-alt: countreg logo
     title: false
     pinned: false
     search: true
@@ -53,16 +53,25 @@ website:
         file: NEWS.md
       - text: Citation
         file: CITATION.md
-    right:
       - text: Contact
         file: contact.qmd
-      - icon: code
+    right:
+      - icon: mastodon
+        href: https://fosstodon.org/@zeileis
+        aria-label: "@zeileis@fosstodon.org"
+        target: _blank
+      - icon: twitter-x
+        href: https://x.com/AchimZeileis
+        aria-label: "@AchimZeileis"
+        target: _blank
+      - icon: code-square
         href: https://R-Forge.R-project.org/projects/countreg
         aria-label: countreg @ R-Forge
+        target: _blank
   sidebar:
     - id: documentation
-      title: "Documentation"
-      style: "floating"
+      title: Documentation
+      style: floating
       collapse-level: 1
       contents:
         - section: Negative binomial regression
@@ -158,6 +167,8 @@ format:
     code-copy: true
     code-overflow: scroll
     title-block-style: none
+    email-obfuscation: javascript
+    link-external-newwindow: true
     grid:
       sidebar-width: 340px
       margin-width: 340px
