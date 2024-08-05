@@ -27,3 +27,19 @@ $toc-hl: #b52267;
         }
     }
 }
+
+// Adjusting height of ORCID icon on conctacts page
+.content {
+    section {
+        #authors-and-contributors {    
+            ul {
+                a {
+                    img {
+                        width: 1.05em;
+                        padding-bottom: 0.2em;
+                    }
+                }
+            }
+        }
+    }
+}
