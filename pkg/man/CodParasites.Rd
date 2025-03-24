@@ -98,10 +98,11 @@ BIC(cp_p, cp_nb, cp_hp, cp_hnb)
 ## rootograms
 if(require("topmodels")) {
 par(mfrow = c(2, 2))
-rootogram(cp_p, max = 50, main = "Poisson")
-rootogram(cp_nb, max = 50, main = "Negative Binomial")
-rootogram(cp_hp, max = 50, main = "Hurdle Poisson")
-rootogram(cp_hnb, max = 50, main = "Hurdle Negative Binomial")
+br <- 0:51 - 0.5
+rootogram(cp_p, breaks = br, main = "Poisson")
+rootogram(cp_nb, breaks = br, main = "Negative Binomial")
+rootogram(cp_hp, breaks = br, main = "Hurdle Poisson")
+rootogram(cp_hnb, breaks = br, main = "Hurdle Negative Binomial")
 }
 }
 
