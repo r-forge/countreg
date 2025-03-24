@@ -124,6 +124,8 @@ website:
               file: man/zitest.qmd
         - section: Data sets
           contents:
+            - text: CodParasites
+              file: man/CodParasites.qmd
             - text: CrabSatellites
               file: man/CrabSatellites.qmd
             - text: GSOEP
