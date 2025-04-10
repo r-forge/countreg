@@ -7,13 +7,7 @@ website:
   site-url: https://topmodels.R-Forge.R-project.org/countreg/
   favicon: countreg.png
   image: countreg.png
-  open-graph:
-    image: countreg.png
-  twitter-card:
-    site: '@AchimZeileis'
-    card-style: summary
-    image: countreg.png
-    image-alt: 'countreg: Count Data Regression in R'
+  open-graph: true
   navbar:
     logo: countreg-wide.png
     logo-alt: countreg logo
@@ -60,9 +54,9 @@ website:
         href: https://fosstodon.org/@zeileis
         aria-label: "@zeileis@fosstodon.org"
         target: _blank
-      - icon: twitter-x
-        href: https://x.com/AchimZeileis
-        aria-label: "@AchimZeileis"
+      - text: "{{< iconify fa6-brands:bluesky >}}"
+        href: https://bsky.app/profile/zeileis.org
+        aria-label: "@zeileis.org"
         target: _blank
       - icon: code-square
         href: https://R-Forge.R-project.org/projects/countreg
